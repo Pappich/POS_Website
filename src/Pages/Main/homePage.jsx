@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import CategoryCard from "../../Components/categoryCard";
 
+//change style cart
 const CartIcon = () => {
   return (
     <div className="relative bounce">
