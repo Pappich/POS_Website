@@ -1,18 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
-import HomePage from './Pages/Main/homePage';
-import Menu from './Pages/Main/Drinks/menuList';
-import MenuDetail from './Pages/Main/Drinks/menuDetail';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import logo from "./logo.svg";
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./Pages/Owner/SetupShop/login";
+import GuideLine from "./Pages/Owner/SetupShop/guideLine";
+import ForgotPassword from "./Pages/Owner/SetupShop/forgotPassword";
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/menu/:id" element={<MenuDetail />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/guideline" element={<GuideLine />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </div>
     </Router>
