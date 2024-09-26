@@ -7,7 +7,7 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-    navigate("/");
+    navigate("/enter-otp");
   };
 
   const handleSignIn = () => {

@@ -1,6 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const GuideLine = () => {
+  const navigate = useNavigate();
+  const handleStart = () => {
+    navigate("/main-menu");
+  };
+
   return (
     <div className="font-noto flex flex-col items-center justify-center min-h-screen bg-white">
       <div className="mb-8 text-center">
@@ -14,10 +20,8 @@ const GuideLine = () => {
         {[
           "สร้างรายการสินค้าที่ต้องการ",
           "เพิ่มกลุ่มรายการสินค้า",
-          "เลือกสินค้าที่ต้องการเพิ่มในแต่ละหมวดหมู่",
           "เพิ่มตัวเลือกสำหรับใช้ในรายการสินค้า",
-          "เลือกสินค้าที่ต้องการเพิ่มตัวเลือกในรายการ",
-          "เพิ่มการตัดสต็อกในแต่ละรายการสินค้า",
+          "เพิ่มการตัดการสต็อคในแต่ละรายการสินค้า",
         ].map((step, index) => (
           <div
             key={index}
@@ -31,7 +35,10 @@ const GuideLine = () => {
         ))}
       </div>
 
-      <button className="mt-10 w-4/5 max-w-lg px-6 py-2 bg-[#D4B28C] text-white font-semibold rounded-full hover:bg-[#c9a07e] transition">
+      <button
+        className="mt-10 w-4/5 max-w-lg px-6 py-2 bg-[#D4B28C] text-white font-semibold rounded-full hover:bg-[#c9a07e] transition"
+        onClick={handleStart}
+      >
         เริ่มต้น
       </button>
     </div>
