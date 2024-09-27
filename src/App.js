@@ -9,6 +9,9 @@ import AddProductForm from "./Pages/Owner/SetupShop/addProduct/addProductForm";
 import EnterOTP from "./Pages/Owner/SetupShop/forgotPassword/enterOTP";
 import EnterNewPassword from "./Pages/Owner/SetupShop/forgotPassword/enterNewpassword";
 import ProductList from "./Pages/Owner/SetupShop/addProduct/productList";
+import GroupList from "./Pages/Owner/SetupShop/addGroup/groupList";
+import AddGroupForm from "./Pages/Owner/SetupShop/addGroup/addGroupForm";
+import GroupMenu from "./Pages/Owner/SetupShop/addGroup/groupMenu";
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
           <Route path="/main-menu" element={<MainMenu />} />
           <Route path="/add-product" element={<AddProductForm />} />
           <Route path="/product-list" element={<ProductList />} />
+          <Route path="/group-list" element={<GroupList />} />
+          <Route path="/add-group" element={<AddGroupForm />} />
+          <Route path="/group-menu" element={<GroupMenu />} />
         </Routes>
       </div>
     </Router>

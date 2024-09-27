@@ -4,57 +4,68 @@ import { useNavigate } from "react-router-dom";
 
 const MainMenu = () => {
   const navigate = useNavigate();
-  const [disabledIcons, setDisabledIcons] = useState([
-    "category",
-    "options",
-    "inventory",
-  ]);
+
+  const [enabledSteps, setEnabledSteps] = useState(["product"]);
 
   const icons = [
     {
-      id: "add-product",
+      id: "product",
       label: "เพิ่มรายการสินค้า",
       icon: <FaUtensils size={50} />,
-      disabled: false,
+      disabled: !enabledSteps.includes("product"),
     },
     {
-      id: "category",
-      label: "เพิ่มหมวดหมู่",
+      id: "group",
+      label: "เพิ่มกลุ่มรายการสินค้า",
       icon: <FaList size={50} />,
-      disabled: true,
+      disabled: !enabledSteps.includes("group"),
     },
     {
       id: "options",
       label: "เพิ่มตัวเลือก",
       icon: <FaThLarge size={50} />,
-      disabled: true,
+      disabled: !enabledSteps.includes("options"),
     },
     {
-      id: "inventory",
+      id: "stock",
       label: "เพิ่มการตัดคลังสินค้า",
       icon: <FaBox size={50} />,
-      disabled: true,
+      disabled: !enabledSteps.includes("stock"),
     },
   ];
 
   const handleClick = (id) => {
-    if (!disabledIcons.includes(id)) {
-      if (id === "add-product") {
+    if (enabledSteps.includes(id)) {
+      if (id === "product") {
+        unlockNextStep("group");
         navigate("/product-list");
-      } else {
-        alert(`click menu ${id}`);
+      } else if (id === "group") {
+        unlockNextStep("options");
+        navigate("/group-list");
+      } else if (id === "options") {
+        unlockNextStep("stock");
+        navigate("/options-list");
+      } else if (id === "stock") {
+        navigate("/stock-list");
       }
     }
   };
 
+  // ENABLE NEXT STEP
+  const unlockNextStep = (nextStepId) => {
+    if (!enabledSteps.includes(nextStepId)) {
+      setEnabledSteps((prevSteps) => [...prevSteps, nextStepId]);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-xl font-bold mb-6">
+    <div className="w-full flex flex-col items-center">
+      <h1 className="text-xl font-bold mb-8">
         จัดการเมนู / สินค้า{" "}
         <span className="text-orange-400 text-sm ml-1">ℹ️</span>
       </h1>
 
-      <div className="flex justify-center space-x-8">
+      <div className="w-full flex justify-center space-x-24">
         {icons.map(({ id, label, icon, disabled }) => (
           <div
             key={id}
