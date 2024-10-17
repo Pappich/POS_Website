@@ -12,6 +12,13 @@ import ProductList from "./Pages/Owner/SetupShop/addProduct/productList";
 import GroupList from "./Pages/Owner/SetupShop/addGroup/groupList";
 import AddGroupForm from "./Pages/Owner/SetupShop/addGroup/addGroupForm";
 import GroupMenu from "./Pages/Owner/SetupShop/addGroup/groupMenu";
+import ChoiceList from "./Pages/Owner/SetupShop/addChioce/choiceList";
+import ChoiceOptions from "./Pages/Owner/SetupShop/addChioce/choiceOption";
+import GlassChoice from "./Pages/Owner/SetupShop/addChioce/glassChoice";
+import TypeChoice from "./Pages/Owner/SetupShop/addChioce/typeChoice";
+import ToppingChoice from "./Pages/Owner/SetupShop/addChioce/toppingChoice";
+import SweetLevelChoice from "./Pages/Owner/SetupShop/addChioce/sweetLevelChoice";
+import ChoiceMenu from "./Pages/Owner/SetupShop/addChioce/choiceMenu";
 
 function App() {
   return (
@@ -23,12 +30,23 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/enter-otp" element={<EnterOTP />} />
           <Route path="/enter-new-password" element={<EnterNewPassword />} />
+
           <Route path="/main-menu" element={<MainMenu />} />
+
           <Route path="/add-product" element={<AddProductForm />} />
           <Route path="/product-list" element={<ProductList />} />
+
           <Route path="/group-list" element={<GroupList />} />
           <Route path="/add-group" element={<AddGroupForm />} />
           <Route path="/group-menu" element={<GroupMenu />} />
+
+          <Route path="/choice-list" element={<ChoiceList />} />
+          <Route path="/choice-option" element={<ChoiceOptions />} />
+          <Route path="/glass-choice" element={<GlassChoice />} />
+          <Route path="/topping-choice" element={<ToppingChoice />} />
+          <Route path="/type-choice" element={<TypeChoice />} />
+          <Route path="/sweet-level-choice" element={<SweetLevelChoice />} />
+          <Route path="/choice-menu" element={<ChoiceMenu />} />
         </Routes>
       </div>
     </Router>

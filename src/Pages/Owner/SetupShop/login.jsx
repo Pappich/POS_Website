@@ -11,15 +11,15 @@ const Login = () => {
   const [input, setInput] = useState("");
   const [keyboardLanguage, setKeyboardLanguage] = useState("th");
 
-  useEffect(() => {
-    if (showKeyboard) {
-      // Center the page when keyboard is shown
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }, [showKeyboard]);
+  // useEffect(() => {
+  //   if (showKeyboard) {
+  //     // Center the page when keyboard is shown
+  //     window.scrollTo({
+  //       top: document.body.scrollHeight,
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // }, [showKeyboard]);
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
@@ -59,8 +59,8 @@ const Login = () => {
               value={input}
               placeholder="กรอกชื่อผู้ใช้..."
               className="w-full py-2 px-3 bg-transparent outline-none text-gray-700"
-              onFocus={() => setShowKeyboard(true)}
-              onBlur={() => setShowKeyboard(false)}
+              // onFocus={() => setShowKeyboard(true)}
+              // onBlur={() => setShowKeyboard(false)}
             />
           </div>
         </div>
@@ -76,8 +76,8 @@ const Login = () => {
               id="password"
               placeholder="กรอกรหัสผ่าน..."
               className="w-full py-2 px-3 bg-transparent outline-none text-gray-700"
-              onFocus={() => setShowKeyboard(true)}
-              onBlur={() => setShowKeyboard(false)}
+              // onFocus={() => setShowKeyboard(true)}
+              // onBlur={() => setShowKeyboard(false)}
             />
             <button
               type="button"
