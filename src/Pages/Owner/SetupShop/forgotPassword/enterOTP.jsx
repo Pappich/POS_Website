@@ -21,11 +21,13 @@ const EnterOTP = () => {
   };
 
   return (
-    <div className="font-noto flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="font-noto flex flex-col items-center min-h-screen bg-white">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl text-black mb-2 text-left">กรุณากรอกเลข OTP</h2>
         <p className="text-primaryRegular text-gray-500 mb-6 text-left">
-          ที่ส่งไปยังอีเมล pappich.2002@gmail.com เพื่อตั้งค่ารหัสผ่านใหม่
+          ที่ส่งไปยังอีเมล
+          <strong> pappich.2002@gmail.com </strong>
+          เพื่อตั้งค่ารหัสผ่านใหม่
         </p>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
         <div className="mb-4">

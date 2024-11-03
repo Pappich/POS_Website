@@ -8,7 +8,7 @@ const GuideLine = () => {
   };
 
   return (
-    <div className="font-noto flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="font-noto flex flex-col items-center min-h-screen bg-white">
       <div className="mb-8 text-center">
         <h1 className="text-xl font-semibold text-black mb-2">
           ขั้นตอนการตั้งค่าเพื่อใช้งานระบบการขายหน้าร้าน
