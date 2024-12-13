@@ -171,7 +171,7 @@ const ToppingChoice = () => {
 
             <button
               onClick={addChoice}
-              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold hover:bg-[#c9a07e] transition mt-4"
+              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-4"
             >
               + เพิ่มช้อยส์
             </button>

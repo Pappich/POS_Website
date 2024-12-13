@@ -8,6 +8,7 @@ const GlassChoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [choices, setChoices] = useState([{ name: "", price: "" }]);
 
   const handleNext = () => {
     if (step === 3) {
@@ -64,6 +65,16 @@ const GlassChoice = () => {
     },
   ];
 
+  const handleChoiceChange = (index, field, value) => {
+    const updatedChoices = [...choices];
+    updatedChoices[index][field] = value;
+    setChoices(updatedChoices);
+  };
+
+  const addChoice = () => {
+    setChoices((prev) => [...prev, { name: "", price: "" }]);
+  };
+
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const handleSelectMenu = (menu) => {
@@ -118,52 +129,49 @@ const GlassChoice = () => {
               <span className="text-[#D4B28C] ml-2"> ขนาดแก้ว</span>
             </div>
 
+            <div className="grid grid-cols-2 mb-4 w-full">
+              <div className="font-bold mb-2">ชื่อช้อยส์</div>
+              <div className="font-bold mb-2 ml-4">
+                ส่วนต่างของราคาที่คิดเพิ่ม (บาท)
+              </div>
+            </div>
+
             {/* Form Section */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-6">
+            {choices.map((choice, index) => (
+              <div className="grid grid-cols-2 gap-6 mb-4 w-full">
                 {/* Left Column */}
                 <div>
-                  <label className="block font-bold mb-2">ชื่อช้อยส์</label>
                   <input
                     type="text"
                     placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                    value={choice.name}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "name", e.target.value)
+                    }
                     className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 mb-2"
                   />
-                  <input
-                    type="text"
-                    placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
-                  />
-                  <input
-                    type="text"
-                    placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
-                  />
                 </div>
-
                 {/* Right Column */}
                 <div>
-                  <label className="block font-bold mb-2">
-                    ส่วนต่างของราคาที่คิดเพิ่ม (บาท)
-                  </label>
                   <input
                     type="text"
                     placeholder="ยังไม่มีข้อมูล..."
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
-                  />
-                  <input
-                    type="text"
-                    placeholder="ยังไม่มีข้อมูล..."
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
-                  />
-                  <input
-                    type="text"
-                    placeholder="ยังไม่มีข้อมูล..."
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
+                    value={choice.price}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "price", e.target.value)
+                    }
+                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
                 </div>
               </div>
-            </div>
+            ))}
+
+            <button
+              onClick={addChoice}
+              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-4"
+            >
+              + เพิ่มช้อยส์
+            </button>
           </>
         );
       case 2:

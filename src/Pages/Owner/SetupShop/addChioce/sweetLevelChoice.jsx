@@ -8,6 +8,7 @@ const SweetLevelChoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [choices, setChoices] = useState([{ name: "" }]);
 
   const handleNext = () => {
     if (step === 3) {
@@ -63,6 +64,16 @@ const SweetLevelChoice = () => {
       ],
     },
   ];
+
+  const handleChoiceChange = (index, field, value) => {
+    const updatedChoices = [...choices];
+    updatedChoices[index][field] = value;
+    setChoices(updatedChoices);
+  };
+
+  const addChoice = () => {
+    setChoices((prev) => [...prev, { name: "" }]);
+  };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -120,26 +131,29 @@ const SweetLevelChoice = () => {
 
             {/* Form Section */}
             <div className="w-full">
-              {/* Left Column */}
-              <div>
+              <div className="space-y-4 w-full">
                 <label className="block font-bold mb-2">ชื่อช้อยส์</label>
-                <input
-                  type="text"
-                  placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 mb-2"
-                />
-                <input
-                  type="text"
-                  placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
-                />
-                <input
-                  type="text"
-                  placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400  mb-2"
-                />
+                {choices.map((choice, index) => (
+                  <div key={index}>
+                    <input
+                      type="text"
+                      placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                      value={choice.name}
+                      onChange={(e) =>
+                        handleChoiceChange(index, "name", e.target.value)
+                      }
+                    />
+                  </div>
+                ))}
               </div>
             </div>
+            <button
+              onClick={addChoice}
+              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-4"
+            >
+              + เพิ่มช้อยส์
+            </button>
           </>
         );
       case 2:

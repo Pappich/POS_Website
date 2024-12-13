@@ -19,12 +19,15 @@ import TypeChoice from "./Pages/Owner/SetupShop/addChioce/typeChoice";
 import ToppingChoice from "./Pages/Owner/SetupShop/addChioce/toppingChoice";
 import SweetLevelChoice from "./Pages/Owner/SetupShop/addChioce/sweetLevelChoice";
 import ChoiceMenu from "./Pages/Owner/SetupShop/addChioce/choiceMenu";
+import StockList from "./Pages/Owner/SetupShop/addStock/stockList";
+import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
 
 function App() {
   return (
     <Router>
       <div className="p-10 border-[40px] border-white min-h-screen">
         <Routes>
+          {/* main flow */}
           <Route path="/" element={<Login />} />
           <Route path="/guideline" element={<GuideLine />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -33,13 +36,16 @@ function App() {
 
           <Route path="/main-menu" element={<MainMenu />} />
 
+          {/* add product flow */}
           <Route path="/add-product" element={<AddProductForm />} />
           <Route path="/product-list" element={<ProductList />} />
 
+          {/* add group flow */}
           <Route path="/group-list" element={<GroupList />} />
           <Route path="/add-group" element={<AddGroupForm />} />
           <Route path="/group-menu" element={<GroupMenu />} />
 
+          {/* add choice flow */}
           <Route path="/choice-list" element={<ChoiceList />} />
           <Route path="/choice-option" element={<ChoiceOptions />} />
           <Route path="/glass-choice" element={<GlassChoice />} />
@@ -47,6 +53,10 @@ function App() {
           <Route path="/type-choice" element={<TypeChoice />} />
           <Route path="/sweet-level-choice" element={<SweetLevelChoice />} />
           <Route path="/choice-menu" element={<ChoiceMenu />} />
+
+          {/* add stock flow */}
+          <Route path="/stock-list" element={<StockList />} />
+          <Route path="/add-stock" element={<AddStockForm />} />
         </Routes>
       </div>
     </Router>
