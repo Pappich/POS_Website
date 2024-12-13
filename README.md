@@ -1,70 +1,61 @@
-# Getting Started with Create React App
+# POS_Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository is for a Point of Sale (POS) system website that includes interfaces for Owners, Customers, and Employees.
 
-## Available Scripts
+## Development Timeline
 
-In the project directory, you can run:
+### Week 7-8 [Date: 19-30 Aug 2024]
 
-### `npm start`
+#### Owner Page
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- หน้า Login
+- หน้า Forgot Password
+- หน้ารายละเอียดการใช้งาน (Guideline)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Week 9-10 [Date: 2-13 Sep 2024]
 
-### `npm test`
+#### Owner Page
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- หน้า Category
+- หน้าเพิ่มรายการสินค้า
+  - หน้ากรอกชื่อสินค้า
+  - หน้ากรอกรายละเอียดสินค้า
+  - อัพโหลดรูปภาพสินค้า
+  - กรอกราคาสินค้า
+  - สรุปรายการสินค้า
 
-### `npm run build`
+### Week 11 [Date: 16-20 Sep 2024]
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Owner Page
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- หน้าดู List รายการสินค้า
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Week 12 [Date: 23-27 Sep 2024]
 
-### `npm run eject`
+#### Owner Page
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- หน้าหมวดหมู่รายการสินค้า
+  - หน้ากรอกชื่อหมวดหมู่
+  - หน้าเลือกเมนูที่ต้องการเพิ่ม
+  - หน้าสรุปรายการหมวดหมู่
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Week 13 [Date: 30 Sep-4 Oct 2024]
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+#### Owner Page
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- หน้าตัวเลือกรายการสินค้า
+  - หน้ากรอกชื่อตัวเลือก
+  - หน้าเพิ่ม choice ตัวเลือก
+  - Pop up add choice
+  - หน้าเลือก menu ที่ใช้ตัวเลือก
 
-## Learn More
+### Week 14 [Date: 21-25 Oct 2024]
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Owner Page
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- เพิ่ม ลบ แก้ไข รายการขายสินค้า
 
-### Code Splitting
+#### Customer Page
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- หน้าดูรายการสินค้า
+- หน้าดูรายละเอียดของสินค้า
