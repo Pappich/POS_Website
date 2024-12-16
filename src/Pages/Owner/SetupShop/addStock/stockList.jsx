@@ -72,9 +72,9 @@ const StockList = () => {
           <button
             key={index}
             onClick={() => handleCategoryClick(categoryItem)}
-            className={`px-6 py-3 rounded-full border border-[#DD9F52] font-bold ml-2 ${
+            className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold ml-2 ${
               selectedCategory === categoryItem
-                ? "bg-[#FFA726] text-white"
+                ? "bg-[#D4B28C] text-white"
                 : "bg-white text-[#DD9F52]"
             }`}
           >

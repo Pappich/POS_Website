@@ -1,68 +1,85 @@
 import React, { useState } from "react";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
+// import "./VirtualKeyboard.css"; // Optional custom styles for additional styling.
 
 const VirtualKeyboard = ({ input, setInput }) => {
   const [layout, setLayout] = useState("default");
-  const [language, setLanguage] = useState("th");
+  const [language, setLanguage] = useState("english");
 
-  const onChange = (input) => {
-    setInput(input);
+  const handleKeyPress = (button) => {
+    if (button === "{shift}" || button === "{lock}") {
+      handleShift();
+    } else if (button === "{language}") {
+      toggleLanguage();
+    } else if (button === "{bksp}") {
+      setInput(input.slice(0, -1));
+    } else if (button === "{space}") {
+      setInput(input + " ");
+    } else {
+      setInput(input + button);
+    }
   };
 
-  const handleLanguageSwitch = () => {
-    setLanguage(language === "th" ? "en" : "th");
+  const handleShift = () => {
+    setLayout(layout === "default" ? "shift" : "default");
   };
 
-  const layouts = {
-    en: {
+  const toggleLanguage = () => {
+    setLanguage(language === "english" ? "thai" : "english");
+  };
+
+  const keyboardLayouts = {
+    english: {
       default: [
-        "q w e r t y u i o p [ ]",
-        "a s d f g h j k l ; '",
-        "z x c v b n m , . /",
-        "{shift} {space} {backspace}",
+        "q w e r t y u i o p",
+        "a s d f g h j k l",
+        "{shift} z x c v b n m {bksp}",
+        "{language} {space}",
       ],
       shift: [
-        "Q W E R T Y U I O P { }",
-        'A S D F G H J K L : "',
-        "Z X C V B N M < > ?",
-        "{shift} {space} {backspace}",
+        "Q W E R T Y U I O P",
+        "A S D F G H J K L",
+        "{shift} Z X C V B N M {bksp}",
+        "{language} {space}",
       ],
     },
-    th: {
+    thai: {
       default: [
-        "ๆ ไ ำ พ ะ ก น ย ล ว ะ ั",
-        "ฟ ห ด ต ้ แ ข ่ า ส ว",
-        "ป ็ เ ข บ ท ร ม , . /",
-        "{shift} {space} {backspace}",
+        "ฟ ภ ม ร ธ ย จ ว บ ล",
+        "ด ถ ิ ั ส น บ อ",
+        "{shift} บ ฤ ี ญ ท ร ื {bksp}",
+        "{language} {space}",
       ],
       shift: [
-        '๐ " ฑ ณ ษ ศ ซ ม ห ฐ ณ ฒ',
-        "ผ ฝ ฎ ภ ฤ ฏ ธ ถ ถ ภ",
-        "ป ช ฯ ญ ญ พ ฒ พ ง ๆ ๆ",
-        "{shift} {space} {backspace}",
+        "ู ื ฝ ั ร แ น ส ร",
+        "เ ิ ำ ก ้ ๊",
+        "{shift} ะ ์ ๊ ห เ ฤ แ {bksp}",
+        "{language} {space}",
       ],
     },
   };
 
   return (
-    <div
-      className="keyboard-container fixed bottom-0 left-0 w-full bg-gray-200 p-4"
-      onMouseDown={(e) => e.preventDefault()} // Prevents blur on keyboard clicks
-    >
+    <div>
       <Keyboard
+        onKeyPress={handleKeyPress}
+        layout={keyboardLayouts[language]}
         layoutName={layout}
-        onChange={onChange}
-        layout={layouts[language]}
         display={{
-          "{space}": "Space",
-          "{backspace}": "Backspace",
-          "{shift}": "Shift",
+          "{bksp}": "⌫",
+          "{shift}": "⇧",
+          "{space}": "␣",
+          "{lock}": "⇪",
+          "{language}": language === "english" ? "ไทย" : "ENG",
         }}
+        buttonTheme={[
+          {
+            class: "function-keys",
+            buttons: "{bksp} {shift} {language} {space}",
+          },
+        ]}
       />
-      <button onClick={handleLanguageSwitch} className="mt-2">
-        {language === "th" ? "Switch to English" : "Switch to Thai"}
-      </button>
     </div>
   );
 };
