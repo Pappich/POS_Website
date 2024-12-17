@@ -21,6 +21,7 @@ import SweetLevelChoice from "./Pages/Owner/SetupShop/addChioce/sweetLevelChoice
 import ChoiceMenu from "./Pages/Owner/SetupShop/addChioce/choiceMenu";
 import StockList from "./Pages/Owner/SetupShop/addStock/stockList";
 import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
+import Order from "./Pages/Employee/main/order";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           {/* add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
+          <Route path="/order-list" element={<Order />} />
         </Routes>
       </div>
     </Router>
