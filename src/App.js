@@ -22,6 +22,8 @@ import ChoiceMenu from "./Pages/Owner/SetupShop/addChioce/choiceMenu";
 import StockList from "./Pages/Owner/SetupShop/addStock/stockList";
 import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
 import Order from "./Pages/Employee/main/order";
+import Home from "./Pages/Owner/SaleSummary/OverView/home";
+import OrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/orderSummary";
 
 function App() {
   return (
@@ -59,6 +61,10 @@ function App() {
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
           <Route path="/order-list" element={<Order />} />
+
+          {/* sale summary */}
+          <Route path="/overview" element={<Home />} />
+          <Route path="/order-summary" element={<OrderSummary />} />
         </Routes>
       </div>
     </Router>
