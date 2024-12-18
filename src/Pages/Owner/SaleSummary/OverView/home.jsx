@@ -1,6 +1,7 @@
 import React from "react";
 import SideBar from "../../../../Components/sideBar";
 import CalendarSelect from "../../../../Components/calendarSelect";
+import IncomeOrderCancel from "../../../../Components/incomeOrderCancel";
 
 const Home = () => {
   const myName = [
@@ -13,7 +14,10 @@ const Home = () => {
     <div>
       <SideBar menuTab={"overview"} />
       <h1 className="font-bold">ภาพรวมการขาย</h1>
-      <CalendarSelect/>
+      <span className="flex justify-end">
+        <CalendarSelect />
+      </span>
+      <IncomeOrderCancel />
     </div>
   );
 };

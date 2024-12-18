@@ -6,7 +6,7 @@ const CalendarSelect = () => {
     <div>
       <button
         type="button"
-        class="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-1 py-0.2 me-2 mb-2 "
+        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-1 py-0.2  mb-2 "
       >
         <div className="flex">
           <CiCalendar size={17} />
