@@ -1,5 +1,6 @@
 import React from "react";
 import SideBar from "../../../../Components/sideBar";
+import CalendarSelect from "../../../../Components/calendarSelect";
 
 const Home = () => {
   const myName = [
@@ -10,8 +11,9 @@ const Home = () => {
 
   return (
     <div>
-      <SideBar />
-      <h1 className="font-bold">ออเดอร์ทั้งหมด</h1>
+      <SideBar menuTab={"overview"} />
+      <h1 className="font-bold">ภาพรวมการขาย</h1>
+      <CalendarSelect/>
     </div>
   );
 };

@@ -24,6 +24,9 @@ import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
 import Order from "./Pages/Employee/main/order";
 import Home from "./Pages/Owner/SaleSummary/OverView/home";
 import OrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/orderSummary";
+import SaleSummaryGraph from "./Pages/Owner/SaleSummary/SaleSummaryGraph/saleSummaryGraph";
+import Stock from "./Pages/Owner/SaleSummary/Stock/stock";
+import NotificationSummary from "./Pages/Owner/SaleSummary/NotificationSummary/notificationSummary";
 
 function App() {
   return (
@@ -65,6 +68,9 @@ function App() {
           {/* sale summary */}
           <Route path="/overview" element={<Home />} />
           <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
+          <Route path="/stock" element={<Stock />} />
+          <Route path="/notification-summary" element={<NotificationSummary />} />
         </Routes>
       </div>
     </Router>

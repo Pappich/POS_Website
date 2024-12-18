@@ -1,7 +1,7 @@
 import React from "react";
 import SideBar from "../../../../Components/sideBar";
 
-const OrderSummary = () => {
+const SaleSummaryGraph = () => {
   const myName = [
     { name: "Tot", age: 5 },
     { name: "T", age: 51 },
@@ -10,10 +10,10 @@ const OrderSummary = () => {
 
   return (
     <div>
-      <SideBar menuTab={"orderSummary"} />
-      <h1 className="font-bold">นี่คือหน้า Order Summary</h1>
+      <SideBar menuTab={"saleSummaryGraph"} />
+      <h1 className="font-bold">นี่คือหน้า SaleSummaryGraph</h1>
     </div>
   );
 };
 
-export default OrderSummary;
+export default SaleSummaryGraph;
