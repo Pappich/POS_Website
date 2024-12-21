@@ -12,9 +12,9 @@ const Home = () => {
   ];
 
   return (
-    <div >
+    <div>
       <SideBar menuTab={"overview"} />
-      <h1 className="font-bold">ภาพรวมการขาย</h1>
+      <h1 className="font-bold text-xl">ภาพรวมการขาย</h1>
       <span className="flex justify-end">
         <CalendarSelect />
       </span>
