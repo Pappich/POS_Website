@@ -1,19 +1,28 @@
 import React from "react";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  BarElement,
+  LineElement,
+  PointElement,
   CategoryScale,
   LinearScale,
   Tooltip,
   Legend,
 } from "chart.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend
+);
 ChartJS.defaults.font.family = "Noto Sans Thai";
 ChartJS.defaults.font.size = 16;
 ChartJS.defaults.color = "black";
-const BarChart = () => {
+
+const LineChart = () => {
   const data = {
     labels: [
       "ม.ค.",
@@ -35,8 +44,14 @@ const BarChart = () => {
         data: [
           50000, 10000, 40000, 30000, 60000, 50000, 80000, 70000, 90000, 60000,
           70000, 40000,
-        ], // Monthly data
-        backgroundColor: "#A3C4DC", // Light blue color
+        ],
+        borderColor: "#A3C4DC", // Light blue line color
+        backgroundColor: "rgba(163, 196, 220, 0.3)", // Transparent fill color
+        fill: true, // Enable area under the line to be filled
+        tension: 0, // Smooth curve
+        pointStyle: "circle",
+        pointBorderColor: "#A3C4DC",
+        pointBackgroundColor: "#A3C4DC",
       },
     ],
   };
@@ -50,8 +65,8 @@ const BarChart = () => {
         display: true,
         position: "bottom", // Move the legend to the bottom
         labels: {
-          usePointStyle: true, // Makes the marker a square or circle
-          pointStyle: "rectRounded", // Use a square-like style
+          usePointStyle: true, // Makes the marker a circle
+          pointStyle: "rectRounded", // Use a circle style
           padding: 5, // Padding around the legend items
         },
       },
@@ -64,19 +79,24 @@ const BarChart = () => {
       },
       y: {
         beginAtZero: true,
+        border: {
+          display: false,
+          dash: [10, 15],
+          dashOffset: 4,
+        },
         ticks: { stepSize: 100 },
         grid: {
-          display: false, // Turn off the grid on the x-axis
+          color: "grey", // Turn off the grid on the y-axis
         },
       },
     },
   };
 
   return (
-    <div className="w-full h-64">
-      <Bar data={data} options={options} />
+    <div className="w-full h-96">
+      <Line data={data} options={options} />
     </div>
   );
 };
 
-export default BarChart;
+export default LineChart;
