@@ -7,7 +7,7 @@ const SaleSummaryGraph = () => {
   return (
     <div className="h-screen flex flex-col">
       <SideBar menuTab={"saleSummaryGraph"} />
-      <h1 className="font-bold">ภาพรวมยอดขาย</h1>
+      <h1 className="font-bold text-xl">ภาพรวมยอดขาย</h1>
       <span className="flex justify-end">
         <CalendarSelect />
       </span>
