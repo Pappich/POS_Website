@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import SideBar from "../../../../Components/sideBar";
 import { IoIosArrowDown } from "react-icons/io";
-
+import { useNavigate } from "react-router-dom";
+import { AiOutlineCheckCircle } from "react-icons/ai"; // Import success icon
 const AddOwnerProduct = () => {
+  const navigate = useNavigate();
   const [productImage, setProductImage] = useState(null);
   const [productName, setProductName] = useState("");
   const [productAmount, setProductAmount] = useState("");
@@ -15,7 +17,7 @@ const AddOwnerProduct = () => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isVolumeUnitDropdownOpen, setIsVolumeUnitDropdownOpen] =
     useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const categoryOptions = [
     "Option 1",
     "Option 2",
@@ -46,6 +48,19 @@ const AddOwnerProduct = () => {
   const handleSelectVolumeUnit = (option) => {
     setVolumeUnit(option);
     setIsVolumeUnitDropdownOpen(false);
+  };
+
+  const handleSave = () => {
+    setIsModalOpen(true); // Show modal on save
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    navigate("/stock"); // Navigate after closing modal
+  };
+
+  const handleBack = () => {
+    navigate("/stock");
   };
 
   return (
@@ -238,6 +253,39 @@ const AddOwnerProduct = () => {
               </div>
             </div>
           </div>
+          {/* Modal */}
+          {isModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-[400px] text-center">
+                <AiOutlineCheckCircle
+                  size={60}
+                  className="text-green-500 mx-auto"
+                />
+                <h2 className="font-bold text-lg my-4">บันทึกเสร็จสิ้น</h2>
+                <button
+                  className="px-4 py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                  onClick={closeModal}
+                >
+                  ปิด
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Save and Back buttons */}
+        <div className="flex mt-8 w-full justify-between">
+          <button
+            className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            onClick={handleBack}
+          >
+            ย้อนกลับ
+          </button>
+          <button
+            className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+            onClick={handleSave}
+          >
+            บันทึก
+          </button>
         </div>
       </div>
     </div>
