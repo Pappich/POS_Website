@@ -25,6 +25,33 @@ const Stock = () => {
   const [selectedTag, setSelectedTag] = useState("ทั้งหมด");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [stockData, setStockData] = useState([
+    { id: 1, name: "แก้วพลาสติก", quantity: "56 แถว", category: "อุปกรณ์" },
+    { id: 2, name: "วุ้นมะพร้าว", quantity: "20 ถุง", category: "ท็อปปิ้ง" },
+    { id: 3, name: "ผงชานม", quantity: "6 ถุง", category: "น้ำซุป" },
+    { id: 4, name: "ผงชาไทย", quantity: "12 ถุง", category: "น้ำซุป" },
+    {
+      id: 5,
+      name: "หลอดแบบพลาสติก",
+      quantity: "29 ถุง",
+      category: "อุปกรณ์",
+    },
+    {
+      id: 6,
+      name: "หลอดคละแบบพลาสติก",
+      quantity: "10 ถุง",
+      category: "อุปกรณ์",
+    },
+    { id: 7, name: "ฝาโดมแก้ว", quantity: "3 แถว 5 ฝา", category: "อุปกรณ์" },
+    {
+      id: 8,
+      name: "น้ำชาแอนป๋วย",
+      quantity: "9 ขวด 500 มิลลิลิตร",
+      category: "น้ำซุป",
+    },
+    { id: 9, name: "ไข่มุกแบบต้ม", quantity: "23 ถุง", category: "ท็อปปิ้ง" },
+  ]);
+
   const handleTagClick = (tag) => {
     setSelectedTag(tag);
   };
@@ -124,6 +151,64 @@ const Stock = () => {
               <span className="pl-2">เพิ่มรายการสินค้า</span>
             </div>
           </button>
+        </div>
+
+        {/* Table Section */}
+        <div className="overflow-x-auto border rounded-lg p-5">
+          <table className="border-collapse table-auto w-full">
+            <thead>
+              <tr>
+                <th className="py-2 pr-5 text-center border-b border-[#000000]">
+                  ลำดับที่
+                </th>
+                <th className="py-2 text-left border-b border-[#000000]">
+                  รายการสินค้า
+                </th>
+                <th className="px-1 py-2 border-b border-[#000000]">
+                  จำนวนคงเหลือ
+                </th>
+                <th className="pl-10 py-2 border-b border-[#000000]">
+                  หมวดหมู่
+                </th>
+                <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
+                  อัปเดต
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {stockData.map((item) => (
+                <tr
+                  key={item.id}
+                  onClick={() => navigate(`/product-detail?id=${item.id}`)}
+                  className="cursor-pointer hover:bg-gray-100"
+                >
+                  <td className="pr-5 text-center border-b border-[#F1F4F7]">
+                    {item.id}
+                  </td>
+                  <td className="py-2 break-words border-b border-[#F1F4F7]">
+                    {item.name}
+                  </td>
+                  <td className="py-2 text-center border-b border-[#F1F4F7]">
+                    {item.quantity}
+                  </td>
+                  <td className="py-2 pl-10 text-center border-b border-[#F1F4F7]">
+                    {item.category}
+                  </td>
+                  <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent the row click handler from firing
+                        alert(`Updating product: ${item.name}`);
+                      }}
+                      className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-2 py-0"
+                    >
+                      อัปเดต
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

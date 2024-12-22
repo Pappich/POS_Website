@@ -28,6 +28,7 @@ import SaleSummaryGraph from "./Pages/Owner/SaleSummary/SaleSummaryGraph/saleSum
 import Stock from "./Pages/Owner/SaleSummary/Stock/stock";
 import NotificationSummary from "./Pages/Owner/SaleSummary/NotificationSummary/notificationSummary";
 import AddOwnerProduct from "./Pages/Owner/SaleSummary/Stock/addOwnerProduct";
+import ProductDetail from "./Pages/Owner/SaleSummary/Stock/productDetail";
 
 function App() {
   return (
@@ -73,6 +74,7 @@ function App() {
           <Route path="/stock" element={<Stock />} />
           <Route path="/notification-summary" element={<NotificationSummary />} />
           <Route path="/add-owner-product" element={<AddOwnerProduct />} />
+          <Route path="/product-detail" element={<ProductDetail />} />
 
         </Routes>
       </div>
