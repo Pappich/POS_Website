@@ -1,0 +1,35 @@
+import React, { useState } from "react";
+
+const PaymentMethodFilter = () => {
+  const tags = ["ทั้งหมด", "QR CODE", "เงินสด"];
+  const [selectedTag, setSelectedTag] = useState("ทั้งหมด");
+
+  const handleTagClick = (tag) => {
+    setSelectedTag(tag);
+  };
+  return (
+    <div>
+      <div className="my-3">
+        <div className="flex items-center space-x-4">
+          <div>ช่องทางการชำระเงิน</div>
+          {/* Tags Section */}
+          {tags.map((tag, index) => (
+            <button
+              key={index}
+              onClick={() => handleTagClick(tag)}
+              className={`px-4 py-1  ${
+                selectedTag === tag
+                  ? "bg-[#C6B399] text-white rounded-full border"
+                  : "bg-white border-[#C6B399]"
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PaymentMethodFilter;

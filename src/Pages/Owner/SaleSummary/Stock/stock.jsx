@@ -139,8 +139,8 @@ const Stock = () => {
             </div>
           </div>
 
-          {/* ยอดออร์เดอร์ทั้งหมด */}
-          <div className="flex py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
+          {/* สินค้าที่ใกล้จะหมดอายุ */}
+          <div className="flex py-2 px-4 w-full bg-white border rounded-lg ">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
               <IoMdTime color="white" size={32} />
             </div>
