@@ -1,13 +1,26 @@
 import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import the CSS
+import { registerLocale, setLocale } from "react-datepicker";
+import th from "date-fns/locale/th"; // Import Thai locale from date-fns
 import SideBar from "../../../../Components/sideBar";
 import AddCategoryButton from "../../../../Components/addCategoryButton";
 import { LuInfo } from "react-icons/lu";
 import { IoMdTime } from "react-icons/io";
 import { IoWarningOutline } from "react-icons/io5";
 import { FiSearch } from "react-icons/fi"; // Import magnifier icon
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaRegCalendar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { FaMinus } from "react-icons/fa";
 
+// Register Thai locale
+const thLocaleWithMondayStart = {
+  ...th,
+  options: {
+    ...th.options,
+    weekStartsOn: 1, // Start the week on Monday (0 = Sunday, 1 = Monday)
+  },
+};
 const tags = [
   "ทั้งหมด",
   "อุปกรณ์",
@@ -24,7 +37,9 @@ const Stock = () => {
   const navigate = useNavigate();
   const [selectedTag, setSelectedTag] = useState("ทั้งหมด");
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [stockData, setStockData] = useState([
     { id: 1, name: "แก้วพลาสติก", quantity: "56 แถว", category: "อุปกรณ์" },
     { id: 2, name: "วุ้นมะพร้าว", quantity: "20 ถุง", category: "ท็อปปิ้ง" },
@@ -62,6 +77,16 @@ const Stock = () => {
 
   const handleAddOwnerProduct = () => {
     navigate("/add-owner-product");
+  };
+
+  const handleUpdateClick = (product) => {
+    setSelectedProduct(product);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedProduct(null);
   };
 
   return (
@@ -198,7 +223,7 @@ const Stock = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation(); // Prevent the row click handler from firing
-                        alert(`Updating product: ${item.name}`);
+                        handleUpdateClick(item);
                       }}
                       className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-2 py-0"
                     >
@@ -211,6 +236,67 @@ const Stock = () => {
           </table>
         </div>
       </div>
+      {/* Modal */}
+      {modalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white rounded-lg p-5 w-1/3">
+            <h2 className="text-lg font-bold mb-4">{selectedProduct.name}</h2>
+            <p>
+              <span className="font-bold pr-2">หมวดหมู่</span>
+              <span className="px-3 border border-[#613080] rounded-full text-[#613080]">
+                {selectedProduct.category}
+              </span>
+            </p>
+            <div className="font-bold">วันหมดอายุของสินค้า</div>
+            <div className="relative">
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                dateFormat="dd / MM / yyyy"
+                placeholderText="DD / MM / YYYY"
+                locale={thLocaleWithMondayStart}
+                className="pl-10 py-1 border border-[#C6B399] rounded-full font-noto"
+              />
+              {/* Calendar Icon */}
+              <FaRegCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C6B399] w-5 h-5" />
+            </div>
+
+            <div className="font-bold">ปริมาตรสุทธิต่อหน่วย</div>
+            <input
+              value={`1000 กรัม`}
+              type="text"
+              placeholder="กรอกชื่อสินค้า"
+              className="border border-[#D4B28C] rounded-full p-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+            />
+            <div className="font-bold">จำนวนคงเหลือในสต็อคสินค้า</div>
+            <div className="flex items-center">
+              <button
+                type="button"
+                className="px-2 py-2 flex text-white border border-[#A2DC94] bg-[#A2DC94] hover:text-[#A2DC94] hover:bg-white hover:border hover:border-[#A2DC94] rounded-full"
+              >
+                <FaPlus size={12} />
+              </button>
+              <div className="px-8 relative inline-block">
+                <span className="font-bold">{selectedProduct.quantity}</span>
+                <span className="absolute left-[10%] right-[10%] bottom-0 h-[1px] bg-[#848484]"></span>
+              </div>
+
+              <button
+                type="button"
+                className="px-2 py-2 flex text-white border border-[#DC9494] bg-[#DC9494] hover:text-[#DC9494] hover:bg-white hover:border hover:border-[#DC9494] rounded-full"
+              >
+                <FaMinus size={12} />
+              </button>
+            </div>
+            <button
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
