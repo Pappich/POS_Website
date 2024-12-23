@@ -239,61 +239,109 @@ const Stock = () => {
       {/* Modal */}
       {modalVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white rounded-lg p-5 w-1/3">
-            <h2 className="text-lg font-bold mb-4">{selectedProduct.name}</h2>
-            <p>
-              <span className="font-bold pr-2">หมวดหมู่</span>
-              <span className="px-3 border border-[#613080] rounded-full text-[#613080]">
-                {selectedProduct.category}
-              </span>
-            </p>
-            <div className="font-bold">วันหมดอายุของสินค้า</div>
-            <div className="relative">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
-                dateFormat="dd / MM / yyyy"
-                placeholderText="DD / MM / YYYY"
-                locale={thLocaleWithMondayStart}
-                className="pl-10 py-1 border border-[#C6B399] rounded-full font-noto"
-              />
-              {/* Calendar Icon */}
-              <FaRegCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C6B399] w-5 h-5" />
-            </div>
+          <div className="bg-white rounded-lg p-8 flex just flex-col h-[500px] w-[700px] relative">
+            {/* Product Name */}
+            <h2 className="text-lg font-bold text-center mb-4 absolute top-4 w-full">
+              ผงชานมใต้หวัน
+            </h2>
 
-            <div className="font-bold">ปริมาตรสุทธิต่อหน่วย</div>
-            <input
-              value={`1000 กรัม`}
-              type="text"
-              placeholder="กรอกชื่อสินค้า"
-              className="border border-[#D4B28C] rounded-full p-1 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-            />
-            <div className="font-bold">จำนวนคงเหลือในสต็อคสินค้า</div>
-            <div className="flex items-center">
-              <button
-                type="button"
-                className="px-2 py-2 flex text-white border border-[#A2DC94] bg-[#A2DC94] hover:text-[#A2DC94] hover:bg-white hover:border hover:border-[#A2DC94] rounded-full"
-              >
-                <FaPlus size={12} />
-              </button>
-              <div className="px-8 relative inline-block">
-                <span className="font-bold">{selectedProduct.quantity}</span>
-                <span className="absolute left-[10%] right-[10%] bottom-0 h-[1px] bg-[#848484]"></span>
+            {/* Modal Content */}
+            <div className="flex mt-10">
+              <div className="flex-shrink-0">
+                <img
+                  src="https://sordaotieam.com/cdn/shop/files/200.webp?v=1687934958"
+                  alt="product"
+                  className="object-cover w-auto h-[310px] rounded-md border-solid border-4 border-[#848484]"
+                />
               </div>
+              <div className="pl-8 flex-1">
+                {/* Category */}
+                <p className="mb-4">
+                  <span className="font-bold pr-2">หมวดหมู่</span>
+                  <span className="px-3 border border-[#613080] rounded-full text-[#613080]">
+                    น้ำชา
+                  </span>
+                </p>
 
+                {/* Expiry Date */}
+                <div className="mb-4">
+                  <div className="font-bold mb-2">วันหมดอายุของสินค้า</div>
+                  <div className="relative">
+                    <DatePicker
+                      selected={selectedDate}
+                      onChange={(date) => setSelectedDate(date)}
+                      dateFormat="dd / MM / yyyy"
+                      placeholderText="DD / MM / YYYY"
+                      locale={thLocaleWithMondayStart}
+                      className="pl-10 py-2 border border-[#C6B399] rounded-full "
+                    />
+                    <FaRegCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C6B399] w-5 h-5" />
+                  </div>
+                </div>
+
+                {/* Net Volume */}
+                <div className="mb-4">
+                  <div className="font-bold mb-2">ปริมาตรสุทธิต่อหน่วย</div>
+                  <div className="flex items-center">
+                    <input
+                      value="1000 กรัม"
+                      type="text"
+                      readOnly
+                      className="border border-[#D4B28C] rounded-full p-2 text-gray-600 focus:outline-none pr-8 mr-3"
+                    />
+                    <button
+                      type="button"
+                      className="px-4 text-[#C6B399] border border-[#C6B399] bg-white hover:bg-[#C6B399] hover:text-white rounded-full font-medium"
+                    >
+                      แก้ไข
+                    </button>
+                  </div>
+                </div>
+
+                {/* Stock Quantity */}
+                <div className="mb-4">
+                  <div className="font-bold mb-2">
+                    จำนวนคงเหลือในสต็อคสินค้า
+                  </div>
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      className="px-3 py-3 text-white bg-[#A2DC94] border border-[#A2DC94] hover:bg-white hover:text-[#A2DC94] rounded-full flex items-center justify-center"
+                    >
+                      <FaPlus />
+                    </button>
+                    <div className="px-8 relative inline-block">
+                      <span className="font-bold">
+                        {selectedProduct.quantity}
+                      </span>
+                      <span className="absolute left-[10%] right-[10%] bottom-0 h-[1px] bg-[#848484]"></span>
+                    </div>
+                    <button
+                      type="button"
+                      className="px-3 py-3 text-white bg-[#DC9494] border border-[#DC9494] hover:bg-white hover:text-[#DC9494] rounded-full flex items-center justify-center"
+                    >
+                      <FaMinus />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-between mt-auto">
               <button
-                type="button"
-                className="px-2 py-2 flex text-white border border-[#DC9494] bg-[#DC9494] hover:text-[#DC9494] hover:bg-white hover:border hover:border-[#DC9494] rounded-full"
+                className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                onClick={closeModal}
               >
-                <FaMinus size={12} />
+                ย้อนกลับ
+              </button>
+              <button
+                className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                onClick={closeModal}
+              >
+                บันทึก
               </button>
             </div>
-            <button
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-              onClick={closeModal}
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
