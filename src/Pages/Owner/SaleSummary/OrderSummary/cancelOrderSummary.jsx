@@ -24,7 +24,6 @@ const CancelOrderSummary = () => {
       tel: "086-151-7624",
       status: "รอคืนเงิน",
     },
-    // Add more orders here...
   ]);
 
   const [orderDataDetail, setOrderDataDetail] = useState([
@@ -46,10 +45,11 @@ const CancelOrderSummary = () => {
       price: "40",
       category: "โปรโคตรพ่อ",
     },
-    // Add more orders here...
   ]);
 
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
 
   const handleRowClick = (order) => {
     setSelectedOrder(order);
@@ -57,6 +57,33 @@ const CancelOrderSummary = () => {
 
   const closeModal = () => {
     setSelectedOrder(null);
+    setIsEditModalOpen(false);
+    setSelectedStatus("");
+  };
+
+  const openEditModal = (e) => {
+    e.stopPropagation();
+    setSelectedStatus(selectedOrder.status);
+    setIsEditModalOpen(true);
+  };
+
+  const handleStatusChange = () => {
+    // Update the status in orderData
+    setOrderData((prevData) =>
+      prevData.map((order) =>
+        order.orderId === selectedOrder.orderId
+          ? { ...order, status: selectedStatus }
+          : order
+      )
+    );
+
+    // Update selected order status
+    setSelectedOrder((prev) => ({
+      ...prev,
+      status: selectedStatus,
+    }));
+
+    setIsEditModalOpen(false);
   };
 
   return (
@@ -122,7 +149,7 @@ const CancelOrderSummary = () => {
         </table>
       </div>
 
-      {/* Modal Section */}
+      {/* Order Detail Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-5 rounded-lg shadow-lg w-[90%] max-w-2xl max-h-[80%] overflow-y-auto">
@@ -187,13 +214,16 @@ const CancelOrderSummary = () => {
               <div className="col-span-1 flex">
                 <p>สถานะ </p>
                 <div className="px-2">
-                  <button className="border border-[#C6B399] text-[#C6B399] rounded-full px-2 hover:bg-[#C6B399] hover:text-white">
+                  <button
+                    className="border border-[#C6B399] text-[#C6B399] rounded-full px-2 hover:bg-[#C6B399] hover:text-white"
+                    onClick={openEditModal}
+                  >
                     แก้ไข
                   </button>
                 </div>
               </div>
               <p className="col-span-3 border border-[#7AAC72] text-[#7AAC72] rounded-full flex justify-center max-w-24">
-                {selectedOrder.status}{" "}
+                {selectedOrder.status}
               </p>
               <p className="col-span-1">ช่องทางการติดต่อลูกค้า </p>
               <p className="col-span-3">{selectedOrder.tel} </p>
@@ -204,6 +234,55 @@ const CancelOrderSummary = () => {
                 onClick={closeModal}
               >
                 ย้อนกลับ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Status Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-5 rounded-lg shadow-lg w-[400px]">
+            <h2 className="text-lg font-bold mb-4 text-center">สถานะ</h2>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="pending"
+                  name="status"
+                  value="รอคืนเงิน"
+                  checked={selectedStatus === "รอคืนเงิน"}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-4 h-4"
+                />
+                <label htmlFor="pending">รอคืนเงิน</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  id="completed"
+                  name="status"
+                  value="คืนเงินสำเร็จ"
+                  checked={selectedStatus === "คืนเงินสำเร็จ"}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="w-4 h-4"
+                />
+                <label htmlFor="completed">คืนเงินสำเร็จ</label>
+              </div>
+            </div>
+            <div className="flex justify-between mt-6">
+              <button
+                className="w-32 py-1 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+                onClick={() => setIsEditModalOpen(false)}
+              >
+                ย้อนกลับ
+              </button>
+              <button
+                className="w-32 py-1 bg-[#D4B28C] text-white rounded-full hover:bg-[#c4a27c] transition-colors"
+                onClick={handleStatusChange}
+              >
+                บันทึก
               </button>
             </div>
           </div>
