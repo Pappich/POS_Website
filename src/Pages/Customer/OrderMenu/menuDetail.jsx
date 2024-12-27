@@ -9,18 +9,27 @@ const MenuDetail = () => {
   const [selectedSweetness, setSelectedSweetness] = useState("0%");
   const [selectedSize, setSelectedSize] = useState("S");
   const [selectedAddOn, setSelectedAddOn] = useState("ไข่มุก");
+  const [quantity, setQuantity] = useState(1);
 
   const handleBack = () => navigate("/menu");
-  const handleCart = () => navigate("/cart");
+  const handleAddToCart = () => navigate("/order-summary");
 
   const handleSelection = (setter, value, current) => {
     setter(current === value ? null : value);
   };
 
+  const handleAdd = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleDelete = () => {
+    if (quantity > 1) setQuantity((prev) => prev - 1);
+  };
+
   const OptionGroup = ({ title, options, selected, onSelect }) => (
     <div>
       <div className="font-bold mb-2">{title}</div>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 mb-4">
         {options.map((option) => (
           <button
             key={option}
@@ -29,7 +38,7 @@ const MenuDetail = () => {
             className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
               selected === option
                 ? "bg-[#D4B28C] text-white"
-                : "bg-white text-[#D4B28C"
+                : "bg-white text-[#D4B28C]"
             }`}
           >
             {option}
@@ -40,21 +49,13 @@ const MenuDetail = () => {
   );
 
   return (
-    <div className="font-noto flex flex-col min-h-screen bg-white p-6">
+    <div className="font-noto flex flex-col min-h-screen bg-white">
       {/* Back button and cart */}
       <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={handleBack}
-          aria-label="Go back to menu"
-          className="text-[#DD9F52] text-4xl"
-        >
+        <button onClick={handleBack} className="text-[#DD9F52] text-4xl">
           <IoChevronBack />
         </button>
-        <button
-          onClick={handleCart}
-          aria-label="View cart"
-          className="text-[#DD9F52] text-4xl"
-        >
+        <button onClick={handleAddToCart} className="text-[#DD9F52] text-4xl">
           <PiShoppingCart />
         </button>
       </div>
@@ -74,7 +75,7 @@ const MenuDetail = () => {
       </div>
 
       {/* Options */}
-      <div className="space-y-6">
+      <div className="mt-4">
         {/* Type */}
         <OptionGroup
           title="ชนิดเครื่องดื่ม"
@@ -108,12 +109,49 @@ const MenuDetail = () => {
         {/* Add-ons */}
         <OptionGroup
           title="ตัวเลือก"
-          options={["ไข่มุก", "วุ้นมะพร้าว", "บุก"]}
+          options={["ไข่มุก + 10 ", "วุ้นมะพร้าว + 15", "บุก + 10"]}
           selected={selectedAddOn}
           onSelect={(option) =>
             handleSelection(setSelectedAddOn, option, selectedAddOn)
           }
         />
+      </div>
+
+      <div className="mt-4 flex flex-col items-center space-y-4">
+        <div className="w-full flex flex-row items-center justify-between">
+          <span className="font-bold">จำนวน</span>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleDelete}
+              className="w-10 h-10 font-bold text-white bg-[#DC9494] rounded-full flex items-center justify-center"
+            >
+              -
+            </button>
+            <div className="w-20 h-10 font-bold text-center border border-[#AD8B73] rounded-full flex items-center justify-center">
+              {quantity}
+            </div>
+            <button
+              onClick={handleAdd}
+              className="w-10 h-10 text-white bg-[#A2DC94] rounded-full flex items-center justify-center"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div className="w-full flex flex-row items-center justify-between">
+          <span className="font-bold">ราคา</span>
+          <div className="w-40 text-center border border-[#AD8B73] text-black font-bold text-xl px-6 py-2 rounded-full">
+            {69} ฿
+          </div>
+        </div>
+
+        <button
+          onClick={handleAddToCart}
+          className="w-full py-3 bg-[#D4B28C] text-white rounded-full font-semibold"
+        >
+          + เพิ่มเข้าตระกร้า
+        </button>
       </div>
     </div>
   );
