@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import PaymentMethod from "./paymentMethod";
 
 const OrderSummary = () => {
   const navigate = useNavigate();
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState("qr");
+  const totalAmount = 321;
 
   const handleBack = () => navigate("/menu");
-  const handlePayment = () => navigate("/payment");
 
   const items = [
     { name: "ชาเขียว", quantity: 1, price: 69, total: 69 },
@@ -17,6 +20,16 @@ const OrderSummary = () => {
   const subtotal = items.reduce((acc, item) => acc + item.total, 0);
   const tax = (subtotal * 0.07).toFixed(2);
   const total = (subtotal + parseFloat(tax)).toFixed(2);
+
+  const handlePaymentClick = () => setShowPaymentPopup(true);
+  const closePaymentPopup = () => setShowPaymentPopup(false);
+  const handleSelectPayment = (method) => setSelectedPayment(method);
+
+  const handleConfirmPayment = () => {
+    console.log("Selected payment method :", selectedPayment);
+    navigate("/payment-method");
+    setShowPaymentPopup(false);
+  };
 
   return (
     <div className="w-full font-noto flex flex-col items-center min-h-screen bg-white">
@@ -81,11 +94,62 @@ const OrderSummary = () => {
       </div>
 
       <button
-        onClick={handlePayment}
+        onClick={handlePaymentClick}
         className="w-full mt-6 py-3 bg-[#D4B28C] text-white rounded-full font-bold"
       >
         จ่ายเงิน
       </button>
+
+      {/* payment popup */}
+      {showPaymentPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 w-[500px] relative">
+            <h2 className="text-xl font-bold mb-4 flex justify-center">
+              วิธีการชำระเงิน
+            </h2>
+            <div className="flex items-center mb-4">
+              <input
+                type="radio"
+                id="qr-code"
+                name="payment-method"
+                className="mr-2"
+                checked={selectedPayment === "qr"}
+                onChange={() => handleSelectPayment("qr")}
+              />
+              <label htmlFor="qr-code" className="text-lg">
+                QR CODE
+              </label>
+            </div>
+            <div className="flex items-center mb-4">
+              <input
+                type="radio"
+                id="cash"
+                name="payment-method"
+                className="mr-2"
+                checked={selectedPayment === "cash"}
+                onChange={() => handleSelectPayment("cash")}
+              />
+              <label htmlFor="cash" className="text-lg">
+                เงินสด
+              </label>
+            </div>
+            <div className="w-full flex justify-between space-x-8">
+              <button
+                onClick={closePaymentPopup}
+                className="w-full py-2 mt-4 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+              >
+                ย้อนกลับ
+              </button>
+              <button
+                onClick={handleConfirmPayment}
+                className="w-full py-2 mt-4 bg-[#D4B28C] text-white rounded-full font-bold"
+              >
+                ตกลง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

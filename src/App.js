@@ -24,6 +24,7 @@ import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
 import Menu from "./Pages/Customer/OrderMenu/menu";
 import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
 import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
+import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
 
 function App() {
   return (
@@ -60,9 +61,12 @@ function App() {
           {/* add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
+
+          {/* Customer flow */}
           <Route path="/menu" element={<Menu />} />
           <Route path="/menu-detail" element={<MenuDetail />} />
           <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/payment-method" element={<PaymentMethod />} />
         </Routes>
       </div>
     </Router>
