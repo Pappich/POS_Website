@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PiShoppingCart } from "react-icons/pi";
 
 const Menu = () => {
   const navigate = useNavigate();
+
+  const handleCart = () => navigate("/order-summary");
 
   const categories = [
     "ยอดฮิต",
@@ -57,7 +60,12 @@ const Menu = () => {
   return (
     <div className="font-noto flex flex-col min-h-screen bg-white">
       {/* LOGO */}
-      <h1 className="text-3xl font-bold mb-4">SHOP NAME</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold mb-4">SHOP NAME</h1>
+        <button onClick={handleCart}>
+          <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
+        </button>
+      </div>
 
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 ml-2 space-x-4 mb-4">
         {categories.map((category) => (

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import PaymentMethod from "./paymentMethod";
+import { IoTrashOutline } from "react-icons/io5";
 
 const OrderSummary = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const OrderSummary = () => {
 
   const handleConfirmPayment = () => {
     console.log("Selected payment method :", selectedPayment);
-    navigate("/payment-method");
+    navigate("/payment-method", { state: { selectedPayment, totalAmount } });
     setShowPaymentPopup(false);
   };
 
@@ -35,7 +36,7 @@ const OrderSummary = () => {
     <div className="w-full font-noto flex flex-col items-center min-h-screen bg-white">
       <div className="w-full flex justify-start items-center mb-6">
         <button onClick={handleBack} className="text-[#DD9F52] text-4xl">
-          <IoChevronBack />
+          <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
       </div>
 
@@ -58,9 +59,9 @@ const OrderSummary = () => {
             <tr key={index} className="border-b border-gray-200">
               <td className="flex items-center py-2">
                 <img
-                  src="https://via.placeholder.com/50"
+                  src="https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
                   alt={item.name}
-                  className="w-12 h-12 mr-2 rounded"
+                  className="mr-2 rounded flex items-center h-[50px] w-[50px] mb-2"
                 />
                 <div>
                   <p className="font-semibold">{item.name}</p>
@@ -72,6 +73,12 @@ const OrderSummary = () => {
               <td className="text-center">{item.quantity}</td>
               <td className="text-center">{item.price} ฿</td>
               <td className="text-center">{item.total} ฿</td>
+              <td className="text-[#DD9F52]">
+                <IoTrashOutline
+                  className="w-6 h-6 transition-transform duration-200 ease-in-out transform hover:scale-125 hover:text-[#cda777]"
+                  onClick={null}
+                />
+              </td>
             </tr>
           ))}
         </tbody>
@@ -89,7 +96,7 @@ const OrderSummary = () => {
         </div>
         <div className="flex justify-between text-xl font-bold">
           <span>รวมทั้งหมด</span>
-          <span className="text-orange-600">{total} ฿</span>
+          <span className="text-[#DD9F52]">{total} ฿</span>
         </div>
       </div>
 
@@ -117,7 +124,7 @@ const OrderSummary = () => {
                 onChange={() => handleSelectPayment("qr")}
               />
               <label htmlFor="qr-code" className="text-lg">
-                QR CODE
+                QR Code
               </label>
             </div>
             <div className="flex items-center mb-4">

@@ -52,11 +52,11 @@ const MenuDetail = () => {
     <div className="font-noto flex flex-col min-h-screen bg-white">
       {/* Back button and cart */}
       <div className="flex justify-between items-center mb-6">
-        <button onClick={handleBack} className="text-[#DD9F52] text-4xl">
-          <IoChevronBack />
+        <button onClick={handleBack}>
+          <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
-        <button onClick={handleAddToCart} className="text-[#DD9F52] text-4xl">
-          <PiShoppingCart />
+        <button onClick={handleAddToCart}>
+          <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
       </div>
 

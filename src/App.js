@@ -25,11 +25,12 @@ import Menu from "./Pages/Customer/OrderMenu/menu";
 import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
 import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
 import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
+import QueueSummary from "./Pages/Customer/OrderSumary/queueSummary";
 
 function App() {
   return (
     <Router>
-      <div className="p-10 border-[40px] border-white min-h-screen">
+      <div className="p-10 border-white min-h-screen">
         <Routes>
           {/* main flow */}
           <Route path="/" element={<Login />} />
@@ -67,6 +68,7 @@ function App() {
           <Route path="/menu-detail" element={<MenuDetail />} />
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/payment-method" element={<PaymentMethod />} />
+          <Route path="/queue-summary" element={<QueueSummary />} />
         </Routes>
       </div>
     </Router>
