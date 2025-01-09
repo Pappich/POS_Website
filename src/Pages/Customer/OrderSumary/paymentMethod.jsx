@@ -58,9 +58,9 @@ const PaymentMethod = () => {
               <p className="text-xl mb-[16px]">
                 อย่าลืมรับสลิปที่ช่องทางด้านขวามือ
               </p>
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
+              <div className="flex flex-wrap justify-center items-center gap-2 mt-4">
                 {bankIcons.map((bankName, index) => (
-                  <div key={index} className="w-1/6">
+                  <div key={index} className="w-1/6 flex justify-center">
                     <img
                       src={require(`../../../Assets/Images/bankIcons/${bankName}`)}
                       alt={`Bank logo ${index + 1}`}
