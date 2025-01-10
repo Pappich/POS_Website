@@ -7,6 +7,7 @@ import { CiCalendar } from "react-icons/ci";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdStopwatch } from "react-icons/io";
 import { MdDone } from "react-icons/md";
+import DoneOrderButton from "../../../Components/doneOrderButton";
 
 const Order = () => {
   return (
@@ -74,9 +75,7 @@ const Order = () => {
             <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
               ยกเลิกออเดอร์
             </button>
-            <button class="w-full bg-[#C6B399] hover:bg-[#a69781] text-white font-bold py-2 px-4 rounded-full">
-              เสร็จสิ้นออเดอร์
-            </button>
+            <DoneOrderButton/>
           </div>
         </div>
       </div>
