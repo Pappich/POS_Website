@@ -70,6 +70,10 @@ const MainMenu = () => {
   //   }
   // };
 
+  const handleBack = () => {
+    navigate("/guideline");
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
       <div className="text-center mb-10">
@@ -102,6 +106,15 @@ const MainMenu = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="flex mt-24 w-full space-x-8 justify-between">
+        <button
+          className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          onClick={handleBack}
+        >
+          ย้อนกลับ
+        </button>
       </div>
     </div>
   );

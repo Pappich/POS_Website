@@ -26,11 +26,13 @@ import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
 import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
 import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
 import QueueSummary from "./Pages/Customer/OrderSumary/queueSummary";
+import UserRole from "./Pages/Owner/SetupShop/userRole";
+import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
 
 function App() {
   return (
     <Router>
-      <div className="p-10 border-white min-h-screen">
+      <div className="p-10 border-[20px] border-white min-h-screen">
         <Routes>
           {/* main flow */}
           <Route path="/" element={<Login />} />
@@ -40,6 +42,8 @@ function App() {
           <Route path="/enter-new-password" element={<EnterNewPassword />} />
 
           <Route path="/main-menu" element={<MainMenu />} />
+          <Route path="/role" element={<UserRole />} />
+          <Route path="/owner" element={<OwnerMenu />} />
 
           {/* add product flow */}
           <Route path="/add-product" element={<AddProductForm />} />
