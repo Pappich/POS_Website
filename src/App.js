@@ -21,6 +21,7 @@ import SweetLevelChoice from "./Pages/Owner/SetupShop/addChioce/sweetLevelChoice
 import ChoiceMenu from "./Pages/Owner/SetupShop/addChioce/choiceMenu";
 import StockList from "./Pages/Owner/SetupShop/addStock/stockList";
 import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
+import Order from "./Pages/Employee/main/order";
 import Menu from "./Pages/Customer/OrderMenu/menu";
 import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
 import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
@@ -66,6 +67,7 @@ function App() {
           {/* add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
+          <Route path="/order-list" element={<Order />} />
 
           {/* Customer flow */}
           <Route path="/menu" element={<Menu />} />
@@ -73,6 +75,7 @@ function App() {
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/payment-method" element={<PaymentMethod />} />
           <Route path="/queue-summary" element={<QueueSummary />} />
+
         </Routes>
       </div>
     </Router>
