@@ -75,7 +75,6 @@ function App() {
           {/* add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
-          <Route path="/order-list" element={<Order />} />
 
           {/* sale summary */}
           <Route path="/overview" element={<Home />} />
@@ -99,6 +98,9 @@ function App() {
           <Route path="/summary" element={<Summary />} />
           <Route path="/payment-method" element={<PaymentMethod />} />
           <Route path="/queue-summary" element={<QueueSummary />} />
+
+          {/* employee flow */}
+          <Route path="/order-list" element={<Order />} />
         </Routes>
       </div>
     </Router>

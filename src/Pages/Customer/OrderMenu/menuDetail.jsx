@@ -12,7 +12,7 @@ const MenuDetail = () => {
   const [quantity, setQuantity] = useState(1);
 
   const handleBack = () => navigate("/menu");
-  const handleAddToCart = () => navigate("/order-summary");
+  const handleAddToCart = () => navigate("/summary");
 
   const handleSelection = (setter, value, current) => {
     setter(current === value ? null : value);
