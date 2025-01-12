@@ -144,7 +144,7 @@ const AddStockForm = () => {
                   onClick={() => handleTypeClick(TypeItem)}
                   className={`px-6 py-3 rounded-full border border-[#DD9F52] font-bold ml-2 ${
                     selectedType === TypeItem
-                      ? "bg-[#FFA726] text-white"
+                      ? "bg-[#D4B28C] text-white"
                       : "bg-white text-[#DD9F52]"
                   }`}
                 >

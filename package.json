@@ -19,6 +19,7 @@
     "react-simple-keyboard": "^3.7.150",
     "simple-keyboard": "^3.7.106",
     "simple-keyboard-layouts": "^3.4.21",
+    "thai-banks-logo": "^1.0.6",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

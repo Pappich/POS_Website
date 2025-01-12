@@ -30,11 +30,18 @@ import NotificationSummary from "./Pages/Owner/SaleSummary/NotificationSummary/n
 import AddOwnerProduct from "./Pages/Owner/SaleSummary/Stock/addOwnerProduct";
 import ProductDetail from "./Pages/Owner/SaleSummary/Stock/productDetail";
 import CancelOrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/cancelOrderSummary";
+import Menu from "./Pages/Customer/OrderMenu/menu";
+import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
+import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
+import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
+import QueueSummary from "./Pages/Customer/OrderSumary/queueSummary";
+import UserRole from "./Pages/Owner/SetupShop/userRole";
+import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
 
 function App() {
   return (
     <Router>
-      <div className="p-10 border-[40px] border-white min-h-screen">
+      <div className="p-10 border-[20px] border-white min-h-screen">
         <Routes>
           {/* main flow */}
           <Route path="/" element={<Login />} />
@@ -44,6 +51,8 @@ function App() {
           <Route path="/enter-new-password" element={<EnterNewPassword />} />
 
           <Route path="/main-menu" element={<MainMenu />} />
+          <Route path="/role" element={<UserRole />} />
+          <Route path="/owner" element={<OwnerMenu />} />
 
           {/* add product flow */}
           <Route path="/add-product" element={<AddProductForm />} />
@@ -77,6 +86,13 @@ function App() {
           <Route path="/add-owner-product" element={<AddOwnerProduct />} />
           <Route path="/product-detail" element={<ProductDetail />} />
           <Route path="/cancel-order-summary" element={<CancelOrderSummary />} />
+
+          {/* Customer flow */}
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/menu-detail" element={<MenuDetail />} />
+          <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/payment-method" element={<PaymentMethod />} />
+          <Route path="/queue-summary" element={<QueueSummary />} />
 
         </Routes>
       </div>
