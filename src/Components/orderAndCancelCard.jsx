@@ -1,0 +1,50 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  MdOutlineRemoveShoppingCart,
+  MdOutlineShoppingCart,
+} from "react-icons/md";
+import { IoIosArrowForward } from "react-icons/io";
+const OrderAndCancelCard = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/cancel-order-summary");
+  };
+
+  return (
+    <div className="flex">
+      {/* รายรับทั้งหมด */}
+      <div className="flex py-2 px-4 w-3/4 mr-2 bg-white border rounded-lg ">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+          <MdOutlineShoppingCart color="white" size={28} />
+        </div>
+        <div className="ml-3">
+          <p>ยอดออเดอร์ทั้งหมด</p>
+          <div className="flex">
+            <p className="font-bold">3674 ออเดอร์</p>
+          </div>
+        </div>
+      </div>
+
+      {/* สินค้าที่ใกล้จะหมดอายุ */}
+      <div
+        onClick={handleClick}
+        className="flex items-center justify-between py-2 px-4 w-full bg-white border rounded-lg"
+      >
+        <div className="flex items-center">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+            <MdOutlineRemoveShoppingCart color="white" size={28} />
+          </div>
+          <div className="ml-3">
+            <p>จำนวนออเดอร์ที่ถูกยกเลิก</p>
+            <p className="font-bold">5 ออเดอร์</p>
+          </div>
+        </div>
+        <IoIosArrowForward size={30} className="text-[#C6B399]" />
+      </div>
+    </div>
+  );
+};
+
+export default OrderAndCancelCard;
