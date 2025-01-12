@@ -23,7 +23,6 @@ import StockList from "./Pages/Owner/SetupShop/addStock/stockList";
 import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
 import Order from "./Pages/Employee/main/order";
 import Home from "./Pages/Owner/SaleSummary/OverView/home";
-import OrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/orderSummary";
 import SaleSummaryGraph from "./Pages/Owner/SaleSummary/SaleSummaryGraph/saleSummaryGraph";
 import Stock from "./Pages/Owner/SaleSummary/Stock/stock";
 import NotificationSummary from "./Pages/Owner/SaleSummary/NotificationSummary/notificationSummary";
@@ -32,11 +31,12 @@ import ProductDetail from "./Pages/Owner/SaleSummary/Stock/productDetail";
 import CancelOrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/cancelOrderSummary";
 import Menu from "./Pages/Customer/OrderMenu/menu";
 import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
-import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
+import OrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/orderSummary";
 import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
 import QueueSummary from "./Pages/Customer/OrderSumary/queueSummary";
 import UserRole from "./Pages/Owner/SetupShop/userRole";
 import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
+import Summary from "./Pages/Customer/OrderSumary/orderSummary";
 
 function App() {
   return (
@@ -82,18 +82,23 @@ function App() {
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
           <Route path="/stock" element={<Stock />} />
-          <Route path="/notification-summary" element={<NotificationSummary />} />
+          <Route
+            path="/notification-summary"
+            element={<NotificationSummary />}
+          />
           <Route path="/add-owner-product" element={<AddOwnerProduct />} />
           <Route path="/product-detail" element={<ProductDetail />} />
-          <Route path="/cancel-order-summary" element={<CancelOrderSummary />} />
+          <Route
+            path="/cancel-order-summary"
+            element={<CancelOrderSummary />}
+          />
 
           {/* Customer flow */}
           <Route path="/menu" element={<Menu />} />
           <Route path="/menu-detail" element={<MenuDetail />} />
-          <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/summary" element={<Summary />} />
           <Route path="/payment-method" element={<PaymentMethod />} />
           <Route path="/queue-summary" element={<QueueSummary />} />
-
         </Routes>
       </div>
     </Router>

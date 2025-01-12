@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PaymentMethod from "./paymentMethod";
 import { IoTrashOutline } from "react-icons/io5";
 
-const OrderSummary = () => {
+const Summary = () => {
   const navigate = useNavigate();
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("qr");
@@ -161,4 +161,4 @@ const OrderSummary = () => {
   );
 };
 
-export default OrderSummary;
+export default Summary;
