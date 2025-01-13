@@ -25,7 +25,7 @@ const OwnerMenu = () => {
     if (id === "createMenu") {
       navigate("/guideline");
     } else if (id === "stock") {
-      navigate("/");
+      navigate("/overview");
     }
   };
 

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import fetchApi from "../../../../Config/fetchApi";
 
 const AddProductForm = () => {
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
-  const [productName, setProductName] = useState("");
+  const [menuName, setMenuName] = useState("");
   const [productDetails, setProductDetails] = useState("");
   const [productImage, setProductImage] = useState(null);
   const [productPrice, setProductPrice] = useState("");
@@ -36,6 +37,15 @@ const AddProductForm = () => {
     }
   };
 
+  const handleCreateMenu = (menu_name, productDetails, price, image_url) => {
+    fetchApi("/api/crate", "POST", {
+      menu_name,
+      description: productDetails,
+      price,
+      image_url,
+    });
+  };
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -45,16 +55,16 @@ const AddProductForm = () => {
               1. กรอกชื่อสินค้าที่ต้องการ
             </div>
             <label
-              htmlFor="productName"
+              htmlFor="menuName"
               className="text-lg mb-2 w-full text-center"
             >
               ชื่อสินค้า
             </label>
             <input
               type="text"
-              id="productName"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              id="menuName"
+              value={menuName}
+              onChange={(e) => setMenuName(e.target.value)}
               placeholder="กรอกชื่อสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -159,7 +169,7 @@ const AddProductForm = () => {
               5. สรุปรายการสินค้า
             </div>
             <div className="flex w-full space-x-8 justify-between mb-2">
-              <p className="font-bold">ชื่อสินค้า {productName}</p>
+              <p className="font-bold">ชื่อสินค้า {menuName}</p>
               <p className="font-bold">ราคาสินค้า {productPrice} บาท</p>
             </div>
             <div className="font-bold text-left mb-2 w-full">รูปภาพสินค้า</div>

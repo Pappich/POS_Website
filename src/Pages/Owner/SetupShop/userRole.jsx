@@ -34,7 +34,7 @@ const UserRole = () => {
     if (id === "owner") {
       navigate("/owner");
     } else if (id === "employee") {
-      navigate("/");
+      navigate("/order-list");
     } else if (id === "customer") {
       navigate("/menu");
     }

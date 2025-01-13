@@ -22,19 +22,28 @@ import ChoiceMenu from "./Pages/Owner/SetupShop/addChioce/choiceMenu";
 import StockList from "./Pages/Owner/SetupShop/addStock/stockList";
 import AddStockForm from "./Pages/Owner/SetupShop/addStock/addStockForm";
 import Order from "./Pages/Employee/main/order";
+import Home from "./Pages/Owner/SaleSummary/OverView/home";
+import SaleSummaryGraph from "./Pages/Owner/SaleSummary/SaleSummaryGraph/saleSummaryGraph";
+import Stock from "./Pages/Owner/SaleSummary/Stock/stock";
+import NotificationSummary from "./Pages/Owner/SaleSummary/NotificationSummary/notificationSummary";
+import AddOwnerProduct from "./Pages/Owner/SaleSummary/Stock/addOwnerProduct";
+import ProductDetail from "./Pages/Owner/SaleSummary/Stock/productDetail";
+import CancelOrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/cancelOrderSummary";
 import Menu from "./Pages/Customer/OrderMenu/menu";
 import MenuDetail from "./Pages/Customer/OrderMenu/menuDetail";
-import OrderSummary from "./Pages/Customer/OrderSumary/orderSummary";
+import OrderSummary from "./Pages/Owner/SaleSummary/OrderSummary/orderSummary";
 import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
 import QueueSummary from "./Pages/Customer/OrderSumary/queueSummary";
 import UserRole from "./Pages/Owner/SetupShop/userRole";
 import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
 import PauseSection from "./Pages/Employee/main/pauseSection";
+import Summary from "./Pages/Customer/OrderSumary/orderSummary";
+import PauseIngredient from "./Pages/Employee/main/pauseIngredient";
 
 function App() {
   return (
     <Router>
-      <div className="p-10 border-[20px] border-white min-h-screen">
+      <div className="lg:p-0 xl:p-10 border-[20px] border-white min-h-screen">
         <Routes>
           {/* main flow */}
           <Route path="/" element={<Login />} />
@@ -68,18 +77,35 @@ function App() {
           {/* add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
-          <Route path="/order-list" element={<Order />} />
+
+          {/* sale summary */}
+          <Route path="/overview" element={<Home />} />
+          <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
+          <Route path="/stock" element={<Stock />} />
+          <Route
+            path="/notification-summary"
+            element={<NotificationSummary />}
+          />
+          <Route path="/add-owner-product" element={<AddOwnerProduct />} />
+          <Route path="/product-detail" element={<ProductDetail />} />
+          <Route
+            path="/cancel-order-summary"
+            element={<CancelOrderSummary />}
+          />
 
           {/* Customer flow */}
           <Route path="/menu" element={<Menu />} />
           <Route path="/menu-detail" element={<MenuDetail />} />
-          <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/summary" element={<Summary />} />
           <Route path="/payment-method" element={<PaymentMethod />} />
           <Route path="/queue-summary" element={<QueueSummary />} />
 
-          {/* Employee */}
-          <Route path="/pause-section" element={<PauseSection />} />
 
+          {/* employee flow */}
+          <Route path="/order-list" element={<Order />} />
+          <Route path="/pause-section" element={<PauseSection />} />
+          <Route path="/pause-ingredient" element={<PauseIngredient />} />
         </Routes>
       </div>
     </Router>

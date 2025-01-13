@@ -21,7 +21,7 @@ const PaymentMethod = () => {
     "TTB.png",
   ];
 
-  const handleBack = () => navigate("/order-summary");
+  const handleBack = () => navigate("/summary");
 
   const { selectedPayment, totalAmount } = location.state || {};
   console.log("selectedPayment: ", selectedPayment);

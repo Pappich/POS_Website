@@ -40,7 +40,7 @@ const Login = () => {
   };
 
   return (
-    <div className="font-noto flex flex-col justify-center items-center min-h-screen bg-gray-50">
+    <div className="font-noto flex flex-col justify-center items-center min-h-screen">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl text-black mb-2 text-left">
           ยินดีต้อนรับสู่ระบบการขายหน้าร้าน
