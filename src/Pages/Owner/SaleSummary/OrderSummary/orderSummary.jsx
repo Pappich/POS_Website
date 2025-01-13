@@ -72,7 +72,7 @@ const OrderSummary = () => {
   return (
     <div>
       <SideBar menuTab={"orderSummary"} />
-      <h1 className="font-bold text-xl">ออร์เดอร์ทั้งหมด</h1>
+      <h1 className="font-bold text-xl">ออเดอร์ทั้งหมด</h1>
       <span className="flex justify-end">
         <CalendarSelect />
       </span>

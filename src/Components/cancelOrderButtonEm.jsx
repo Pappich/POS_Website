@@ -29,7 +29,7 @@ const CancelOrderButtonEm = () => {
             </h2>
             <hr className="h-0.5 bg-[#DD9F52] border-0" />
             <div className="mt-2">
-              <label>หมายเลขออร์เดอร์</label>
+              <label>หมายเลขออเดอร์</label>
               <input
                 type="text"
                 placeholder="กรอกหมายเลขออเดอร์ของลูกค้า..."

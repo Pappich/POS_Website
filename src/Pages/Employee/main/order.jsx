@@ -18,7 +18,7 @@ const Order = () => {
   };
   return (
     <div className="grid grid-cols-3 gap-4">
-      <div className="bg-[#FFFFFF] rounded-2xl shadow-md">
+      <div className="bg-[#FFFFFF] rounded-2xl shadow-md col-span-1">
         {/* ข้างบน */}
         <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
           <h1 className="flex items-center justify-center font-bold border bg-[#F0ECE3] w-full rounded-full py-2 px-4 text-xl">
@@ -105,13 +105,13 @@ const Order = () => {
           </button>
         </div>
         <div className="flex justify-around">
-          {/* ยอดออร์เดอร์ทั้งหมด */}
+          {/* ยอดออเดอร์ทั้งหมด */}
           <div className="flex block max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
               <MdOutlineShoppingCart color="white" size={24} />
             </div>
             <div className="ml-3">
-              <p>ยอดออร์เดอร์ทั้งหมด</p>
+              <p>ออเดอร์วันนี้</p>
               <p className="font-bold">15 ออเดอร์</p>
             </div>
           </div>
@@ -120,7 +120,7 @@ const Order = () => {
               <IoMdStopwatch className="font-bold" color="white" size={30} />
             </div>
             <div className="ml-3">
-              <p>ยอดออเดอร์ที่รอ</p>
+              <p>ออเดอร์ที่รอ</p>
               <p className="font-bold">17 ออเดอร์</p>
             </div>
           </div>
@@ -129,7 +129,7 @@ const Order = () => {
               <MdDone color="white" size={28} />
             </div>
             <div className="ml-3">
-              <p>ยอดออเดอร์ที่เสร็จสิ้น</p>
+              <p>ออเดอร์ที่เสร็จ</p>
               <p className="font-bold">10 ออเดอร์</p>
             </div>
           </div>
@@ -138,7 +138,7 @@ const Order = () => {
         <div className="overflow-x-auto">
           <div className="flex space-x-4">
             {/* คิวหัวน้อย */}
-            <div className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md">
+            <div className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md ml-0.5">
               {/* ข้างบน */}
               <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
                 <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">

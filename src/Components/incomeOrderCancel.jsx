@@ -17,25 +17,25 @@ const IncomeOrderCancel = () => {
           </div>
         </div>
 
-        {/* ยอดออร์เดอร์ทั้งหมด */}
+        {/* ยอดออเดอร์ทั้งหมด */}
         <div className="flex block max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
             <MdOutlineShoppingCart color="white" size={16} />
           </div>
           <div className="ml-3">
-            <p>ยอดออร์เดอร์ทั้งหมด</p>
-            <p className="font-bold">3674 ออร์เดอร์</p>
+            <p>ยอดออเดอร์ทั้งหมด</p>
+            <p className="font-bold">3674 ออเดอร์</p>
           </div>
         </div>
 
-        {/* จำนวนออร์เดอร์ที่ถูกยกเลิก */}
+        {/* จำนวนออเดอร์ที่ถูกยกเลิก */}
         <div className="flex block max-w-sm py-2 px-4 w-full bg-white border rounded-lg ">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
             <MdOutlineRemoveShoppingCart color="white" size={16} />
           </div>
           <div className="ml-3">
-            <p>จำนวนออร์เดอร์ที่ถูกยกเลิก</p>
-            <p className="font-bold">5 ออร์เดอร์</p>
+            <p>จำนวนออเดอร์ที่ถูกยกเลิก</p>
+            <p className="font-bold">5 ออเดอร์</p>
           </div>
         </div>
       </div>

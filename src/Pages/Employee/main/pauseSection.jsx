@@ -5,6 +5,9 @@ const PauseSection = () => {
   const handleBackButton = () => {
     navigate("/order-list");
   };
+  const handlePauseIngredient = () => {
+    navigate("/pause-ingredient");
+  };
   return (
     <>
       <div className="flex flex-col items-center min-h-screen bg-white">
@@ -20,8 +23,11 @@ const PauseSection = () => {
               <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
                 {/* <button className="hover:underline font-bold">ดูรายการ</button>
                 <span className="text-gray-300">|</span> */}
-                <button className="hover:underline font-bold">
-                  แก้ไขการพักวัตถุดิบ
+                <button
+                  onClick={handlePauseIngredient}
+                  className="hover:underline font-bold"
+                >
+                  แก้ไข
                 </button>
               </div>
             </div>
@@ -35,9 +41,7 @@ const PauseSection = () => {
               <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
                 {/* <button className="hover:underline font-bold">ดูรายการ</button>
                 <span className="text-gray-300">|</span> */}
-                <button className="hover:underline font-bold">
-                  แก้ไขการพักเมนู
-                </button>
+                <button className="hover:underline font-bold">แก้ไข</button>
               </div>
             </div>
             <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
