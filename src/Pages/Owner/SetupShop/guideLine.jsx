@@ -1,10 +1,23 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { FaUtensils, FaList, FaThLarge, FaBox } from "react-icons/fa";
 
 const GuideLine = () => {
   const navigate = useNavigate();
+
+  const steps = [
+    { label: "เพิ่มรายการสินค้า", icon: <FaUtensils size={24} /> },
+    { label: "เพิ่มกลุ่มรายการสินค้า", icon: <FaList size={24} /> },
+    { label: "เพิ่มตัวเลือก", icon: <FaThLarge size={24} /> },
+    { label: "เพิ่มการตัดคลังสินค้า", icon: <FaBox size={24} /> },
+  ];
+
   const handleStart = () => {
     navigate("/main-menu");
+  };
+
+  const handleBack = () => {
+    navigate("/owner");
   };
 
   return (
@@ -17,12 +30,7 @@ const GuideLine = () => {
       </div>
 
       <div className="space-y-4 w-4/5 max-w-lg">
-        {[
-          "สร้างรายการสินค้าที่ต้องการ",
-          "เพิ่มกลุ่มรายการสินค้า",
-          "เพิ่มตัวเลือกสำหรับใช้ในรายการสินค้า",
-          "เพิ่มการตัดการสต็อคในแต่ละรายการสินค้า",
-        ].map((step, index) => (
+        {steps.map((step, index) => (
           <div
             key={index}
             className="flex items-center p-2 border rounded-full shadow-sm"
@@ -30,17 +38,28 @@ const GuideLine = () => {
             <div className="flex-shrink-0 w-10 h-10 bg-[#D4B28C] rounded-full flex items-center justify-center text-lg font-bold text-black">
               {index + 1}
             </div>
-            <div className="ml-4 text-black">{step}</div>
+            <div className="flex items-center ml-4 space-x-2 w-full justify-between">
+              <span className="text-black">{step.label}</span>
+              <span className="text-[#D4B28C] pr-4">{step.icon}</span>
+            </div>
           </div>
         ))}
       </div>
 
-      <button
-        className="mt-10 w-4/5 max-w-lg px-6 py-2 bg-[#D4B28C] text-white font-semibold rounded-full hover:bg-[#c9a07e] transition"
-        onClick={handleStart}
-      >
-        เริ่มต้น
-      </button>
+      <div className="flex mt-[40px] w-full space-x-8 justify-between">
+        <button
+          className="px-6 py-3 w-[250px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          onClick={handleBack}
+        >
+          ย้อนกลับ
+        </button>
+        <button
+          className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+          onClick={handleStart}
+        >
+          เริ่มต้น
+        </button>
+      </div>
     </div>
   );
 };
