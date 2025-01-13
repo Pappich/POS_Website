@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaRegClock } from "react-icons/fa6";
 import { MdOutlineTableBar } from "react-icons/md";
 import { MdOutlinePauseCircleOutline } from "react-icons/md";
@@ -11,6 +12,10 @@ import DoneOrderButton from "../../../Components/doneOrderButton";
 import CancelOrderButtonEm from "../../../Components/cancelOrderButtonEm";
 
 const Order = () => {
+  const navigate = useNavigate();
+  const handlePauseSection = () => {
+    navigate("/pause-section");
+  };
   return (
     <div className="grid grid-cols-3 gap-4">
       <div className="bg-[#FFFFFF] rounded-2xl shadow-md">
@@ -84,7 +89,10 @@ const Order = () => {
             <CiCalendar className="text-[#C6B399]" size={24} />
             <span className="pl-1 text-[#C6B399]">17 ธันวาคม พ.ศ. 2567</span>
           </div>
-          <button className="py-1 col-span-4 w-full bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full">
+          <button
+            onClick={handlePauseSection}
+            className="py-1 col-span-4 w-full bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full"
+          >
             <div className="flex justify-center items-center">
               <MdOutlinePauseCircleOutline size={24} />
               พักวัตถุดิบ / รายการสินค้า

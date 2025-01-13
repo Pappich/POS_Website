@@ -29,6 +29,7 @@ import PaymentMethod from "./Pages/Customer/OrderSumary/paymentMethod";
 import QueueSummary from "./Pages/Customer/OrderSumary/queueSummary";
 import UserRole from "./Pages/Owner/SetupShop/userRole";
 import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
+import PauseSection from "./Pages/Employee/main/pauseSection";
 
 function App() {
   return (
@@ -75,6 +76,9 @@ function App() {
           <Route path="/order-summary" element={<OrderSummary />} />
           <Route path="/payment-method" element={<PaymentMethod />} />
           <Route path="/queue-summary" element={<QueueSummary />} />
+
+          {/* Employee */}
+          <Route path="/pause-section" element={<PauseSection />} />
 
         </Routes>
       </div>
