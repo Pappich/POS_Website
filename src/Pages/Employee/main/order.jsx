@@ -8,6 +8,7 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdStopwatch } from "react-icons/io";
 import { MdDone } from "react-icons/md";
 import DoneOrderButton from "../../../Components/doneOrderButton";
+import CancelOrderButtonEm from "../../../Components/cancelOrderButtonEm";
 
 const Order = () => {
   return (
@@ -72,10 +73,8 @@ const Order = () => {
             </div>
           </div>
           <div class="space-y-2 w-full pt-2 pb-2">
-            <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
-              ยกเลิกออเดอร์
-            </button>
-            <DoneOrderButton/>
+            <CancelOrderButtonEm />
+            <DoneOrderButton />
           </div>
         </div>
       </div>
@@ -177,9 +176,7 @@ const Order = () => {
                   </div>
                 </div>
                 <div class="space-y-2 w-full pt-2 pb-2">
-                  <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
-                    ยกเลิกออเดอร์
-                  </button>
+                  <CancelOrderButtonEm />
                 </div>
               </div>
             </div>
@@ -232,9 +229,7 @@ const Order = () => {
                   </div>
                 </div>
                 <div class="space-y-2 w-full pt-2 pb-2">
-                  <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
-                    ยกเลิกออเดอร์
-                  </button>
+                  <CancelOrderButtonEm />
                 </div>
               </div>
             </div>
