@@ -10,6 +10,7 @@ import { IoMdStopwatch } from "react-icons/io";
 import { MdDone } from "react-icons/md";
 import DoneOrderButton from "../../../Components/doneOrderButton";
 import CancelOrderButtonEm from "../../../Components/cancelOrderButtonEm";
+import LogoutButton from "../../../Components/logoutButton";
 
 const Order = () => {
   const navigate = useNavigate();
@@ -98,11 +99,12 @@ const Order = () => {
               พักวัตถุดิบ / รายการสินค้า
             </div>
           </button>
-          <button className="col-span-1 w-full bg-[#F0ECE3] hover:bg-[#a69781] text-white font-bold rounded-full">
+          {/* <button className="col-span-1 w-full bg-[#F0ECE3] hover:bg-[#a69781] text-white font-bold rounded-full">
             <div className="py-1 flex justify-center">
               <IoMdHome className="text-[#AD8B73]" size={24} />
             </div>
-          </button>
+          </button> */}
+            <LogoutButton className="col-span-1 w-full"/>
         </div>
         <div className="flex justify-around">
           {/* ยอดออเดอร์ทั้งหมด */}
