@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
+import HomeEmButton from "../../../Components/homeEmButton";
 
 const PauseIngredient = () => {
   const menus = [
@@ -65,6 +66,9 @@ const PauseIngredient = () => {
 
   return (
     <>
+      <div className="flex justify-end">
+        <HomeEmButton />
+      </div>
       <div className="w-full flex justify-center text-lg font-bold">
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>

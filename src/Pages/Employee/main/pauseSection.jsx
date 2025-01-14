@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import HomeEmButton from "../../../Components/homeEmButton";
 const PauseSection = () => {
   const navigate = useNavigate();
   const handleBackButton = () => {
@@ -10,6 +11,9 @@ const PauseSection = () => {
   };
   return (
     <>
+      <div className="flex justify-end">
+        <HomeEmButton />
+      </div>
       <div className="flex flex-col items-center min-h-screen bg-white">
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>
