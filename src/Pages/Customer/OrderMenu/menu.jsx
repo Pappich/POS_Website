@@ -5,7 +5,7 @@ import { PiShoppingCart } from "react-icons/pi";
 const Menu = () => {
   const navigate = useNavigate();
 
-  const handleCart = () => navigate("/order-summary");
+  const handleCart = () => navigate("/summary");
 
   const categories = [
     "ยอดฮิต",

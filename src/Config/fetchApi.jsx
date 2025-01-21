@@ -5,7 +5,7 @@ function fetchApi(url, method, body) {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(body),
+    body: body ? JSON.stringify(body) : undefined, // case GET method not have body
   });
 }
 

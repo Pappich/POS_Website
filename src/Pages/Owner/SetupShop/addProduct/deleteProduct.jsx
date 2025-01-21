@@ -1,14 +1,37 @@
 import React from "react";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
 
 const DeleteProduct = ({ isOpen, onClose, onConfirm, product }) => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   if (!isOpen) return null;
-  console.log("PRODUCT: ", product);
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/menus/${product.menu_id}`,
+        "DELETE"
+      );
+
+      if (response.ok) {
+        console.log("Product deleted successfully");
+        onConfirm();
+      } else {
+        console.error("Failed to delete the product");
+      }
+    } catch (error) {
+      console.error("An error occurred while deleting the product:", error);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-1">
       <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
         <h2 className="text-xl mb-4">
-          ลบเมนู <span className="font-bold">{product}</span> หรือไม่ ?
+          ลบเมนู <span className="font-bold">{product.menu_name}</span> หรือไม่
+          ?
         </h2>
         <p className="text-gray-600 mb-8">
           การลบเมนูจะไม่สามารถย้อนกลับมาแก้ไขได้อีก
@@ -21,7 +44,7 @@ const DeleteProduct = ({ isOpen, onClose, onConfirm, product }) => {
             ยกเลิก
           </button>
           <button
-            onClick={onConfirm}
+            onClick={handleDelete}
             className="px-8 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors"
           >
             ลบ
