@@ -59,13 +59,13 @@ const Menu = () => {
 
   return (
     <div className="font-noto flex flex-col min-h-screen bg-white">
-      {/* LOGO */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold mb-4">SHOP NAME</h1>
-        <button onClick={handleCart}>
-          <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
-        </button>
-      </div>
+      {/* cart */}
+      <button
+        onClick={handleCart}
+        className="flex justify-end p-2 text-[#DD9F52] hover:text-orange-500 transition-all duration-300"
+      >
+        <PiShoppingCart size={36} />
+      </button>
 
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 ml-2 space-x-4 mb-4">
         {categories.map((category) => (

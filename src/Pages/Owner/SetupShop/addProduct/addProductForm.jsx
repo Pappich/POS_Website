@@ -18,8 +18,6 @@ const AddProductForm = () => {
     productData: {},
   };
 
-  console.log("PRODUCT DATA:", productData);
-
   const [step, setStep] = useState(1);
   const [menuName, setMenuName] = useState("");
   const [productDetails, setProductDetails] = useState("");
@@ -27,8 +25,6 @@ const AddProductForm = () => {
   const [productPrice, setProductPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const { owner_id } = userData || {};
-
-  console.log("MODE:", mode);
 
   useEffect(() => {
     if (mode === "edit" && productData) {
