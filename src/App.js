@@ -37,7 +37,7 @@ import QueueSummary from "./Pages/Customer/OrderSummary/queueSummary";
 import UserRole from "./Pages/Owner/SetupShop/userRole";
 import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
 import Summary from "./Pages/Customer/OrderSummary/orderSummary";
-import NavbarLayout from "./NavbarLayot";
+import NavbarLayout from "./NavbarLayout";
 
 function App() {
   return (
@@ -49,6 +49,16 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/enter-otp" element={<EnterOTP />} />
         <Route path="/enter-new-password" element={<EnterNewPassword />} />
+
+        {/* Sale summary */}
+        <Route path="/overview" element={<Home />} />
+        <Route path="/order-summary" element={<OrderSummary />} />
+        <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
+        <Route path="/stock" element={<Stock />} />
+        <Route path="/notification-summary" element={<NotificationSummary />} />
+        <Route path="/add-owner-product" element={<AddOwnerProduct />} />
+        <Route path="/product-detail" element={<ProductDetail />} />
+        <Route path="/cancel-order-summary" element={<CancelOrderSummary />} />
 
         {/* Routes with Navbar : other flow*/}
         <Route element={<NavbarLayout />}>
@@ -77,22 +87,6 @@ function App() {
           {/* Add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
-
-          {/* Sale summary */}
-          <Route path="/overview" element={<Home />} />
-          <Route path="/order-summary" element={<OrderSummary />} />
-          <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
-          <Route path="/stock" element={<Stock />} />
-          <Route
-            path="/notification-summary"
-            element={<NotificationSummary />}
-          />
-          <Route path="/add-owner-product" element={<AddOwnerProduct />} />
-          <Route path="/product-detail" element={<ProductDetail />} />
-          <Route
-            path="/cancel-order-summary"
-            element={<CancelOrderSummary />}
-          />
 
           {/* Customer flow */}
           <Route path="/menu" element={<Menu />} />

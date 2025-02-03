@@ -71,7 +71,7 @@ const OrderSummary = () => {
   ]);
   return (
     <div>
-      {/* <SideBar menuTab={"orderSummary"} /> */}
+      <SideBar menuTab={"orderSummary"} />
       <h1 className="font-bold text-xl">ออร์เดอร์ทั้งหมด</h1>
       <span className="flex justify-end">
         <CalendarSelect />
@@ -84,7 +84,7 @@ const OrderSummary = () => {
         <div>
           <div className="my-3">
             <div className="flex justify-between items-center space-x-4">
-              <div>ช่องทางการชำระเงิน</div>
+              <div>รายการออเดอร์</div>
               <div>
                 {/* timeRange Section */}
                 {timeRangeFilter.map((timeRange, index) => (
