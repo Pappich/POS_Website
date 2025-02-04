@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaRegClock } from "react-icons/fa6";
 import { MdOutlineTableBar } from "react-icons/md";
 import { MdOutlinePauseCircleOutline } from "react-icons/md";
@@ -8,40 +9,101 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdStopwatch } from "react-icons/io";
 import { MdDone } from "react-icons/md";
 import DoneOrderButton from "../../../Components/doneOrderButton";
+import CancelOrderButtonEm from "../../../Components/cancelOrderButtonEm";
+import LogoutButton from "../../../Components/logoutButton";
+import { useState, useEffect } from "react";
+import fetchApi from "../../../Config/fetchApi";
+import configureAPI from "../../../Config/configureAPI";
 
 const Order = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const navigate = useNavigate();
+  const handlePauseSection = () => {
+    navigate("/pause-section");
+  };
+  const [orders, setOrders] = useState([]);
+  const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        // const response = await fetchApi(`${URL}/employee/orders`, "GET");
+        const response = await fetch("http://localhost:3000/employee/orders");
+        const data = await response.json();
+
+        const formattedOrders = data.map((order) => {
+          const formattedDate = new Date(order.order_date).toLocaleString(
+            "th-TH",
+            {
+              timeZone: "Asia/Bangkok",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            }
+          );
+
+          return {
+            ...order,
+            order_date: formattedDate,
+            order_items: order.order_items || [],
+          };
+        });
+
+        setOrders(formattedOrders);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  console.log("ORDER DATA:", orders);
+
+  // useEffect(() => {
+  //   fetchOrders()
+  //     .then((data) => setOrder(data))
+  //     .catch((err) => console.error(err));
+  // }, []);
+
   return (
     <div className="grid grid-cols-3 gap-4">
-      <div className="bg-[#FFFFFF] rounded-2xl shadow-md">
-        {/* ข้างบน */}
-        <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
-          <h1 className="flex items-center justify-center font-bold border bg-[#F0ECE3] w-full rounded-full py-2 px-4 text-xl">
-            คิวที่ 01
-          </h1>
+      <div className="bg-[#FFFFFF] rounded-2xl shadow-md col-span-1">
+        {orders.length > 0 && orders[0]?.order_id ? (
+          <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
+            <h1 className="flex items-center justify-center font-bold border bg-[#F0ECE3] w-full rounded-full py-2 px-4 text-xl">
+              คิวที่ {orders[0].order_id}
+            </h1>
 
-          <div className="flex justify-between items-center">
-            <span>
-              <FaRegClock className="text-[#DD9F52]" />
-            </span>
-            <span className="pl-1">13:00:52 น.</span>
-          </div>
+            <div className="flex justify-between items-center">
+              <span>
+                <FaRegClock className="text-[#DD9F52]" />
+              </span>
+              <span className="pl-1">{orders[0].order_date} น.</span>
+            </div>
 
-          <div className="flex justify-between items-center">
+            {/* <div className="flex justify-between items-center">
             <span>
               <MdOutlineTableBar className="text-[#DD9F52]" size={19} />
             </span>
             <span className="pl-1 font-bold text-[#FF5555]">ทานที่ร้าน</span>
-          </div>
+          </div> */}
 
-          <div className="flex justify-between">
-            <span className="pr-1">ช่องทางการชำระเงิน</span>
-            <span className="border border-[#70AB8E] text-[#70AB8E] rounded-full px-5 ">
-              QR CODE
-            </span>
+            <div className="flex justify-between">
+              <span className="pr-1">ช่องทางการชำระเงิน</span>
+              <span className="border border-[#70AB8E] text-[#70AB8E] rounded-full px-5 ">
+                {/* add payment method */}
+                QR CODE
+              </span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div>Loading orders...</div>
+        )}
         <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
-        {/* ข้างล่าง */}
         <div className="pl-4 pr-4 pt-2">
           <span className="font-bold flex justify-center">
             รายการคำสั่งซื้อ
@@ -50,70 +112,69 @@ const Order = () => {
             <div>รายการสินค้า</div>
             <div>จำนวน</div>
           </div>
-          {/* ชื่อเมนู */}
-          <div className="h-[200px] overflow-y-auto">
-            <div className="mb-2">
-              <div className="flex justify-between">
-                <div>ชาสตรอเบอร์รี่</div>
-                <div>1</div>
-              </div>
-              <span className="text-[#5B5B5B] text-sm">
-                ชนิด: ปั่น | หวาน: 50% | ขนาด: S
-              </span>
+          {orders[0].order_items && orders[0].order_items.length > 0 ? (
+            <div className="h-[200px] overflow-y-auto">
+              {orders[0].order_items.map((item, idx) => (
+                <div key={idx} className="mb-2">
+                  <div className="flex justify-between">
+                    <div>{item.menu.menu_name}</div>
+                    <div>{item.quantity}</div>
+                  </div>
+                  <span className="text-[#5B5B5B] text-sm">
+                    ชนิด: {item.menu_type.type_name} | หวาน:{" "}
+                    {item.sweetness.level_name} | ขนาด: {item.size.size_name}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="mb-2">
-              <div className="flex justify-between">
-                <div>ชานมไต้หวัน</div>
-                <div>2</div>
-              </div>
-              <span className="text-[#5B5B5B] text-sm">
-                ชนิด: ปั่น | หวาน: 50% | ขนาด: S
-              </span>
-            </div>
-          </div>
-          <div class="space-y-2 w-full pt-2 pb-2">
-            <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
-              ยกเลิกออเดอร์
-            </button>
-            <DoneOrderButton/>
+          ) : (
+            <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
+          )}
+          <div className="space-y-2 w-full pt-2 pb-2">
+            <CancelOrderButtonEm />
+            <DoneOrderButton />
           </div>
         </div>
       </div>
-      <div className="col-span-2">
-        <div className="grid grid-cols-8 gap-2 my-2">
-          <div className="py-1 col-span-3 flex justify-center items-center border border-[#C6B399] rounded-full">
-            <CiCalendar className="text-[#C6B399]" size={24} />
-            <span className="pl-1 text-[#C6B399]">17 ธันวาคม พ.ศ. 2567</span>
+
+      {/* Loop through other orders */}
+      <div className="col-span-2 w-full">
+        <div className="grid grid-cols-2 gap-2 my-2 w-full">
+          {/* Calendar */}
+          <div className="py-1 flex justify-center items-center border bg-[#F0ECE3] rounded-full w-full">
+            <CiCalendar className="text-[#000000]" size={24} />
+            <span className="pl-1 text-[#000000]">17 ธันวาคม พ.ศ. 2567</span>
           </div>
-          <button className="py-1 col-span-4 w-full bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full">
+
+          {/* Button */}
+          <button
+            onClick={handlePauseSection}
+            className="py-1 bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full w-full"
+          >
             <div className="flex justify-center items-center">
               <MdOutlinePauseCircleOutline size={24} />
               พักวัตถุดิบ / รายการสินค้า
             </div>
           </button>
-          <button className="col-span-1 w-full bg-[#F0ECE3] hover:bg-[#a69781] text-white font-bold rounded-full">
-            <div className="py-1 flex justify-center">
-              <IoMdHome className="text-[#AD8B73]" size={24} />
-            </div>
-          </button>
         </div>
+        {/* <LogoutButton className="w-full" /> */}
+
         <div className="flex justify-around">
-          {/* ยอดออร์เดอร์ทั้งหมด */}
-          <div className="flex block max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
+          <div className="flex max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
               <MdOutlineShoppingCart color="white" size={24} />
             </div>
             <div className="ml-3">
-              <p>ยอดออร์เดอร์ทั้งหมด</p>
+              <p>ออเดอร์วันนี้</p>
               <p className="font-bold">15 ออเดอร์</p>
             </div>
           </div>
-          <div className="flex block max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
+          <div className="flex max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
               <IoMdStopwatch className="font-bold" color="white" size={30} />
             </div>
             <div className="ml-3">
-              <p>ยอดออเดอร์ที่รอ</p>
+              <p>ออเดอร์ที่รอ</p>
               <p className="font-bold">17 ออเดอร์</p>
             </div>
           </div>
@@ -122,124 +183,69 @@ const Order = () => {
               <MdDone color="white" size={28} />
             </div>
             <div className="ml-3">
-              <p>ยอดออเดอร์ที่เสร็จสิ้น</p>
+              <p>ออเดอร์ที่เสร็จ</p>
               <p className="font-bold">10 ออเดอร์</p>
             </div>
           </div>
         </div>
-        {/* ตัวCard */}
+
+        {/* Order Cards */}
         <div className="overflow-x-auto">
           <div className="flex space-x-4">
-            {/* คิวหัวน้อย */}
-            <div className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md">
-              {/* ข้างบน */}
-              <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
-                <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">
-                  คิวที่ 02
-                </h1>
+            {orders.length > 0 &&
+              orders.slice(1).map((order, index) => (
+                <div
+                  key={index}
+                  className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md ml-0.5"
+                >
+                  {/* ข้างบน */}
+                  <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
+                    <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">
+                      คิวที่ {index + 2}
+                    </h1>
 
-                <div className="flex justify-between items-center">
-                  <span>
-                    <FaRegClock className="text-[#DD9F52]" />
-                  </span>
-                  <span className="pl-1">13:00:52 น.</span>
-                </div>
-              </div>
-              <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
-              {/* ข้างล่าง */}
-              <div className="pl-4 pr-4 pt-2">
-                <span className="font-bold flex justify-center">
-                  รายการคำสั่งซื้อ
-                </span>
-                <div className="flex justify-between font-bold">
-                  <div>รายการสินค้า</div>
-                  <div>จำนวน</div>
-                </div>
-                {/* ชื่อเมนู */}
-                <div className="h-[200px] overflow-y-auto">
-                  <div className="mb-2">
-                    <div className="flex justify-between">
-                      <div>ชาสตรอเบอร์รี่</div>
-                      <div>1</div>
+                    <div className="flex justify-between items-center">
+                      <span>
+                        <FaRegClock className="text-[#DD9F52]" />
+                      </span>
+                      <span className="pl-1">{order.order_date} น.</span>
                     </div>
-                    <span className="text-[#5B5B5B] text-sm">
-                      ชนิด: ปั่น | หวาน: 50% | ขนาด: S
-                    </span>
                   </div>
-                  <div className="mb-2">
-                    <div className="flex justify-between">
-                      <div>ชานมไต้หวัน</div>
-                      <div>2</div>
-                    </div>
-                    <span className="text-[#5B5B5B] text-sm">
-                      ชนิด: ปั่น | หวาน: 50% | ขนาด: S
+                  <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
+                  {/* ข้างล่าง */}
+                  <div className="pl-4 pr-4 pt-2">
+                    <span className="font-bold flex justify-center">
+                      รายการคำสั่งซื้อ
                     </span>
-                  </div>
-                </div>
-                <div class="space-y-2 w-full pt-2 pb-2">
-                  <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
-                    ยกเลิกออเดอร์
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Add more cards as needed */}
-            {/* คิวหัวน้อย */}
-            <div className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md">
-              {/* ข้างบน */}
-              <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
-                <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">
-                  คิวที่ 02
-                </h1>
-
-                <div className="flex justify-between items-center">
-                  <span>
-                    <FaRegClock className="text-[#DD9F52]" />
-                  </span>
-                  <span className="pl-1">13:00:52 น.</span>
-                </div>
-              </div>
-              <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
-              {/* ข้างล่าง */}
-              <div className="pl-4 pr-4 pt-2">
-                <span className="font-bold flex justify-center">
-                  รายการคำสั่งซื้อ
-                </span>
-                <div className="flex justify-between font-bold">
-                  <div>รายการสินค้า</div>
-                  <div>จำนวน</div>
-                </div>
-                {/* ชื่อเมนู */}
-                <div className="h-[200px] overflow-y-auto">
-                  <div className="mb-2">
-                    <div className="flex justify-between">
-                      <div>ชาสตรอเบอร์รี่</div>
-                      <div>1</div>
+                    <div className="flex justify-between font-bold">
+                      <div>รายการสินค้า</div>
+                      <div>จำนวน</div>
                     </div>
-                    <span className="text-[#5B5B5B] text-sm">
-                      ชนิด: ปั่น | หวาน: 50% | ขนาด: S
-                    </span>
-                  </div>
-                  <div className="mb-2">
-                    <div className="flex justify-between">
-                      <div>ชานมไต้หวัน</div>
-                      <div>2</div>
+                    {/* ชื่อเมนู */}
+                    <div className="h-[200px] overflow-y-auto">
+                      {order.order_items && order.order_items.length > 0 ? (
+                        order.order_items.map((item, idx) => (
+                          <div key={idx} className="mb-2">
+                            <div className="flex justify-between">
+                              <div>{item.menu.menu_name}</div>
+                              <div>{item.quantity}</div>
+                            </div>
+                            <span className="text-[#5B5B5B] text-sm">
+                              {item.sweetness.level_name} -{" "}
+                              {item.size.size_name}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
+                      )}
                     </div>
-                    <span className="text-[#5B5B5B] text-sm">
-                      ชนิด: ปั่น | หวาน: 50% | ขนาด: S
-                    </span>
+                    <div className="space-y-2 w-full pt-2 pb-2">
+                      <CancelOrderButtonEm />
+                    </div>
                   </div>
                 </div>
-                <div class="space-y-2 w-full pt-2 pb-2">
-                  <button class="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#FF5555] hover:border-[#FF5555] hover:text-white font-bold py-2 px-4 rounded-full">
-                    ยกเลิกออเดอร์
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Add more cards as needed */}
+              ))}
           </div>
         </div>
       </div>

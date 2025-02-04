@@ -36,8 +36,11 @@ import PaymentMethod from "./Pages/Customer/OrderSummary/paymentMethod";
 import QueueSummary from "./Pages/Customer/OrderSummary/queueSummary";
 import UserRole from "./Pages/Owner/SetupShop/userRole";
 import OwnerMenu from "./Pages/Owner/SetupShop/ownerMenu";
+import PauseSection from "./Pages/Employee/main/pauseSection";
 import Summary from "./Pages/Customer/OrderSummary/orderSummary";
+import PauseIngredient from "./Pages/Employee/main/pauseIngredient";
 import NavbarLayout from "./NavbarLayout";
+import PauseMenu from "./Pages/Employee/main/pauseMenu";
 
 function App() {
   return (
@@ -97,8 +100,12 @@ function App() {
 
           {/* Employee flow */}
           <Route path="/order-list" element={<Order />} />
+          <Route path="/pause-section" element={<PauseSection />} />
+          <Route path="/pause-ingredient" element={<PauseIngredient />} />
+          <Route path="/pause-menu" element={<PauseMenu />} />
         </Route>
       </Routes>
+      {/* </div> */}
     </Router>
   );
 }

@@ -6,65 +6,56 @@ import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import { useEffect } from "react";
 
-const PauseIngredient = () => {
+const PauseMenu = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedIngredientItems, setSelectedIngredientItems] = useState([]);
+  const [selectedMenuItems, setSelectedMenuItems] = useState([]);
   const [filter, setFilter] = useState("ทั้งหมด");
-  const [ingredientItems, setIngredientItems] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
 
   useEffect(() => {
-    const fetchIngredient = async () => {
+    const fetchMenu = async () => {
       try {
-        const response = await fetchApi(
-          `${URL}/employee/pause/ingredients`,
-          "GET"
-        );
+        const response = await fetchApi(`${URL}/employee/pause/menus`, "GET");
         const data = await response.json();
-        setIngredientItems(data);
+        setMenuItems(data);
       } catch (error) {
-        console.error("Error fetching ingredients:", error);
+        console.error("Error fetching menu:", error);
       }
     };
 
-    fetchIngredient();
+    fetchMenu();
   }, []);
 
-  console.log("ingredientItems", ingredientItems);
+  console.log("MenuItems", menuItems);
 
-  const unpausedIngredients = ingredientItems.filter(
-    (ingredient) =>
-      !selectedIngredientItems.includes(ingredient) && !ingredient.paused
+  const unpausedMenus = menuItems.filter(
+    (menu) => !selectedMenuItems.includes(menu) && !menu.paused
   );
 
-  const getFilteredIngredientItems = () => {
-    if (filter === "ทั้งหมด") return ingredientItems;
+  const getFilteredMenuItems = () => {
+    if (filter === "ทั้งหมด") return menuItems;
 
     if (filter === "วัตถุดิบที่พัก") {
-      return ingredientItems.filter(
-        (ingredient) =>
-          ingredient.paused || selectedIngredientItems.includes(ingredient)
+      return menuItems.filter(
+        (menu) => menu.paused || selectedMenuItems.includes(menu)
       );
     }
 
     if (filter === "วัตถุดิบที่ไม่พัก") {
-      return ingredientItems.filter(
-        (ingredient) =>
-          !ingredient.paused && !selectedIngredientItems.includes(ingredient)
+      return menuItems.filter(
+        (menu) => !menu.paused && !selectedMenuItems.includes(menu)
       );
     }
 
-    return ingredientItems;
+    return menuItems;
   };
 
-  const filteredIngredientItems = getFilteredIngredientItems().filter(
-    (ingredient) =>
-      ingredient.ingredient_name
-        .normalize("NFD")
-        .includes(searchTerm.normalize("NFD"))
+  const filteredMenuItems = getFilteredMenuItems().filter((menu) =>
+    menu.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
   );
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
@@ -72,54 +63,48 @@ const PauseIngredient = () => {
   const handleBackButton = () => navigate("/pause-section");
 
   const handleSaveButton = async () => {
-    if (ingredientItems.length === 0) {
-      console.warn("No ingredients available.");
+    if (menuItems.length === 0) {
+      console.warn("No menus available.");
       return;
     }
 
-    const payload = ingredientItems.map((ingredient) => ({
-      ingredient_id: ingredient.ingredient_id,
-      paused: selectedIngredientItems.includes(ingredient),
+    const payload = menuItems.map((menu) => ({
+      menu_id: menu.menu_id,
+      paused: selectedMenuItems.includes(menu),
     }));
 
     try {
       const response = await fetchApi(
-        `${URL}/employee/pause/ingredients`,
+        `${URL}/employee/pause/menus`,
         "PATCH",
         payload
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to update ingredients: ${response.statusText}`);
+        throw new Error(`Failed to update menus: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("Ingredients updated successfully:", data);
-      setSelectedIngredientItems([]);
+      console.log("Menus updated successfully:", data);
+      setSelectedMenuItems([]);
     } catch (error) {
-      console.error("Error updating ingredients:", error);
+      console.error("Error updating Menus:", error);
     }
   };
 
-  const handleSelectIngredient = (ingredient) => {
-    setSelectedIngredientItems((prev) => {
-      const isSelected = prev.find(
-        (item) => item.ingredient_id === ingredient.ingredient_id
-      );
+  const handleSelectMenu = (menu) => {
+    setSelectedMenuItems((prev) => {
+      const isSelected = prev.find((item) => item.menu_id === menu.menu_id);
       if (isSelected) {
-        return prev.filter(
-          (item) => item.ingredient_id !== ingredient.ingredient_id
-        );
+        return prev.filter((item) => item.menu_id !== menu.menu_id);
       } else {
-        return [...prev, { ...ingredient, paused: !ingredient.paused }];
+        return [...prev, { ...menu, paused: !menu.paused }];
       }
     });
 
-    setIngredientItems((prevItems) =>
+    setMenuItems((prevItems) =>
       prevItems.map((item) =>
-        item.ingredient_id === ingredient.ingredient_id
-          ? { ...item, paused: !item.paused }
-          : item
+        item.menu_id === menu.menu_id ? { ...item, paused: !item.paused } : item
       )
     );
   };
@@ -199,25 +184,22 @@ const PauseIngredient = () => {
 
       <div className="w-full ml-16">
         <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-          {filteredIngredientItems.map((ingredient, index) => (
+          {filteredMenuItems.map((menu, index) => (
             <label key={index} className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={
-                  selectedIngredientItems.includes(ingredient) ||
-                  ingredient.paused
-                }
-                onChange={() => handleSelectIngredient(ingredient)}
+                checked={selectedMenuItems.includes(menu) || menu.paused}
+                onChange={() => handleSelectMenu(menu)}
                 className="form-checkbox h-5 w-5 accent-[#DD9F52]"
               />
-              <span>{ingredient.ingredient_name}</span>
+              <span>{menu.menu_name}</span>
             </label>
           ))}
         </div>
       </div>
       <div className="p-4 flex justify-center">
-        {selectedIngredientItems.length === 0 &&
-        ingredientItems.filter((item) => item.paused).length === 0 &&
+        {selectedMenuItems.length === 0 &&
+        menuItems.filter((item) => item.paused).length === 0 &&
         filter === "วัตถุดิบที่พัก"
           ? "ไม่มีวัตถุดิบที่พักในขณะนี้"
           : null}
@@ -242,4 +224,4 @@ const PauseIngredient = () => {
   );
 };
 
-export default PauseIngredient;
+export default PauseMenu;

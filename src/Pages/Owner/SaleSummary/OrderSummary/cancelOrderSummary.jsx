@@ -89,10 +89,10 @@ const CancelOrderSummary = () => {
   return (
     <div>
       <SideBar menuTab={"orderSummary"} />
-      <h1 className="font-bold text-xl">ออร์เดอร์ทั้งหมด</h1>
+      <h1 className="font-bold text-xl">ออเดอร์ทั้งหมด</h1>
       <div className="flex justify-between items-center">
         <span className="flex items-center">
-          <span className="font-bold">ออร์เดอร์ที่ถูกยกเลิก</span>
+          <span className="font-bold">ออเดอร์ที่ถูกยกเลิก</span>
         </span>
         <CalendarSelect />
       </div>
