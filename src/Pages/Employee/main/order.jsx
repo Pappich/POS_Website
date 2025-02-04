@@ -24,50 +24,54 @@ const Order = () => {
     navigate("/pause-section");
   };
   const [orders, setOrders] = useState([]);
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState({});
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // const response = await fetchApi(`${URL}/employee/orders`, "GET");
         const response = await fetch("http://localhost:3000/employee/orders");
+        if (!response.ok) {
+          throw new Error("Failed to fetch orders");
+        }
         const data = await response.json();
+        const formattedOrders = data
+          .filter((order) => order.status === "processing") // Filter only 'processing' orders
+          .map((order) => {
+            const formattedDate = new Date(order.order_date).toLocaleString(
+              "th-TH",
+              {
+                timeZone: "Asia/Bangkok",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+              }
+            );
 
-        const formattedOrders = data.map((order) => {
-          const formattedDate = new Date(order.order_date).toLocaleString(
-            "th-TH",
-            {
-              timeZone: "Asia/Bangkok",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            }
-          );
-
-          return {
-            ...order,
-            order_date: formattedDate,
-            order_items: order.order_items || [],
-          };
-        });
-
+            return {
+              ...order,
+              order_date: formattedDate,
+              order_items: order.order_items || [],
+            };
+          });
         setOrders(formattedOrders);
       } catch (err) {
-        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchOrders();
-  }, []);
+  }, [orders]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   console.log("ORDER DATA:", orders);
-
-  // useEffect(() => {
-  //   fetchOrders()
-  //     .then((data) => setOrder(data))
-  //     .catch((err) => console.error(err));
-  // }, []);
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -75,7 +79,7 @@ const Order = () => {
         {orders.length > 0 && orders[0]?.order_id ? (
           <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
             <h1 className="flex items-center justify-center font-bold border bg-[#F0ECE3] w-full rounded-full py-2 px-4 text-xl">
-              คิวที่ {orders[0].order_id}
+              ออเดอร์คิวที่ {orders[0]?.order_id}
             </h1>
 
             <div className="flex justify-between items-center">
@@ -112,7 +116,7 @@ const Order = () => {
             <div>รายการสินค้า</div>
             <div>จำนวน</div>
           </div>
-          {orders[0].order_items && orders[0].order_items.length > 0 ? (
+          {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
             <div className="h-[200px] overflow-y-auto">
               {orders[0].order_items.map((item, idx) => (
                 <div key={idx} className="mb-2">
@@ -130,9 +134,9 @@ const Order = () => {
           ) : (
             <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
           )}
-          <div className="space-y-2 w-full pt-2 pb-2">
-            <CancelOrderButtonEm />
-            <DoneOrderButton />
+          <div className="space-y-2 w-full pt-2 pb-2 mb-auto">
+            <CancelOrderButtonEm order={orders[0].order_id} />
+            <DoneOrderButton order={orders[0].order_id} />
           </div>
         </div>
       </div>
@@ -201,7 +205,7 @@ const Order = () => {
                   {/* ข้างบน */}
                   <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
                     <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">
-                      คิวที่ {index + 2}
+                      ออเดอร์คิวที่ {order?.order_id}
                     </h1>
 
                     <div className="flex justify-between items-center">
@@ -241,7 +245,7 @@ const Order = () => {
                       )}
                     </div>
                     <div className="space-y-2 w-full pt-2 pb-2">
-                      <CancelOrderButtonEm />
+                      <CancelOrderButtonEm order={order?.order_id} />
                     </div>
                   </div>
                 </div>

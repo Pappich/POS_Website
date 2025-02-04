@@ -48,7 +48,6 @@ function App() {
       <Routes>
         {/* Routes without Navbar : login flow */}
         <Route path="/" element={<Login />} />
-        <Route path="/guideline" element={<GuideLine />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/enter-otp" element={<EnterOTP />} />
         <Route path="/enter-new-password" element={<EnterNewPassword />} />
@@ -70,6 +69,7 @@ function App() {
           <Route path="/owner" element={<OwnerMenu />} />
 
           {/* Add product flow */}
+          <Route path="/guideline" element={<GuideLine />} />
           <Route path="/add-product" element={<AddProductForm />} />
           <Route path="/product-list" element={<ProductList />} />
 

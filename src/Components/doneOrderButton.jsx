@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import "react-simple-keyboard/build/css/index.css";
+import fetchApi from "../Config/fetchApi";
+import configureAPI from "../Config/configureAPI";
 
-const DoneOrderButton = () => {
+const DoneOrderButton = ({ order }) => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  console.log("order", order);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -10,6 +17,31 @@ const DoneOrderButton = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const completeOrder = async () => {
+    const orderData = {
+      order_id: order,
+      status: "success",
+    };
+
+    try {
+      const response = await fetchApi(
+        `${URL}/employee/orders/${order}/complete`,
+        "PATCH",
+        orderData
+      );
+
+      if (response.ok) {
+        console.log("Order completed successfully!");
+        closeModal();
+      } else {
+        console.log(response);
+        console.log("Failed to complete the order.");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -39,7 +71,7 @@ const DoneOrderButton = () => {
               </button>
               <button
                 className="w-full bg-[#C6B399] hover:bg-[#a69781] text-white font-bold py-2 px-4 rounded-full"
-                onClick={closeModal}
+                onClick={completeOrder}
               >
                 เสร็จสิ้นออเดอร์
               </button>
