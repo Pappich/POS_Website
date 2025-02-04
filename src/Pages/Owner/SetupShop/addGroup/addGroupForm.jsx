@@ -1,21 +1,101 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
+import { useEffect } from "react";
+import fetchApi from "../../../../Config/fetchApi";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import configureAPI from "../../../../Config/configureAPI";
+import LoadingPopup from "../../../../Components/loadingPopup";
 
 const AddGroupForm = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
+  const userData = useSelector((state) => state.user.userData);
+  const location = useLocation();
+  const { mode, groupData } = location.state || {
+    mode: "add",
+    groupData: {},
+  };
 
   const [step, setStep] = useState(1);
   const [groupName, setGroupName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { owner_id } = userData || {};
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
-  const handleNext = () => {
-    if (step === 3) {
-      //ADD HANDLE SEND TO BACKEND
-      navigate("/group-list");
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const response = await fetchApi(`${URL}/owner/menus`, "GET");
+        const data = await response.json();
+
+        setMenuItems(data);
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
+
+    fetchMenus();
+  }, []);
+
+  console.log("selectedMenus:", selectedMenus);
+  console.log("mode:", mode);
+  console.log("owner id:", owner_id);
+
+  useEffect(() => {
+    const fetchGroupData = async () => {
+      try {
+        const categoryId = groupData.category_id;
+        const response = await fetchApi(
+          `${URL}/owner/categories/${categoryId}/menus`,
+          "GET"
+        );
+        const group = await response.json();
+        console.log("Group data:", group);
+
+        if (mode === "edit" && groupData) {
+          const menuNames = group.map((menu) => menu.menu_id);
+
+          setGroupName(groupData.category_name || null);
+          setSelectedMenus(menuNames || []);
+        }
+      } catch (error) {
+        console.error("Error fetching group data:", error);
+      }
+    };
+
+    fetchGroupData();
+  }, []);
+
+  const handleNext = async () => {
+    setLoading(true);
+    try {
+      if (step === 3) {
+        if (owner_id) {
+          const endpoint = mode === "add" ? `${URL}/owner/categories` : null;
+          const method = mode === "add" ? "POST" : "PATCH";
+
+          const response = await fetchApi(endpoint, method, {
+            category_name: groupName,
+            menu_id: selectedMenus,
+          });
+
+          if (response.ok) {
+            navigate("/group-list");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error create category:", error);
+    } finally {
+      setLoading(false);
     }
     if (step < 3) {
       setStep(step + 1);
@@ -31,39 +111,16 @@ const AddGroupForm = () => {
     }
   };
 
-  // SELECT MENU
-  const menus = [
-    "กาแฟดำ",
-    "ชามบไต้หวัน",
-    "ชามนไข่มุก",
-    "ชามนสตรอเบอรี่",
-    "ชามนบลูเบอรี่",
-    "ชามนแอปเปิ้ล",
-    "ชามกีวี",
-    "เอสเปรสโซ่",
-    "อเมริกาโน่",
-    "การแฟโบราณ",
-    "มอคค่า",
-    "ลาเต้",
-    "คาปูชิโน่",
-    "สตอเบอรี่โซดา",
-    "บลูเบอรี่โซดา",
-    "แอปเปิ้ลโซดา",
-    "กีวี่โซดา",
-    "ชาพีช",
-    "พีซโซดา",
-  ];
-
-  const handleSelectMenu = (menu) => {
+  const handleSelectMenu = (menuId) => {
     setSelectedMenus((prev) =>
-      prev.includes(menu)
-        ? prev.filter((item) => item !== menu)
-        : [...prev, menu]
+      prev.includes(menuId)
+        ? prev.filter((id) => id !== menuId)
+        : [...prev, menuId]
     );
   };
 
-  const filteredGroups = menus.filter((menu) =>
-    menu.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMenus = menuItems.filter((menu) =>
+    menu.menu_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const renderStepContent = () => {
@@ -121,15 +178,18 @@ const AddGroupForm = () => {
                 เมนูทั้งหมด
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-                {filteredGroups.map((menu, index) => (
-                  <label key={index} className="flex items-center space-x-2">
+                {filteredMenus.map((menu) => (
+                  <label
+                    key={menu.menu_id}
+                    className="flex items-center space-x-2"
+                  >
                     <input
                       type="checkbox"
-                      checked={selectedMenus.includes(menu)}
-                      onChange={() => handleSelectMenu(menu)}
+                      checked={selectedMenus.includes(menu.menu_id)}
+                      onChange={() => handleSelectMenu(menu.menu_id)}
                       className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                     />
-                    <span>{menu}</span>
+                    <span>{menu.menu_name}</span>
                   </label>
                 ))}
               </div>
@@ -151,16 +211,20 @@ const AddGroupForm = () => {
                 เมนูทั้งหมดในหมวดหมู่
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-                {selectedMenus.map((menu, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={true}
-                      className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                    />
-                    <span>{menu}</span>
-                  </div>
-                ))}
+                {selectedMenus.map((menuId) => {
+                  const menu = menuItems.find((m) => m.menu_id === menuId);
+                  return (
+                    <div key={menuId} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked
+                        readOnly
+                        className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                      />
+                      <span>{menu?.menu_name}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </>
@@ -171,33 +235,37 @@ const AddGroupForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
-      <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
-      </div>
-
-      <div className="w-full">
-        <div className="flex flex-col items-center w-full">
-          {renderStepContent()}
+    <>
+      <div className="flex flex-col items-center min-h-screen bg-white">
+        <div className="text-center mb-10">
+          <h1 className="text-2xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
+          <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
         </div>
 
-        <div className="flex mt-8 w-full space-x-8 justify-between">
-          <button
-            className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
-            onClick={handleBack}
-          >
-            ย้อนกลับ
-          </button>
-          <button
-            className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
-            onClick={handleNext}
-          >
-            {step < 3 ? "ถัดไป" : "บันทึก"}
-          </button>
+        <div className="w-full">
+          <div className="flex flex-col items-center w-full">
+            {renderStepContent()}
+          </div>
+
+          <div className="flex mt-8 w-full space-x-8 justify-between">
+            <button
+              className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+              onClick={handleBack}
+            >
+              ย้อนกลับ
+            </button>
+            <button
+              className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+              onClick={handleNext}
+            >
+              {step < 3 ? "ถัดไป" : "บันทึก"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <LoadingPopup loadingStatus={loading} />
+    </>
   );
 };
 

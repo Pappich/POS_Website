@@ -5,7 +5,9 @@ function NavbarLayout() {
   return (
     <div className="border-white min-h-screen">
       <Navbar />
-      <Outlet />
+      <div className="border-l-[40px] border-r-[40px] border-white min-h-screen">
+        <Outlet />
+      </div>
     </div>
   );
 }

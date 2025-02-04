@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import fetchApi from "../../../../Config/fetchApi";
 
 const AddStockForm = () => {
+  const location = useLocation();
+  const { menu, menu_id } = location.state || {};
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
+  console.log("MENU", menu, menu_id);
+
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [rows, setRows] = useState([{ material: "", unit: "" }]);
   const [selectedType, setSelectedType] = useState("ร้อน");
+  const [stockData, setStockData] = useState([]);
 
   // List options
   const unitOptions = [
@@ -50,9 +64,39 @@ const AddStockForm = () => {
     setTypeData(updatedTypeData);
   };
 
-  const handleNext = () => {
-    if (step === 2) {
-      // SAVE
+  const handleNext = async () => {
+    if (step === 3) {
+      const data = {
+        owner_id: owner_id,
+        branch_id: 2,
+        menuData: rows.map((row) => ({
+          ingredient_name: row.material,
+          unit: row.unit,
+          ingredientListForStock: sizeItems.map((size, sizeIndex) => ({
+            size_id: sizeIndex + 1,
+            menu_type_id: typeItems.indexOf(selectedType) + 1,
+            quantity_used: parseInt(
+              typeData[selectedType]?.[sizeIndex]?.[size] || 0
+            ),
+          })),
+        })),
+      };
+
+      console.log("stock data to send:", data);
+
+      try {
+        const response = await fetchApi(`${URL}/owner/menus/stock/10`, "POST", {
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          console.log("stock saved successfully!");
+        } else {
+          console.error("Failed to link stock data");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
     } else {
       setStep(step + 1);
     }
@@ -74,7 +118,7 @@ const AddStockForm = () => {
       </div>
 
       <div className="flex items-start w-full font-bold text-xl">
-        วัตถุดิบ และปริมาณที่ใช้:
+        วัตถุดิบ และปริมาณที่ใช้: {menu}
       </div>
 
       {step === 1 && (
@@ -209,6 +253,70 @@ const AddStockForm = () => {
         </>
       )}
 
+      {step === 3 && (
+        <div className="w-full">
+          <table className="w-full border-collapse border border-gray-200 mt-4">
+            {/* Table Header */}
+            <thead>
+              {/* First Header Row: Group Types */}
+              <tr className="bg-gray-100">
+                <th
+                  className="border border-gray-300 px-4 py-2 text-center"
+                  rowSpan={2}
+                >
+                  รายการวัตถุดิบ
+                </th>
+                {typeItems.map((type, typeIndex) => (
+                  <th
+                    key={typeIndex}
+                    className="border border-gray-300 px-4 py-2 text-center"
+                    colSpan={sizeItems.length} // Span across all sizes
+                  >
+                    {type}
+                  </th>
+                ))}
+              </tr>
+
+              {/* Second Header Row: Sizes under each Type */}
+              <tr className="bg-gray-100">
+                {typeItems.map(() =>
+                  sizeItems.map((size, sizeIndex) => (
+                    <th
+                      key={sizeIndex}
+                      className="border border-gray-300 px-4 py-2 text-center"
+                    >
+                      {size}
+                    </th>
+                  ))
+                )}
+              </tr>
+            </thead>
+
+            {/* Table Body */}
+            <tbody>
+              {rows.map((row, rowIndex) => (
+                <tr key={rowIndex} className="bg-white text-start">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {rowIndex + 1}. {row.material} ({row.unit})
+                  </td>
+                  {typeItems.map((type) =>
+                    sizeItems.map((size, sizeIndex) => (
+                      <td
+                        key={sizeIndex}
+                        className="border border-gray-300 px-4 py-2 text-center"
+                      >
+                        {typeData[type]?.[rowIndex]?.[size] || "-"}{" "}
+                        {/* Read-only display */}
+                      </td>
+                    ))
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       <div className="flex mt-8 w-full space-x-8 justify-between">
         <button
           className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] font-bold"
@@ -220,7 +328,7 @@ const AddStockForm = () => {
           className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
           onClick={handleNext}
         >
-          {step < 2 ? "ถัดไป" : "บันทึก"}
+          {step < 3 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
     </div>

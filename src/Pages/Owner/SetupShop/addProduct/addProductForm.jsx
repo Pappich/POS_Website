@@ -26,6 +26,8 @@ const AddProductForm = () => {
   const [loading, setLoading] = useState(false);
   const { owner_id } = userData || {};
 
+  console.log("user data: ", owner_id);
+
   useEffect(() => {
     if (mode === "edit" && productData) {
       setMenuName(productData.menu_name || null);
@@ -36,6 +38,7 @@ const AddProductForm = () => {
   }, [mode, productData]);
 
   const handleAddProduct = async () => {
+    console.log("add product");
     setLoading(true);
     try {
       if (owner_id) {
@@ -72,6 +75,7 @@ const AddProductForm = () => {
   const handleNext = () => {
     if (step === 5) {
       //ADD HANDLE SEND TO BACKEND
+      console.log("save button click");
       handleAddProduct(menuName, productDetails, productPrice, productImage);
     }
     if (step < 5) {
