@@ -23,6 +23,8 @@ const StockList = () => {
       });
   }, []);
 
+  console.log("MENU DATA", menuData);
+
   const { available_category, available_menus } = menuData;
   console.log("available_menus", available_menus);
 
@@ -36,7 +38,13 @@ const StockList = () => {
   }, {});
 
   const categoryItems = available_category;
-  const allMenuItems = available_menus.map((menu) => menu.menu_name);
+  const allMenuItems = available_menus.map((menu) => ({
+    menu_id: menu.menu_id,
+    menu_name: menu.menu_name,
+  }));
+
+  console.log("MENU:", allMenuItems);
+  console.log("categoryItems:", categoryItems);
 
   // filter by search
   const filteredItems =
@@ -57,7 +65,7 @@ const StockList = () => {
   };
 
   const handleEditClick = (item) => {
-    console.log(item);
+    console.log("item click", item);
     navigate("/add-stock", {
       state: {
         menu: item.menu_name,
@@ -112,7 +120,7 @@ const StockList = () => {
           filteredItems.map((item, index) => (
             <div key={index} className="w-full mb-4">
               <div className="flex justify-between items-center">
-                <p className="text-lg">{item}</p>
+                <p className="text-lg">{item.menu_name}</p>
                 <button
                   onClick={() => handleEditClick(item)}
                   className="text-[#D4B28C] font-bold"

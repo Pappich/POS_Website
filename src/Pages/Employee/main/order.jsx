@@ -145,7 +145,7 @@ const Order = () => {
       <div className="col-span-2 w-full">
         <div className="grid grid-cols-2 gap-2 my-2 w-full">
           {/* Calendar */}
-          <div className="py-1 flex justify-center items-center border bg-[#F0ECE3] rounded-full w-full">
+          <div className="py-1 flex justify-center items-center border border-[#C6B399] rounded-full w-full">
             <CiCalendar className="text-[#000000]" size={24} />
             <span className="pl-1 text-[#000000]">17 ธันวาคม พ.ศ. 2567</span>
           </div>
@@ -197,59 +197,61 @@ const Order = () => {
         <div className="overflow-x-auto">
           <div className="flex space-x-4">
             {orders.length > 0 &&
-              orders.slice(1).map((order, index) => (
-                <div
-                  key={index}
-                  className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md ml-0.5"
-                >
-                  {/* ข้างบน */}
-                  <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
-                    <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">
-                      ออเดอร์คิวที่ {order?.order_id}
-                    </h1>
+              orders
+                .sort((a, b) => a.order_id - b.order_id)
+                .slice(1)
+                .map((order, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[300px] bg-[#FFFFFF] rounded-2xl shadow-md ml-0.5"
+                  >
+                    <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
+                      <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-xl">
+                        ออเดอร์คิวที่ {order?.order_id}
+                      </h1>
 
-                    <div className="flex justify-between items-center">
-                      <span>
-                        <FaRegClock className="text-[#DD9F52]" />
+                      <div className="flex justify-between items-center">
+                        <span>
+                          <FaRegClock className="text-[#DD9F52]" />
+                        </span>
+                        <span className="pl-1">{order.order_date} น.</span>
+                      </div>
+                    </div>
+                    <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
+                    <div className="pl-4 pr-4 pt-2">
+                      <span className="font-bold flex justify-center">
+                        รายการคำสั่งซื้อ
                       </span>
-                      <span className="pl-1">{order.order_date} น.</span>
-                    </div>
-                  </div>
-                  <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
-                  {/* ข้างล่าง */}
-                  <div className="pl-4 pr-4 pt-2">
-                    <span className="font-bold flex justify-center">
-                      รายการคำสั่งซื้อ
-                    </span>
-                    <div className="flex justify-between font-bold">
-                      <div>รายการสินค้า</div>
-                      <div>จำนวน</div>
-                    </div>
-                    {/* ชื่อเมนู */}
-                    <div className="h-[200px] overflow-y-auto">
-                      {order.order_items && order.order_items.length > 0 ? (
-                        order.order_items.map((item, idx) => (
-                          <div key={idx} className="mb-2">
-                            <div className="flex justify-between">
-                              <div>{item.menu.menu_name}</div>
-                              <div>{item.quantity}</div>
+                      <div className="flex justify-between font-bold">
+                        <div>รายการสินค้า</div>
+                        <div>จำนวน</div>
+                      </div>
+
+                      <div className="h-[200px] overflow-y-auto">
+                        {order.order_items && order.order_items.length > 0 ? (
+                          order.order_items.map((item, idx) => (
+                            <div key={idx} className="mb-2">
+                              <div className="flex justify-between">
+                                <div>{item.menu.menu_name}</div>
+                                <div>{item.quantity}</div>
+                              </div>
+                              <span className="text-[#5B5B5B] text-sm">
+                                ชนิด: {item.menu_type.type_name} | หวาน:{" "}
+                                {item.sweetness.level_name} | ขนาด:{" "}
+                                {item.size.size_name}
+                              </span>
                             </div>
-                            <span className="text-[#5B5B5B] text-sm">
-                              {item.sweetness.level_name} -{" "}
-                              {item.size.size_name}
-                            </span>
-                          </div>
-                        ))
-                      ) : (
-                        <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
-                      )}
-                    </div>
-                    <div className="space-y-2 w-full pt-2 pb-2">
-                      <CancelOrderButtonEm order={order?.order_id} />
+                          ))
+                        ) : (
+                          <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
+                        )}
+                      </div>
+                      <div className="space-y-2 w-full pt-2 pb-2">
+                        <CancelOrderButtonEm order={order?.order_id} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
           </div>
         </div>
       </div>
