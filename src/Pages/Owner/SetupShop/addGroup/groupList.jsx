@@ -2,23 +2,36 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import DeleteGroup from "./deleteGroup";
+import fetchApi from "../../../../Config/fetchApi";
+import { useEffect } from "react";
+import configureAPI from "../../../../Config/configureAPI";
 
 const GroupList = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
+  const [categoryItems, setCategoryItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
+  const [deleteCategory, setCategoryToDelete] = useState(null);
 
-  const menuItems = [
-    "โปรสุดคุ้ม",
-    "อิ่มท้อง",
-    "น้ำหวานชื่นใจ",
-    "ตาสว่างยันเช้า",
-    "เครื่องดื่มอุ่นๆ",
-  ];
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const response = await fetchApi(`${URL}/owner/categories`, "GET");
+        const data = await response.json();
+        setCategoryItems(data);
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
 
-  const filteredItems = menuItems.filter((item) =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
+    fetchCategory();
+  }, [categoryItems]);
+
+  const filteredItems = categoryItems.filter((item) =>
+    item.category_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
   );
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
@@ -28,17 +41,16 @@ const GroupList = () => {
   };
 
   const handleAddGroup = () => {
-    navigate("/add-group");
+    navigate("/add-group", { state: { mode: "add" } });
   };
 
-  const handleDeleteClick = (product) => {
-    setProductToDelete(product);
+  const handleDeleteClick = (deleteCategory) => {
+    setCategoryToDelete(deleteCategory);
     setIsDeletePopupOpen(true);
   };
 
   const handleConfirmDelete = () => {
     // DELETE PRODUCT API PATH
-    console.log("Deleting:", productToDelete);
     setIsDeletePopupOpen(false);
   };
 
@@ -46,17 +58,35 @@ const GroupList = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const handleEditClick = (product) => {
+  const handleEditClick = (group) => {
     // EDIT PRODUCT => FLOW ADD BUT HAVE DATA OF EACH PRODUCT
-    navigate("/add-group");
+    console.log("group click", group);
+    navigate("/add-group", { state: { mode: "edit", groupData: group } });
   };
 
-  const handleGroupClick = (product) => {
-    navigate("/group-menu", {
-      // CHANGE TO SEND MENU IN EACH GROUP
-      // EXAMPLE
-      state: { groupName: product, selectedMenus: ["กาแฟดำ", "ลาเต้"] },
-    });
+  const handleGroupClick = async (group) => {
+    try {
+      const categoryId = group.category_id;
+      const response = await fetchApi(
+        `${URL}/owner/categories/${categoryId}/menus`,
+        "GET"
+      );
+
+      const data = await response.json();
+      const menus = data;
+      if (menus && menus.length > 0) {
+        navigate("/group-menu", {
+          state: {
+            groupName: group.category_name,
+            selectedMenus: menus,
+          },
+        });
+      } else {
+        console.error("API response does not contain any menus.");
+      }
+    } catch (error) {
+      console.error("Error fetching group menus:", error);
+    }
   };
 
   return (
@@ -93,7 +123,7 @@ const GroupList = () => {
             filteredItems.map((item, index) => (
               <div key={index} className="w-full mb-4">
                 <div className="flex justify-between items-start">
-                  <p className="text-lg">{item}</p>
+                  <p className="text-lg">{item.category_name}</p>
                   <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
                     <button
                       className="hover:underline font-bold"
@@ -146,7 +176,7 @@ const GroupList = () => {
         isOpen={isDeletePopupOpen}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        product={productToDelete}
+        deleteCategory={deleteCategory}
       />
     </>
   );

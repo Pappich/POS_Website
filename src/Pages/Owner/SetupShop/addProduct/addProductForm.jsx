@@ -1,19 +1,82 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const AddProductForm = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
+  const userData = useSelector((state) => state.user.userData);
+  const location = useLocation();
+  const { mode, productData } = location.state || {
+    mode: "add",
+    productData: {},
+  };
 
   const [step, setStep] = useState(1);
-  const [productName, setProductName] = useState("");
+  const [menuName, setMenuName] = useState("");
   const [productDetails, setProductDetails] = useState("");
   const [productImage, setProductImage] = useState(null);
   const [productPrice, setProductPrice] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { owner_id } = userData || {};
+
+  console.log("user data: ", owner_id);
+
+  useEffect(() => {
+    if (mode === "edit" && productData) {
+      setMenuName(productData.menu_name || null);
+      setProductDetails(productData.description || null);
+      setProductImage(productData.image_url || null);
+      setProductPrice(productData.price || null);
+    }
+  }, [mode, productData]);
+
+  const handleAddProduct = async () => {
+    console.log("add product");
+    setLoading(true);
+    try {
+      if (owner_id) {
+        const endpoint =
+          mode === "add"
+            ? `${URL}/owner/menus`
+            : `${URL}/owner/menus/${productData.menu_id}`;
+        const method = mode === "add" ? "POST" : "PATCH";
+
+        const response = await fetchApi(endpoint, method, {
+          menu_name: menuName,
+          description: productDetails,
+          price: productPrice,
+          image_url:
+            "https://images.app.goo.gl/ufVikgddcd26KVwPA" ||
+            "https://images.app.goo.gl/ufVikgddcd26KVwPA",
+          store_id: 1,
+          owner_id,
+          branch_id: 1,
+          category_id: 1,
+        });
+
+        if (response.ok) {
+          navigate("/product-list");
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting menu:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNext = () => {
     if (step === 5) {
       //ADD HANDLE SEND TO BACKEND
-      navigate("/product-list");
+      console.log("save button click");
+      handleAddProduct(menuName, productDetails, productPrice, productImage);
     }
     if (step < 5) {
       setStep(step + 1);
@@ -32,7 +95,11 @@ const AddProductForm = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setProductImage(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProductImage(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -45,16 +112,16 @@ const AddProductForm = () => {
               1. กรอกชื่อสินค้าที่ต้องการ
             </div>
             <label
-              htmlFor="productName"
+              htmlFor="menuName"
               className="text-lg mb-2 w-full text-center"
             >
               ชื่อสินค้า
             </label>
             <input
               type="text"
-              id="productName"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              id="menuName"
+              value={menuName}
+              onChange={(e) => setMenuName(e.target.value)}
               placeholder="กรอกชื่อสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -159,7 +226,7 @@ const AddProductForm = () => {
               5. สรุปรายการสินค้า
             </div>
             <div className="flex w-full space-x-8 justify-between mb-2">
-              <p className="font-bold">ชื่อสินค้า {productName}</p>
+              <p className="font-bold">ชื่อสินค้า {menuName}</p>
               <p className="font-bold">ราคาสินค้า {productPrice} บาท</p>
             </div>
             <div className="font-bold text-left mb-2 w-full">รูปภาพสินค้า</div>
@@ -188,7 +255,9 @@ const AddProductForm = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
       <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">เพิ่มรายการสินค้า</h1>
+        <h1 className="text-2xl font-bold mb-2">
+          {mode === "add" ? "เพิ่มรายการสินค้า" : "แก้ไขรายการสินค้า"}
+        </h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
@@ -212,6 +281,31 @@ const AddProductForm = () => {
           </button>
         </div>
       </div>
+
+      {/* loading popup */}
+      {loading && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white h-[250px] w-[300px] rounded-md shadow-lg flex justify-center items-center flex-col">
+            <svg
+              aria-hidden="true"
+              className="w-36 h-36 text-gray-200 animate-spin dark:text-gray-300 fill-[#485058]"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+            <p className="mt-8 text-center text-xl">โหลดข้อมูล...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

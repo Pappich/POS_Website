@@ -4,10 +4,13 @@ import { useNavigate } from "react-router-dom";
 const GroupMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { groupName, selectedMenus } = location.state || {
-    groupName: "",
-    selectedMenus: [],
-  };
+
+  const { groupName = "", selectedMenus = [] } = location.state || {};
+
+  // console.log("Location state:", location.state);
+  // console.log("Group Name:", groupName);
+  // console.log("Selected Menus:", selectedMenus);
+  // console.log(groupName, selectedMenus);
 
   const handleBack = () => {
     navigate("/group-list");
@@ -42,7 +45,7 @@ const GroupMenu = () => {
                   checked={true}
                   className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                 />
-                <span>{menu}</span>
+                <span>{menu.menu_name}</span>
               </div>
             ))}
           </div>

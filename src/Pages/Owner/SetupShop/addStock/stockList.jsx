@@ -1,33 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import fetchApi from "../../../../Config/fetchApi";
 
 const StockList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [menuData, setMenuData] = useState({
+    available_category: [],
+    available_menus: [],
+  });
 
-  const menuItems = {
-    สว่างคาตา: ["กาแฟดำ", "ชาเขียว"],
-    เครื่องดื่มอุ่นๆ: ["โกโก้", "นมอุ่น"],
-    จับคู่อิ่มท้อง: ["ชาไทย", "ขนมปังปิ้ง"],
-    โซดาสุดซ่า: ["เลมอนโซดา", "สตรอเบอรี่โซดา"],
-    เรื่องนมๆๆ: ["นมชมพู", "นมเย็น"],
-    เรื่องนมๆๆๆ: ["นมชมพู", "นมเย็น"],
-    เรื่องนมๆๆๆๆ: ["นมชมพู", "นมเย็น"],
-    เรื่องนมๆๆๆๆๆ: ["นมชมพู", "นมเย็น"],
-    เรื่องนมๆๆๆๆๆๆ: ["นมชมพู", "นมเย็น"],
-  };
+  useEffect(() => {
+    fetchApi("http://localhost:3000/customer/menus", "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        setMenuData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching menu data:", error);
+      });
+  }, []);
 
-  const categoryItems = Object.keys(menuItems);
-  const MenuItems = Object.values(menuItems).flat();
+  console.log("MENU DATA", menuData);
 
+  const { available_category, available_menus } = menuData;
+  console.log("available_menus", available_menus);
+
+  // loop map menu items by category
+  const menuItems = available_menus.reduce((acc, menu) => {
+    menu.category.forEach((category) => {
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(menu.menu_name);
+    });
+    return acc;
+  }, {});
+
+  const categoryItems = available_category;
+  const allMenuItems = available_menus.map((menu) => ({
+    menu_id: menu.menu_id,
+    menu_name: menu.menu_name,
+  }));
+
+  console.log("MENU:", allMenuItems);
+  console.log("categoryItems:", categoryItems);
+
+  // filter by search
   const filteredItems =
     selectedCategory && menuItems[selectedCategory]
       ? menuItems[selectedCategory].filter((item) =>
           item.toLowerCase().includes(searchTerm.toLowerCase())
         )
-      : MenuItems;
+      : allMenuItems;
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -39,8 +64,15 @@ const StockList = () => {
     navigate("/main-menu");
   };
 
-  const handleEditClick = (product) => {
-    navigate("/add-stock");
+  const handleEditClick = (item) => {
+    console.log("item click", item);
+    navigate("/add-stock", {
+      state: {
+        menu: item.menu_name,
+        menu_id: item.menu_id,
+        // available_menus: available_menus,
+      },
+    });
   };
 
   return (
@@ -72,9 +104,9 @@ const StockList = () => {
           <button
             key={index}
             onClick={() => handleCategoryClick(categoryItem)}
-            className={`px-6 py-3 rounded-full border border-[#DD9F52] font-bold ml-2 ${
+            className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold ml-2 ${
               selectedCategory === categoryItem
-                ? "bg-[#FFA726] text-white"
+                ? "bg-[#D4B28C] text-white"
                 : "bg-white text-[#DD9F52]"
             }`}
           >
@@ -88,7 +120,7 @@ const StockList = () => {
           filteredItems.map((item, index) => (
             <div key={index} className="w-full mb-4">
               <div className="flex justify-between items-center">
-                <p className="text-lg">{item}</p>
+                <p className="text-lg">{item.menu_name}</p>
                 <button
                   onClick={() => handleEditClick(item)}
                   className="text-[#D4B28C] font-bold"

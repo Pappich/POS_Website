@@ -1,11 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import fetchApi from "../../../../Config/fetchApi";
+import { useEffect } from "react";
 
 const AddStockForm = () => {
+  const location = useLocation();
+  const { menu, menu_id } = location.state || {};
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [rows, setRows] = useState([{ material: "", unit: "" }]);
-  const [selectedType, setSelectedType] = useState("ร้อน");
+  const [sizeItems, setSizeItems] = useState([]);
+  const [typeItems, setTypeItems] = useState([]);
+  const [selectedType, setSelectedType] = useState(typeItems[0]?.menu_type_id);
+  const [typeData, setTypeData] = useState({ selectedType: [] });
+  const [stockData, setStockData] = useState([]);
 
   // List options
   const unitOptions = [
@@ -16,18 +32,56 @@ const AddStockForm = () => {
     { value: "ชิ้น", label: "ชิ้น (unit)" },
   ];
 
-  const typeItems = ["ร้อน", "เย็น", "ปั่น"];
-  const sizeItems = ["เล็ก", "กลาง", "ใหญ่"];
+  useEffect(() => {
+    fetchApi(`${URL}/owner/menus/options/size`, "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          // Ensure it's an array
+          setSizeItems(
+            data.map((item) => ({ size_id: item.id, size_name: item.name }))
+          );
+        } else {
+          console.error("Unexpected size data format:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching size data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchApi(`${URL}/owner/menus/options/menu-type`, "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setTypeItems(
+            data.map((item) => ({
+              menu_type_id: item.id,
+              menu_type_name: item.name,
+            }))
+          );
+        } else {
+          console.error("Unexpected type data format:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching type data:", error);
+      });
+  }, []);
+
+  //set first select type
+  useEffect(() => {
+    if (typeItems.length > 0 && !selectedType) {
+      setSelectedType(typeItems[0].menu_type_id);
+    }
+  }, [typeItems, selectedType]);
 
   //store data for each type
-  const [typeData, setTypeData] = useState({
-    ร้อน: [],
-    เย็น: [],
-    ปั่น: [],
-  });
-
   const handleTypeClick = (type) => {
-    setSelectedType(type === selectedType ? null : type);
+    setSelectedType(
+      type.menu_type_id === selectedType ? null : type.menu_type_id
+    );
   };
 
   const handleAddRow = () => {
@@ -41,18 +95,65 @@ const AddStockForm = () => {
   };
 
   // select each typ data ex. ร้อน เย็น ปั่น ให้ข้อมูลมันเป็น set
-  const handleSizeDataChange = (index, size, value) => {
-    const updatedTypeData = { ...typeData };
-    if (!updatedTypeData[selectedType][index]) {
-      updatedTypeData[selectedType][index] = {};
-    }
-    updatedTypeData[selectedType][index][size] = value;
-    setTypeData(updatedTypeData);
+  const handleSizeDataChange = (rowIndex, sizeId, value) => {
+    setTypeData((prevData) => ({
+      ...prevData,
+      [selectedType]: {
+        ...(prevData[selectedType] || {}),
+        [rowIndex]: {
+          ...(prevData[selectedType]?.[rowIndex] || {}),
+          [sizeId]: value,
+        },
+      },
+    }));
   };
 
-  const handleNext = () => {
-    if (step === 2) {
-      // SAVE
+  const handleNext = async () => {
+    if (step === 3) {
+      const data = {
+        owner_id: owner_id,
+        branch_id: 2,
+        menuData: rows.map((row, index) => {
+          return {
+            ingredient_name: row.material,
+            unit: row.unit,
+            ingredientListForStock: sizeItems
+              .map((size) => {
+                return typeItems.map((menuType) => {
+                  const size_id = size.size_id;
+                  const menu_type_id = menuType.menu_type_id;
+
+                  const quantityUsed = parseFloat(
+                    typeData[menu_type_id]?.[index]?.[size_id]
+                  );
+
+                  return {
+                    size_id,
+                    menu_type_id,
+                    quantity_used: quantityUsed,
+                  };
+                });
+              })
+              .flat(),
+          };
+        }),
+      };
+
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/menus/stock/${menu_id}`,
+          "POST",
+          { data }
+        );
+
+        if (response.ok) {
+          console.log("stock saved successfully!");
+        } else {
+          console.error("Failed to link stock data");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
     } else {
       setStep(step + 1);
     }
@@ -74,7 +175,7 @@ const AddStockForm = () => {
       </div>
 
       <div className="flex items-start w-full font-bold text-xl">
-        วัตถุดิบ และปริมาณที่ใช้:
+        วัตถุดิบ และปริมาณที่ใช้: {menu}
       </div>
 
       {step === 1 && (
@@ -138,17 +239,17 @@ const AddStockForm = () => {
               <span className="text-[#DD9F52]">ชนิดเครื่องดื่ม</span>
             </div>
             <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 ml-2">
-              {typeItems.map((TypeItem, index) => (
+              {typeItems.map((type) => (
                 <button
-                  key={index}
-                  onClick={() => handleTypeClick(TypeItem)}
+                  key={type.menu_type_id}
+                  onClick={() => handleTypeClick(type)}
                   className={`px-6 py-3 rounded-full border border-[#DD9F52] font-bold ml-2 ${
-                    selectedType === TypeItem
-                      ? "bg-[#FFA726] text-white"
+                    selectedType === type.menu_type_id
+                      ? "bg-[#D4B28C] text-white"
                       : "bg-white text-[#DD9F52]"
                   }`}
                 >
-                  {TypeItem}
+                  {type.menu_type_name}
                 </button>
               ))}
             </div>
@@ -171,14 +272,16 @@ const AddStockForm = () => {
                 </th>
               </tr>
               <tr className="bg-gray-100">
-                {sizeItems.map((size, index) => (
-                  <th
-                    key={index}
-                    className="border border-gray-300 px-4 py-2 text-center"
-                  >
-                    {size}
-                  </th>
-                ))}
+                {sizeItems &&
+                  sizeItems.length > 0 &&
+                  sizeItems.map((size) => (
+                    <th
+                      key={size.size_id}
+                      className="border border-gray-300 px-4 py-2 text-center"
+                    >
+                      {size.size_name}
+                    </th>
+                  ))}
               </tr>
             </thead>
             <tbody>
@@ -187,16 +290,22 @@ const AddStockForm = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {index + 1}. {row.material} ({row.unit})
                   </td>
-                  {sizeItems.map((size, sizeIndex) => (
+                  {sizeItems.map((size) => (
                     <td
-                      key={sizeIndex}
+                      key={size.size_id}
                       className="border border-gray-300 px-4 py-2 text-center"
                     >
                       <input
                         type="text"
-                        value={typeData[selectedType]?.[index]?.[size] || ""}
+                        value={
+                          typeData[selectedType]?.[index]?.[size.size_id] || ""
+                        }
                         onChange={(e) =>
-                          handleSizeDataChange(index, size, e.target.value)
+                          handleSizeDataChange(
+                            index, // This is your row index for the outer loop
+                            size.size_id,
+                            e.target.value
+                          )
                         }
                         className="w-full border rounded p-2"
                       />
@@ -207,6 +316,71 @@ const AddStockForm = () => {
             </tbody>
           </table>
         </>
+      )}
+
+      {step === 3 && (
+        <div className="w-full">
+          <table className="w-full border-collapse border border-gray-200 mt-4">
+            {/* Table Header */}
+            <thead>
+              {/* First Header Row: Group Types */}
+              <tr className="bg-gray-100">
+                <th
+                  className="border border-gray-300 px-4 py-2 text-center"
+                  rowSpan={2}
+                >
+                  รายการวัตถุดิบ
+                </th>
+                {typeItems.map((type) => (
+                  <th
+                    key={type.menu_type_id}
+                    className="border border-gray-300 px-4 py-2 text-center"
+                    colSpan={sizeItems.length}
+                  >
+                    {type.menu_type_name}
+                  </th>
+                ))}
+              </tr>
+
+              {/* Second Header Row: Sizes under each Type */}
+              <tr className="bg-gray-100">
+                {typeItems.map(() =>
+                  sizeItems.map((size) => (
+                    <th
+                      key={size.size_id}
+                      className="border border-gray-300 px-4 py-2 text-center"
+                    >
+                      {size.size_name}
+                    </th>
+                  ))
+                )}
+              </tr>
+            </thead>
+
+            {/* Table Body */}
+            <tbody>
+              {rows.map((row, rowIndex) => (
+                <tr key={rowIndex} className="bg-white text-start">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {rowIndex + 1}. {row.material} ({row.unit})
+                  </td>
+                  {typeItems.map((type) =>
+                    sizeItems.map((size) => (
+                      <td
+                        key={`${type.menu_type_id}-${size.size_id}`}
+                        className="border border-gray-300 px-4 py-2 text-center"
+                      >
+                        {typeData[type.menu_type_id]?.[rowIndex]?.[
+                          size.size_id
+                        ] || "-"}
+                      </td>
+                    ))
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <div className="flex mt-8 w-full space-x-8 justify-between">
@@ -220,7 +394,7 @@ const AddStockForm = () => {
           className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
           onClick={handleNext}
         >
-          {step < 2 ? "ถัดไป" : "บันทึก"}
+          {step < 3 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { useEffect } from "react";
 
 const ToppingChoice = () => {
   const navigate = useNavigate();
@@ -10,10 +11,56 @@ const ToppingChoice = () => {
   const [expandedGroups, setExpandedGroups] = useState({});
   const [choices, setChoices] = useState([{ name: "", price: "" }]);
 
+  const [menuData, setMenuData] = useState({
+    available_category: [],
+    available_menus: [],
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:3000/customer/menus", {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setMenuData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching menu data:", error);
+      });
+  }, []);
+
   const handleNext = () => {
     if (step === 3) {
-      // Add handle send to backend
-      navigate("/choice-list");
+      const payload = {
+        options: choices.map((choice) => {
+          return {
+            [choice.name]: {
+              price: choice.price,
+              unit: 20,
+            },
+          };
+        }),
+        menu_ingredient_id: 1,
+        menu_id: selectedMenus,
+      };
+
+      console.log("Payload to send to backend: ", payload);
+
+      fetch("http://localhost:3000/owner/menus/options/add-ons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Data saved successfully:", data);
+          navigate("/choice-list");
+        })
+        .catch((error) => {
+          console.error("Error saving data:", error);
+        });
     } else {
       setStep(step + 1);
     }
@@ -27,43 +74,60 @@ const ToppingChoice = () => {
     }
   };
 
-  const groupedMenus = [
-    {
-      group: "กาแฟ",
-      menus: ["กาแฟดำ", "เอสเปรสโซ่", "อเมริกาโน่", "มอคค่า"],
-    },
-    {
-      group: "ชา",
-      menus: [
-        "ชานมไต้หวัน",
-        "ชานมไข่มุก",
-        "ชานมสตรอเบอรี่",
-        "ชานมบลูเบอรี่",
-        "ชานมแอปเปิ้ล",
-        "ชานมกีวี่",
-      ],
-    },
-    {
-      group: "โซดา",
-      menus: [
-        "สตอเบอรี่โซดา",
-        "บลูเบอรี่โซดา",
-        "แอปเปิ้ลโซดา",
-        "กีวี่โซดา",
-        "พีชโซดา",
-      ],
-    },
-    {
-      group: "ชาผลไม้",
-      menus: [
-        "ชาพีช",
-        "ชาสตรอเบอร์รี่",
-        "ชาบลูเบอร์รี่",
-        "ชากีวี่",
-        "ชาแอปเปิ้ล",
-      ],
-    },
-  ];
+  const handleChoiceChange = (index, field, value) => {
+    const updatedChoices = [...choices];
+    updatedChoices[index][field] = value;
+    setChoices(updatedChoices);
+  };
+
+  const addChoice = () => {
+    setChoices((prev) => [...prev, { name: "", price: "" }]);
+  };
+
+  const groupedMenus = menuData.available_category.map((category) => ({
+    group: category,
+    menus: menuData.available_menus.filter((menu) =>
+      menu.category.includes(category)
+    ),
+  }));
+
+  // const groupedMenus = [
+  //   {
+  //     group: "กาแฟ",
+  //     menus: ["กาแฟดำ", "เอสเปรสโซ่", "อเมริกาโน่", "มอคค่า"],
+  //   },
+  //   {
+  //     group: "ชา",
+  //     menus: [
+  //       "ชานมไต้หวัน",
+  //       "ชานมไข่มุก",
+  //       "ชานมสตรอเบอรี่",
+  //       "ชานมบลูเบอรี่",
+  //       "ชานมแอปเปิ้ล",
+  //       "ชานมกีวี่",
+  //     ],
+  //   },
+  //   {
+  //     group: "โซดา",
+  //     menus: [
+  //       "สตอเบอรี่โซดา",
+  //       "บลูเบอรี่โซดา",
+  //       "แอปเปิ้ลโซดา",
+  //       "กีวี่โซดา",
+  //       "พีชโซดา",
+  //     ],
+  //   },
+  //   {
+  //     group: "ชาผลไม้",
+  //     menus: [
+  //       "ชาพีช",
+  //       "ชาสตรอเบอร์รี่",
+  //       "ชาบลูเบอร์รี่",
+  //       "ชากีวี่",
+  //       "ชาแอปเปิ้ล",
+  //     ],
+  //   },
+  // ];
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -97,8 +161,10 @@ const ToppingChoice = () => {
 
   const filteredGroups = groupedMenus.map((group) => ({
     ...group,
-    menus: group.menus.filter((menu) =>
-      menu.toLowerCase().includes(searchTerm.toLowerCase())
+    menus: group.menus.filter(
+      (menu) =>
+        menu.name &&
+        menu.name.normalize("NFD").includes(searchTerm.normalize("NFD"))
     ),
   }));
 
@@ -109,15 +175,15 @@ const ToppingChoice = () => {
     }));
   };
 
-  const handleChoiceChange = (index, field, value) => {
-    const updatedChoices = [...choices];
-    updatedChoices[index][field] = value;
-    setChoices(updatedChoices);
-  };
+  // const handleChoiceChange = (index, field, value) => {
+  //   const updatedChoices = [...choices];
+  //   updatedChoices[index][field] = value;
+  //   setChoices(updatedChoices);
+  // };
 
-  const addChoice = () => {
-    setChoices((prev) => [...prev, { name: "", price: "" }]);
-  };
+  // const addChoice = () => {
+  //   setChoices((prev) => [...prev, { name: "", price: "" }]);
+  // };
 
   const renderStepContent = () => {
     switch (step) {

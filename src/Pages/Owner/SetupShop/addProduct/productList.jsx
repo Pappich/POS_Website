@@ -2,17 +2,37 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import DeleteProduct from "./deleteProduct";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useEffect } from "react";
 
 const ProductList = () => {
   const navigate = useNavigate();
+
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const [menuItems, setMenuItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const menuItems = ["กาแฟดำ", "ชาเขียว", "นมชมพู", "นมเย็น", "โกโก้"];
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const response = await fetchApi(`${URL}/owner/menus`, "GET");
+        const data = await response.json();
+        setMenuItems(data);
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
+
+    fetchMenus();
+  }, [menuItems]);
 
   const filteredItems = menuItems.filter((item) =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
+    item.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
   );
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
@@ -22,7 +42,7 @@ const ProductList = () => {
   };
 
   const handleAddProduct = () => {
-    navigate("/add-product");
+    navigate("/add-product", { state: { mode: "add" } });
   };
 
   const handleDeleteClick = (product) => {
@@ -42,7 +62,7 @@ const ProductList = () => {
 
   const handleEditClick = (product) => {
     // EDIT PRODUCT => FLOW ADD BUT HAVE DATA OF EACH PRODUCT
-    navigate("/add-product");
+    navigate("/add-product", { state: { mode: "edit", productData: product } });
   };
 
   return (
@@ -76,10 +96,10 @@ const ProductList = () => {
         {/* RENDER MENU */}
         <div className="w-full">
           {filteredItems.length > 0 ? (
-            filteredItems.map((item, index) => (
-              <div key={index} className="w-full mb-4">
+            filteredItems.map((item) => (
+              <div key={item.menu_id} className="w-full mb-4">
                 <div className="flex justify-between items-start">
-                  <p className="text-lg">{item}</p>
+                  <p className="text-lg">{item.menu_name}</p>
                   <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
                     <button
                       className="hover:underline font-bold"
