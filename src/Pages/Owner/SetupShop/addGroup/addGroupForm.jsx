@@ -74,12 +74,18 @@ const AddGroupForm = () => {
     fetchGroupData();
   }, []);
 
+  console.log("groupData", groupData);
+  console.log("selectedMenus", selectedMenus);
+
   const handleNext = async () => {
     setLoading(true);
     try {
       if (step === 3) {
         if (owner_id) {
-          const endpoint = mode === "add" ? `${URL}/owner/categories` : null;
+          const endpoint =
+            mode === "add"
+              ? `${URL}/owner/categories`
+              : `${URL}/owner/categories/${groupData.category_id}`;
           const method = mode === "add" ? "POST" : "PATCH";
 
           const response = await fetchApi(endpoint, method, {

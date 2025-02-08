@@ -2,18 +2,28 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
 
 const StockList = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const groupedMenus = [];
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [menuData, setMenuData] = useState({
     available_category: [],
     available_menus: [],
   });
+  const { available_category, available_menus } = menuData;
 
   useEffect(() => {
-    fetchApi("http://localhost:3000/customer/menus", "GET")
+    fetchApi(`${URL}/customer/menus`, "GET")
       .then((response) => response.json())
       .then((data) => {
         setMenuData(data);
@@ -23,19 +33,35 @@ const StockList = () => {
       });
   }, []);
 
-  console.log("MENU DATA", menuData);
-
-  const { available_category, available_menus } = menuData;
-  console.log("available_menus", available_menus);
-
-  // loop map menu items by category
-  const menuItems = available_menus.reduce((acc, menu) => {
+  menuData.available_menus.forEach((menu) => {
     menu.category.forEach((category) => {
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(menu.menu_name);
+      let group = groupedMenus.find(
+        (g) => g.category_name === category.category_name
+      );
+
+      if (!group) {
+        // If the group doesn't exist, create a new one
+        groupedMenus.push({
+          category_name: category.category_name,
+          category_id: category.category_id,
+          menus: [
+            {
+              menu_id: menu.menu_id,
+              menu_name: menu.menu_name,
+            },
+          ],
+        });
+      } else {
+        // If the group exists, add the menu to the existing group
+        group.menus.push({
+          menu_id: menu.menu_id,
+          menu_name: menu.menu_name,
+        });
+      }
     });
-    return acc;
-  }, {});
+  });
+
+  console.log("GROUP MENU:", groupedMenus);
 
   const categoryItems = available_category;
   const allMenuItems = available_menus.map((menu) => ({
@@ -47,12 +73,21 @@ const StockList = () => {
   console.log("categoryItems:", categoryItems);
 
   // filter by search
-  const filteredItems =
-    selectedCategory && menuItems[selectedCategory]
-      ? menuItems[selectedCategory].filter((item) =>
-          item.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : allMenuItems;
+  const filteredItems = selectedCategory
+    ? groupedMenus
+        .find((group) => group.category_name === selectedCategory)
+        ?.menus.filter((menu) =>
+          menu.menu_name
+            .toLowerCase()
+            .normalize("NFC")
+            .includes(searchTerm.toLowerCase().normalize("NFC"))
+        ) || []
+    : allMenuItems.filter((item) =>
+        item.menu_name
+          .toLowerCase()
+          .normalize("NFC")
+          .includes(searchTerm.toLowerCase().normalize("NFC"))
+      );
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -100,29 +135,50 @@ const StockList = () => {
       </div>
 
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 mb-6">
-        {categoryItems.map((categoryItem, index) => (
+        {groupedMenus.map((group, index) => (
           <button
             key={index}
-            onClick={() => handleCategoryClick(categoryItem)}
+            onClick={() => handleCategoryClick(group.category_name)}
             className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold ml-2 ${
-              selectedCategory === categoryItem
+              selectedCategory === group.category_name
                 ? "bg-[#D4B28C] text-white"
                 : "bg-white text-[#DD9F52]"
             }`}
           >
-            {categoryItem}
+            {group.category_name}
           </button>
         ))}
       </div>
 
       <div className="w-full">
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item, index) => (
+        {selectedCategory ? (
+          filteredItems.length > 0 ? (
+            filteredItems.map((menu, menuIndex) => (
+              <div key={menuIndex} className="w-full mb-4">
+                <div className="flex justify-between items-start">
+                  <p className="text-lg">{menu.menu_name}</p>
+                  <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+                    <button
+                      className="hover:underline font-bold"
+                      onClick={() => handleEditClick(menu)}
+                    >
+                      แก้ไข
+                    </button>
+                  </div>
+                </div>
+                <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-400 text-center">ไม่พบสินค้า</p>
+          )
+        ) : filteredItems.length > 0 ? (
+          filteredItems.map((menu, index) => (
             <div key={index} className="w-full mb-4">
-              <div className="flex justify-between items-center">
-                <p className="text-lg">{item.menu_name}</p>
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-lg">{menu.menu_name}</p>
                 <button
-                  onClick={() => handleEditClick(item)}
+                  onClick={() => handleEditClick(menu)}
                   className="text-[#D4B28C] font-bold"
                 >
                   แก้ไข
@@ -141,7 +197,7 @@ const StockList = () => {
           onClick={handleBack}
           className="px-6 py-3 w-64 rounded-full border border-[#D4B28C] text-[#D4B28C] bg-transparent font-bold transition duration-300 hover:bg-[#D4B28C] hover:text-white"
         >
-          เสร็จสิ้น
+          ย้อนกลับ
         </button>
       </div>
     </div>

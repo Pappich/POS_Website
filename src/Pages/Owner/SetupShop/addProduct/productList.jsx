@@ -129,7 +129,7 @@ const ProductList = () => {
             className="px-6 py-3 w-[250px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}
           >
-            เสร็จสิ้น
+            ย้อนกลับ
           </button>
           <button
             className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"

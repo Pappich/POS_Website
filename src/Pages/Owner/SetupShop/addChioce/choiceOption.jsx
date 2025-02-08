@@ -71,7 +71,7 @@ const ChoiceOptions = () => {
               className="text-[#D4B28C] text-6xl mb-2"
               onClick={handleTypeClick}
             />
-            <p className="text-black font-semibold">ชนิด</p>
+            <p className="text-black font-semibold">ชนิดเครื่องดื่ม</p>
           </div>
         </div>
       </div>

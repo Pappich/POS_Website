@@ -19,9 +19,13 @@ const AddStockForm = () => {
   const [rows, setRows] = useState([{ material: "", unit: "" }]);
   const [sizeItems, setSizeItems] = useState([]);
   const [typeItems, setTypeItems] = useState([]);
+  const [addOnItems, setAddOnItems] = useState([]);
   const [selectedType, setSelectedType] = useState(typeItems[0]?.menu_type_id);
   const [typeData, setTypeData] = useState({ selectedType: [] });
   const [stockData, setStockData] = useState([]);
+  const [ingredientData, setIngredientData] = useState([]);
+  const [menuIngredientData, setMenuIngredientData] = useState([]);
+  const [filterIngredientData, setFilterIngredientData] = useState([]);
 
   // List options
   const unitOptions = [
@@ -32,14 +36,45 @@ const AddStockForm = () => {
     { value: "ชิ้น", label: "ชิ้น (unit)" },
   ];
 
+  // fetch ingredient
   useEffect(() => {
-    fetchApi(`${URL}/owner/menus/options/size`, "GET")
+    fetchApi(`${URL}/owner/ingredient/${menu_id}`, "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        if (
+          data.ingredients &&
+          Array.isArray(data.ingredients) &&
+          data.ingredients.length > 0
+        ) {
+          setIngredientData(
+            data.ingredients.map((item) => ({
+              ingredient_id: item.ingredient_id,
+              ingredient_name: item.ingredient_name,
+              ingredient_unit: item.ingredient_unit || "",
+            }))
+          );
+        } else {
+          console.error("Unexpected ingredient data format:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching ingredient data:", error);
+      });
+  }, []);
+
+  console.log("ingredient data:", ingredientData);
+
+  //fetch size
+  useEffect(() => {
+    fetchApi(`${URL}/owner/menus/options/size/${menu_id}`, "GET")
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          // Ensure it's an array
           setSizeItems(
-            data.map((item) => ({ size_id: item.id, size_name: item.name }))
+            data.map((item) => ({
+              size_id: item.size_id,
+              size_name: item.size_name,
+            }))
           );
         } else {
           console.error("Unexpected size data format:", data);
@@ -50,15 +85,16 @@ const AddStockForm = () => {
       });
   }, []);
 
+  //fetch type
   useEffect(() => {
-    fetchApi(`${URL}/owner/menus/options/menu-type`, "GET")
+    fetchApi(`${URL}/owner/menus/options/menu-type/${menu_id}`, "GET")
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setTypeItems(
             data.map((item) => ({
-              menu_type_id: item.id,
-              menu_type_name: item.name,
+              menu_type_id: item.menu_type_id,
+              menu_type_name: item.type_name,
             }))
           );
         } else {
@@ -77,6 +113,65 @@ const AddStockForm = () => {
     }
   }, [typeItems, selectedType]);
 
+  //fetch add on
+  useEffect(() => {
+    fetchApi(`${URL}/owner/menus/options/add-ons/${menu_id}`, "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAddOnItems(
+            data.map((item) => ({
+              add_on_id: item.add_on_id,
+              add_on_name: item.add_on_name,
+            }))
+          );
+        } else {
+          console.error("Unexpected size data format:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching size data:", error);
+      });
+  }, []);
+
+  //fetch menu ingredient
+  useEffect(() => {
+    fetchApi(`${URL}/owner/menus/options/add-ons/${menu_id}`, "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setMenuIngredientData(
+            data.map((item) => ({
+              add_on_id: item.add_on_id,
+              add_on_name: item.add_on_name,
+            }))
+          );
+        } else {
+          console.error("Unexpected size data format:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching size data:", error);
+      });
+  }, []);
+
+  console.log("typeItems:", typeItems);
+  console.log("sizeItems:", sizeItems);
+  console.log("AddOnItems:", addOnItems);
+
+  // filter add on out of ingredient
+  useEffect(() => {
+    const addOnNames = addOnItems.map((item) => item.add_on_name);
+
+    const filteredIngredients = ingredientData.filter(
+      (ingredient) => !addOnNames.includes(ingredient.ingredient_name)
+    );
+
+    setFilterIngredientData(filteredIngredients);
+  }, [addOnItems, ingredientData]);
+
+  console.log("filter ingredientData:", filterIngredientData);
+
   //store data for each type
   const handleTypeClick = (type) => {
     setSelectedType(
@@ -85,13 +180,31 @@ const AddStockForm = () => {
   };
 
   const handleAddRow = () => {
-    setRows([...rows, { material: "", unit: "" }]);
+    const newRow = { material: "", ingredient_id: null };
+
+    if (filterIngredientData.length > 0) {
+      setFilterIngredientData([...filterIngredientData, newRow]);
+    } else {
+      setRows([...rows, newRow]);
+    }
   };
 
   const handleInputChange = (index, field, value) => {
-    const updatedRows = [...rows];
-    updatedRows[index][field] = value;
-    setRows(updatedRows);
+    setRows((prevRows) =>
+      prevRows.map((row, idx) =>
+        idx === index ? { ...row, [field]: value } : row
+      )
+    );
+  };
+
+  const handleInputChangeForFilter = (ingredientId, field, value) => {
+    setFilterIngredientData((prevData) =>
+      prevData.map((ingredient) =>
+        ingredient.ingredient_id === ingredientId
+          ? { ...ingredient, [field]: value }
+          : ingredient
+      )
+    );
   };
 
   // select each typ data ex. ร้อน เย็น ปั่น ให้ข้อมูลมันเป็น set
@@ -111,7 +224,7 @@ const AddStockForm = () => {
   const handleNext = async () => {
     if (step === 3) {
       const data = {
-        owner_id: owner_id,
+        owner_id: 16,
         branch_id: 2,
         menuData: rows.map((row, index) => {
           return {
@@ -139,15 +252,18 @@ const AddStockForm = () => {
         }),
       };
 
+      console.log("DATA:", data);
+
       try {
         const response = await fetchApi(
           `${URL}/owner/menus/stock/${menu_id}`,
-          "POST",
-          { data }
+          "PATCH",
+          data
         );
 
         if (response.ok) {
           console.log("stock saved successfully!");
+          navigate("/stock-list");
         } else {
           console.error("Failed to link stock data");
         }
@@ -179,58 +295,79 @@ const AddStockForm = () => {
       </div>
 
       {step === 1 && (
-        <>
-          <div className="space-y-4 w-full">
-            <div className="grid grid-cols-2 gap-6 mt-4">
-              <div className="mb-2">รายการวัตถุดิบ</div>
-              <div className="mb-2">หน่วย</div>
-            </div>
-
-            {rows.map((row, index) => (
-              <div key={index} className="grid grid-cols-2 gap-6 mb-4">
-                {/* Left Column */}
-                <div>
-                  <input
-                    type="text"
-                    placeholder="รายการวัตถุดิบ"
-                    value={row.material}
-                    onChange={(e) =>
-                      handleInputChange(index, "material", e.target.value)
-                    }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  />
-                </div>
-
-                {/* Right Column */}
-                <div>
-                  <select
-                    value={row.unit}
-                    onChange={(e) =>
-                      handleInputChange(index, "unit", e.target.value)
-                    }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  >
-                    <option value="">เลือกหน่วย</option>
-                    {unitOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            ))}
+        <div className="space-y-4 w-full">
+          <div className="grid grid-cols-2 gap-6 mt-4">
+            <div className="mb-2">รายการวัตถุดิบ</div>
+            <div className="mb-2">หน่วย</div>
           </div>
 
+          {/* Conditional Rendering */}
+          {(filterIngredientData.length === 0
+            ? rows
+            : filterIngredientData
+          ).map((ingredient, index) => (
+            <div
+              key={ingredient.ingredient_id || index}
+              className="grid grid-cols-2 gap-6 mb-4"
+            >
+              <div>
+                <input
+                  type="text"
+                  placeholder="รายการวัตถุดิบ"
+                  value={ingredient.material || ingredient.ingredient_name}
+                  onChange={(e) => {
+                    const field = "material";
+                    if (ingredient.ingredient_id) {
+                      handleInputChangeForFilter(
+                        ingredient.ingredient_id,
+                        field,
+                        e.target.value
+                      );
+                    } else {
+                      handleInputChange(index, field, e.target.value);
+                    }
+                  }}
+                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                />
+              </div>
+
+              <div>
+                <select
+                  value={ingredient.unit || ingredient.ingredient_unit}
+                  onChange={(e) => {
+                    const field = "unit";
+                    if (ingredient.ingredient_id) {
+                      handleInputChangeForFilter(
+                        ingredient.ingredient_id,
+                        field,
+                        e.target.value
+                      );
+                    } else {
+                      handleInputChange(index, field, e.target.value);
+                    }
+                  }}
+                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                >
+                  <option value="">เลือกหน่วย</option>
+                  {unitOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          ))}
+
+          {/* Button to add new row */}
           <button
             onClick={handleAddRow}
             className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold transition mt-4"
           >
             + เพิ่มวัตถุดิบ
           </button>
-        </>
+        </div>
       )}
-
       {step === 2 && (
         <>
           <div className="mb-4 items-start w-full flex">

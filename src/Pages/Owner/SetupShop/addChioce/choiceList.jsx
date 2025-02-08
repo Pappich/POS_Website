@@ -2,14 +2,50 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import DeleteChoice from "./deleteChoice";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 const ChoiceList = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
 
-  const menuItems = ["ขนาดแก้ว", "ความหวาน", "ท็อปปิ้ง", "ชนิด"];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const urls = {
+          ขนาดแก้ว: `${URL}/owner/menus/options/size`,
+          ความหวาน: `${URL}/owner/menus/options/sweetness`,
+          ท็อปปิ้ง: `${URL}/owner/menus/options/add-ons`,
+          ชนิด: `${URL}/owner/menus/options/menu-type`,
+        };
+
+        const results = await Promise.all(
+          Object.entries(urls).map(async ([key, url]) => {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.length > 0 ? key : null;
+          })
+        );
+
+        setMenuItems(results.filter(Boolean));
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filteredItems = menuItems.filter((item) =>
     item.toLowerCase().includes(searchTerm.toLowerCase())
@@ -41,16 +77,29 @@ const ChoiceList = () => {
   };
 
   const handleEditClick = (product) => {
-    // EDIT PRODUCT => FLOW ADD BUT HAVE DATA OF EACH PRODUCT
-    navigate("/glass-choice");
+    switch (product) {
+      case "ขนาดแก้ว":
+        navigate("/glass-choice", { state: { mode: "edit" } });
+        break;
+      case "ความหวาน":
+        navigate("/sweet-level-choice", { state: { mode: "edit" } });
+        break;
+      case "ท็อปปิ้ง":
+        navigate("/topping-choice", { state: { mode: "edit" } });
+        break;
+      case "ชนิด":
+        navigate("/type-choice", { state: { mode: "edit" } });
+        break;
+    }
   };
 
-  const handleMenuClick = (product) => {
+  const handleMenuClick = (option) => {
+    console.log(option);
     navigate("/choice-menu", {
       // CHANGE TO SEND MENU IN EACH GROUP
       // EXAMPLE
       state: {
-        groupName: product,
+        groupName: option,
         selectedMenus: ["กาแฟดำ", "เอสเปรสโซ่", "อเมริกาโน่", "มอคค่า"],
       },
     });
@@ -96,7 +145,7 @@ const ChoiceList = () => {
                       className="hover:underline font-bold"
                       onClick={() => handleMenuClick(item)}
                     >
-                      เมนู
+                      สินค้าที่ใช้ตัวเลือก
                     </button>
                     <span className="text-gray-300">|</span>
                     <button
@@ -127,13 +176,13 @@ const ChoiceList = () => {
             className="px-6 py-3 w-[250px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}
           >
-            เสร็จสิ้น
+            ย้อนกลับ
           </button>
           <button
             className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
             onClick={handleAddChoice}
           >
-            เพิ่มกลุ่ม
+            เพิ่มตัวเลือก
           </button>
         </div>
       </div>

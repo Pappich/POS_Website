@@ -1,19 +1,151 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { AiOutlineDelete } from "react-icons/ai";
+import { useLocation } from "react-router-dom";
 
 const TypeChoice = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
   const navigate = useNavigate();
+  const groupedMenus = [];
   const [step, setStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
   const [choices, setChoices] = useState([{ name: "", price: "" }]);
+  const [typeData, setTypeData] = useState([]);
+  const [isRequired, setIsRequired] = useState(false);
+  const [isMultiple, setIsMultiple] = useState(false);
+  const [menuData, setMenuData] = useState({
+    available_category: [],
+    available_menus: [],
+  });
+  const location = useLocation();
+  const { mode } = location.state || {
+    mode: "add",
+    choices: {},
+  };
 
-  const handleNext = () => {
+  useEffect(() => {
+    fetchApi(`${URL}/customer/menus`, "GET")
+      .then((response) => response.json())
+      .then((data) => {
+        setMenuData(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching menu data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (mode === "edit") {
+      fetchApi(`${URL}/owner/menus/options/menu-type`, "GET")
+        .then((response) => response.json())
+        .then((data) => {
+          setTypeData(data);
+
+          const uniqueNames = new Set();
+
+          const updatedChoices = data
+            .filter((item) => {
+              if (!uniqueNames.has(item.name)) {
+                uniqueNames.add(item.name);
+                return true;
+              }
+              return false;
+            })
+            .map((item) => ({
+              id: item.id,
+              name: item.name,
+              price: item.price_difference,
+            }));
+
+          setChoices(updatedChoices);
+        })
+        .catch((error) => {
+          console.error("Error fetching glass size data:", error);
+        });
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode !== "edit") {
+      setChoices([{ name: "", price: "" }]);
+    }
+  }, [mode]);
+
+  menuData.available_menus.forEach((menu) => {
+    menu.category.forEach((category) => {
+      let group = groupedMenus.find(
+        (g) => g.category_name === category.category_name
+      );
+
+      if (!group) {
+        // If the group doesn't exist, create a new one
+        groupedMenus.push({
+          category_name: category.category_name,
+          category_id: category.category_id,
+          menus: [
+            {
+              menu_id: menu.menu_id,
+              menu_name: menu.menu_name,
+            },
+          ],
+        });
+      } else {
+        // If the group exists, add the menu to the existing group
+        group.menus.push({
+          menu_id: menu.menu_id,
+          menu_name: menu.menu_name,
+        });
+      }
+    });
+  });
+
+  console.log(groupedMenus);
+
+  const handleNext = async () => {
+    console.log("choices:", choices);
     if (step === 3) {
-      // Add handle send to backend
-      navigate("/choice-list");
+      const formattedOptions = choices.map((option) => ({
+        [option.name]: parseFloat(option.price),
+      }));
+
+      const requestData = {
+        options: formattedOptions,
+        menu_id: selectedMenus,
+      };
+
+      console.log("requestData:", requestData);
+
+      try {
+        if (owner_id) {
+          const response = await fetchApi(
+            `${URL}/owner/menus/options/menu-type`,
+            "POST",
+            requestData
+          );
+
+          if (response.ok) {
+            const text = await response.text();
+            console.log("Response text:", text);
+            navigate("/choice-list");
+          } else {
+            console.error("Error:", response.statusText);
+          }
+        }
+      } catch (error) {
+        console.error("Request failed:", error);
+      }
     } else {
       setStep(step + 1);
     }
@@ -21,49 +153,15 @@ const TypeChoice = () => {
 
   const handleBack = () => {
     if (step === 1) {
-      navigate("/choice-option");
+      if (mode === "edit") {
+        navigate("/choice-list");
+      } else {
+        navigate("/choice-option");
+      }
     } else {
       setStep(step - 1);
     }
   };
-
-  const groupedMenus = [
-    {
-      group: "กาแฟ",
-      menus: ["กาแฟดำ", "เอสเปรสโซ่", "อเมริกาโน่", "มอคค่า"],
-    },
-    {
-      group: "ชา",
-      menus: [
-        "ชานมไต้หวัน",
-        "ชานมไข่มุก",
-        "ชานมสตรอเบอรี่",
-        "ชานมบลูเบอรี่",
-        "ชานมแอปเปิ้ล",
-        "ชานมกีวี่",
-      ],
-    },
-    {
-      group: "โซดา",
-      menus: [
-        "สตอเบอรี่โซดา",
-        "บลูเบอรี่โซดา",
-        "แอปเปิ้ลโซดา",
-        "กีวี่โซดา",
-        "พีชโซดา",
-      ],
-    },
-    {
-      group: "ชาผลไม้",
-      menus: [
-        "ชาพีช",
-        "ชาสตรอเบอร์รี่",
-        "ชาบลูเบอร์รี่",
-        "ชากีวี่",
-        "ชาแอปเปิ้ล",
-      ],
-    },
-  ];
 
   const handleChoiceChange = (index, field, value) => {
     const updatedChoices = [...choices];
@@ -77,46 +175,43 @@ const TypeChoice = () => {
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
-  const handleSelectMenu = (menu) => {
+  const handleSelectMenu = (menuId) => {
     setSelectedMenus((prev) =>
-      prev.includes(menu)
-        ? prev.filter((item) => item !== menu)
-        : [...prev, menu]
+      prev.includes(menuId)
+        ? prev.filter((id) => id !== menuId)
+        : [...prev, menuId]
     );
   };
 
   const handleSelectAllInGroup = (group) => {
-    const groupMenus = group.menus;
-    const allSelected = groupMenus.every((menu) =>
-      selectedMenus.includes(menu)
-    );
+    const groupMenuIds = group.menus.map((menu) => menu.menu_id);
+    const allSelected = groupMenuIds.every((id) => selectedMenus.includes(id));
 
     if (allSelected) {
-      // Deselect all in group
       setSelectedMenus((prev) =>
-        prev.filter((menu) => !groupMenus.includes(menu))
+        prev.filter((id) => !groupMenuIds.includes(id))
       );
     } else {
-      // Select all in group
-      setSelectedMenus((prev) => [
-        ...prev,
-        ...groupMenus.filter((menu) => !prev.includes(menu)),
-      ]);
+      setSelectedMenus((prev) => [...new Set([...prev, ...groupMenuIds])]);
     }
   };
 
   const filteredGroups = groupedMenus.map((group) => ({
     ...group,
     menus: group.menus.filter((menu) =>
-      menu.toLowerCase().includes(searchTerm.toLowerCase())
+      menu.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
     ),
   }));
 
-  const toggleGroup = (groupName) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [groupName]: !prev[groupName],
+  const toggleGroup = (categoryId) => {
+    setExpandedGroups((prevState) => ({
+      ...prevState,
+      [categoryId]: !prevState[categoryId],
     }));
+  };
+
+  const removeChoice = (index) => {
+    setChoices((prev) => prev.filter((_, i) => i !== index));
   };
 
   const renderStepContent = () => {
@@ -129,6 +224,20 @@ const TypeChoice = () => {
               <span className="text-[#D4B28C] ml-2">ชนิด</span>
             </div>
 
+            <div className="flex mb-4 w-full items-center">
+              <div className="mr-12">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isRequired}
+                    onChange={() => setIsRequired(!isRequired)}
+                    className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-2"
+                  />
+                  ลูกค้าจำเป็นต้องเลือก
+                </label>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 mb-4 w-full">
               <div className="font-bold mb-2">ชื่อช้อยส์</div>
               <div className="font-bold mb-2 ml-4">
@@ -138,31 +247,34 @@ const TypeChoice = () => {
 
             {/* Form Section */}
             {choices.map((choice, index) => (
-              <div className="grid grid-cols-2 gap-6 mb-4 w-full">
-                {/* Left Column */}
-                <div>
-                  <input
-                    type="text"
-                    placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                    value={choice.name}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "name", e.target.value)
-                    }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 mb-2"
-                  />
-                </div>
-                {/* Right Column */}
-                <div>
-                  <input
-                    type="text"
-                    placeholder="ยังไม่มีข้อมูล..."
-                    value={choice.price}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "price", e.target.value)
-                    }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  />
-                </div>
+              <div
+                key={index}
+                className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
+              >
+                <input
+                  type="text"
+                  placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                  value={choice.name}
+                  onChange={(e) =>
+                    handleChoiceChange(index, "name", e.target.value)
+                  }
+                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                />
+                <input
+                  type="text"
+                  placeholder="ยังไม่มีข้อมูล..."
+                  value={choice.price}
+                  onChange={(e) =>
+                    handleChoiceChange(index, "price", e.target.value)
+                  }
+                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                />
+                <button
+                  onClick={() => removeChoice(index)}
+                  className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                >
+                  <AiOutlineDelete size={24} />
+                </button>
               </div>
             ))}
 
@@ -205,29 +317,31 @@ const TypeChoice = () => {
               เมนูทั้งหมด
             </label>
 
-            {/* Render grouped menus */}
-            {filteredGroups.map((group, groupIndex) => (
-              <div className="w-full flex justify-start mt-4">
-                <div key={groupIndex} className="w-full mb-8">
+            {filteredGroups.map((group) => (
+              <div
+                className="w-full flex justify-start mt-4"
+                key={group.category_id}
+              >
+                <div className="w-full mb-8">
                   <div className="flex items-center justify-between space-x-2 mb-3">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         checked={group.menus.every((menu) =>
-                          selectedMenus.includes(menu)
+                          selectedMenus.includes(menu.menu_id)
                         )}
                         onChange={() => handleSelectAllInGroup(group)}
                         className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                       />
                       <span className="font-bold text-lg ml-4">
-                        {group.group}
+                        {group.category_name}
                       </span>
                     </div>
                     <button
-                      onClick={() => toggleGroup(group.group)}
+                      onClick={() => toggleGroup(group.category_id)}
                       className="ml-auto focus:outline-none"
                     >
-                      {expandedGroups[group.group] ? (
+                      {expandedGroups[group.category_id] ? (
                         <FaChevronUp className="text-[#DD9F52]" />
                       ) : (
                         <FaChevronDown className="text-[#DD9F52]" />
@@ -235,21 +349,21 @@ const TypeChoice = () => {
                     </button>
                   </div>
 
-                  {/* Conditionally render menus if group is expanded */}
-                  {expandedGroups[group.group] && (
+                  {/* Render menus only if the group is expanded */}
+                  {expandedGroups[group.category_id] && (
                     <div className="ml-8 grid grid-cols-4 gap-4">
-                      {group.menus.map((menu, index) => (
+                      {group.menus.map((menu) => (
                         <label
-                          key={index}
+                          key={menu.menu_id}
                           className="flex items-center space-x-2"
                         >
                           <input
                             type="checkbox"
-                            checked={selectedMenus.includes(menu)}
-                            onChange={() => handleSelectMenu(menu)}
+                            checked={selectedMenus.includes(menu.menu_id)}
+                            onChange={() => handleSelectMenu(menu.menu_id)}
                             className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                           />
-                          <span>{menu}</span>
+                          <span>{menu.menu_name}</span>
                         </label>
                       ))}
                     </div>
@@ -275,16 +389,26 @@ const TypeChoice = () => {
                 เมนูทั้งหมดที่ใช้ในตัวเลือก
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-                {selectedMenus.map((menu, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={true}
-                      className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                    />
-                    <span>{menu}</span>
-                  </div>
-                ))}
+                {selectedMenus.map((menuId) => {
+                  const menu = menuData.available_menus.find(
+                    (m) => m.menu_id === menuId
+                  );
+
+                  return (
+                    <div
+                      key={menu.menu_id}
+                      className="flex items-center space-x-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={true}
+                        className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                        readOnly
+                      />
+                      <span>{menu.menu_name}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </>

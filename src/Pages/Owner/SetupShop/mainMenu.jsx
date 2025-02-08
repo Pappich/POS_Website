@@ -10,25 +10,25 @@ const MainMenu = () => {
   const icons = [
     {
       id: "product",
-      label: "เพิ่มรายการสินค้า",
+      label: "เพิ่ม / จัดการรายการสินค้า",
       icon: <FaUtensils size={50} />,
       // disabled: !enabledSteps.includes("product"),
     },
     {
       id: "group",
-      label: "เพิ่มกลุ่มรายการสินค้า",
+      label: "เพิ่ม / จัดการกลุ่มรายการสินค้า",
       icon: <FaList size={50} />,
       // disabled: !enabledSteps.includes("group"),
     },
     {
       id: "choice",
-      label: "เพิ่มตัวเลือก",
+      label: "เพิ่ม / จัดการตัวเลือก",
       icon: <FaThLarge size={50} />,
       // disabled: !enabledSteps.includes("options"),
     },
     {
       id: "stock",
-      label: "เพิ่มการตัดคลังสินค้า",
+      label: "เพิ่ม / จัดการการตัดคลังสินค้า",
       icon: <FaBox size={50} />,
       // disabled: !enabledSteps.includes("stock"),
     },

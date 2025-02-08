@@ -2,24 +2,86 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useEffect } from "react";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import { AiOutlineDelete } from "react-icons/ai";
+import { useLocation } from "react-router-dom";
 
 const ToppingChoice = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
   const navigate = useNavigate();
+
   const [step, setStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
-  const [choices, setChoices] = useState([{ name: "", price: "" }]);
+  const [isRequired, setIsRequired] = useState(false);
+  const [isMultiple, setIsMultiple] = useState(false);
+  const [choices, setChoices] = useState([
+    { name: "", price: "", quantity: "" },
+  ]);
+  const [toppingData, setToppingData] = useState([]);
+  const groupedMenus = [];
+
+  console.log("CHOICE:", choices);
 
   const [menuData, setMenuData] = useState({
     available_category: [],
     available_menus: [],
   });
 
+  const location = useLocation();
+  const { mode } = location.state || {
+    mode: "add",
+    choices: {},
+  };
+
   useEffect(() => {
-    fetch("http://localhost:3000/customer/menus", {
-      method: "GET",
-    })
+    if (mode === "edit") {
+      fetchApi(`${URL}/owner/menus/options/add-ons`, "GET")
+        .then((response) => response.json())
+        .then((data) => {
+          setToppingData(data);
+
+          const uniqueNames = new Set();
+
+          const updatedChoices = data
+            .filter((item) => {
+              if (!uniqueNames.has(item.name)) {
+                uniqueNames.add(item.name);
+                return true;
+              }
+              return false;
+            })
+            .map((item) => ({
+              id: item.id,
+              name: item.name,
+              price: item.add_on_price,
+              quantity: item.unit,
+            }));
+
+          setChoices(updatedChoices);
+        })
+        .catch((error) => {
+          console.error("Error fetching add on data:", error);
+        });
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    if (mode !== "edit") {
+      setChoices([{ name: "", price: "", quantity: "" }]);
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    fetchApi(`${URL}/customer/menus`, "GET")
       .then((response) => response.json())
       .then((data) => {
         setMenuData(data);
@@ -29,38 +91,71 @@ const ToppingChoice = () => {
       });
   }, []);
 
-  const handleNext = () => {
-    if (step === 3) {
+  menuData.available_menus.forEach((menu) => {
+    menu.category.forEach((category) => {
+      let group = groupedMenus.find(
+        (g) => g.category_name === category.category_name
+      );
+
+      if (!group) {
+        // If the group doesn't exist, create a new one
+        groupedMenus.push({
+          category_name: category.category_name,
+          category_id: category.category_id,
+          menus: [
+            {
+              menu_id: menu.menu_id,
+              menu_name: menu.menu_name,
+            },
+          ],
+        });
+      } else {
+        // If the group exists, add the menu to the existing group
+        group.menus.push({
+          menu_id: menu.menu_id,
+          menu_name: menu.menu_name,
+        });
+      }
+    });
+  });
+
+  console.log(groupedMenus);
+
+  const handleNext = async () => {
+    if (step === 4) {
       const payload = {
         options: choices.map((choice) => {
           return {
             [choice.name]: {
-              price: choice.price,
-              unit: 20,
+              price: parseFloat(choice.price),
+              unit: parseFloat(choice.quantity),
             },
           };
         }),
-        menu_ingredient_id: 1,
         menu_id: selectedMenus,
+        is_required: isRequired,
+        is_multipled: isMultiple,
       };
 
-      console.log("Payload to send to backend: ", payload);
+      console.log("PAYLOAD:", payload);
 
-      fetch("http://localhost:3000/owner/menus/options/add-ons", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-        .then((response) => response.json())
-        .then((data) => {
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/menus/options/add-ons`,
+          "POST",
+          payload
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          const text = await response.text();
+          console.log("Response text:", text);
           console.log("Data saved successfully:", data);
           navigate("/choice-list");
-        })
-        .catch((error) => {
-          console.error("Error saving data:", error);
-        });
+        }
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
     } else {
       setStep(step + 1);
     }
@@ -68,7 +163,11 @@ const ToppingChoice = () => {
 
   const handleBack = () => {
     if (step === 1) {
-      navigate("/choice-option");
+      if (mode === "edit") {
+        navigate("/choice-list");
+      } else {
+        navigate("/choice-option");
+      }
     } else {
       setStep(step - 1);
     }
@@ -81,98 +180,50 @@ const ToppingChoice = () => {
   };
 
   const addChoice = () => {
-    setChoices((prev) => [...prev, { name: "", price: "" }]);
+    setChoices((prev) => [...prev, { name: "", price: "", quantity: "" }]);
   };
-
-  const groupedMenus = menuData.available_category.map((category) => ({
-    group: category,
-    menus: menuData.available_menus.filter((menu) =>
-      menu.category.includes(category)
-    ),
-  }));
-
-  // const groupedMenus = [
-  //   {
-  //     group: "กาแฟ",
-  //     menus: ["กาแฟดำ", "เอสเปรสโซ่", "อเมริกาโน่", "มอคค่า"],
-  //   },
-  //   {
-  //     group: "ชา",
-  //     menus: [
-  //       "ชานมไต้หวัน",
-  //       "ชานมไข่มุก",
-  //       "ชานมสตรอเบอรี่",
-  //       "ชานมบลูเบอรี่",
-  //       "ชานมแอปเปิ้ล",
-  //       "ชานมกีวี่",
-  //     ],
-  //   },
-  //   {
-  //     group: "โซดา",
-  //     menus: [
-  //       "สตอเบอรี่โซดา",
-  //       "บลูเบอรี่โซดา",
-  //       "แอปเปิ้ลโซดา",
-  //       "กีวี่โซดา",
-  //       "พีชโซดา",
-  //     ],
-  //   },
-  //   {
-  //     group: "ชาผลไม้",
-  //     menus: [
-  //       "ชาพีช",
-  //       "ชาสตรอเบอร์รี่",
-  //       "ชาบลูเบอร์รี่",
-  //       "ชากีวี่",
-  //       "ชาแอปเปิ้ล",
-  //     ],
-  //   },
-  // ];
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
-  const handleSelectMenu = (menu) => {
+  const handleSelectMenu = (menuId) => {
     setSelectedMenus((prev) =>
-      prev.includes(menu)
-        ? prev.filter((item) => item !== menu)
-        : [...prev, menu]
+      prev.includes(menuId)
+        ? prev.filter((id) => id !== menuId)
+        : [...prev, menuId]
     );
   };
 
   const handleSelectAllInGroup = (group) => {
-    const groupMenus = group.menus;
-    const allSelected = groupMenus.every((menu) =>
-      selectedMenus.includes(menu)
-    );
+    const groupMenuIds = group.menus.map((menu) => menu.menu_id);
+    const allSelected = groupMenuIds.every((id) => selectedMenus.includes(id));
 
     if (allSelected) {
-      // Deselect all in group
       setSelectedMenus((prev) =>
-        prev.filter((menu) => !groupMenus.includes(menu))
+        prev.filter((id) => !groupMenuIds.includes(id))
       );
     } else {
-      // Select all in group
-      setSelectedMenus((prev) => [
-        ...prev,
-        ...groupMenus.filter((menu) => !prev.includes(menu)),
-      ]);
+      setSelectedMenus((prev) => [...new Set([...prev, ...groupMenuIds])]);
     }
   };
 
   const filteredGroups = groupedMenus.map((group) => ({
     ...group,
-    menus: group.menus.filter(
-      (menu) =>
-        menu.name &&
-        menu.name.normalize("NFD").includes(searchTerm.normalize("NFD"))
+    menus: group.menus.filter((menu) =>
+      menu.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
     ),
   }));
 
-  const toggleGroup = (groupName) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [groupName]: !prev[groupName],
+  console.log("filteredGroups", filteredGroups);
+
+  const toggleGroup = (categoryId) => {
+    setExpandedGroups((prevState) => ({
+      ...prevState,
+      [categoryId]: !prevState[categoryId],
     }));
+  };
+
+  const removeChoice = (index) => {
+    setChoices((prev) => prev.filter((_, i) => i !== index));
   };
 
   // const handleChoiceChange = (index, field, value) => {
@@ -195,6 +246,31 @@ const ToppingChoice = () => {
               <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
             </div>
 
+            <div className="flex mb-4 w-full items-center">
+              <div className="mr-12">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isRequired}
+                    onChange={() => setIsRequired(!isRequired)}
+                    className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-2"
+                  />
+                  ลูกค้าจำเป็นต้องเลือก
+                </label>
+              </div>
+              <div className="">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isMultiple}
+                    onChange={() => setIsMultiple(!isMultiple)}
+                    className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-2"
+                  />
+                  ลูกค้าสามารถเลือกได้มากกว่า 1 ช้อยส์
+                </label>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 mb-4">
               <div className="font-bold mb-2">ชื่อช้อยส์</div>
               <div className="font-bold mb-2 ml-20">
@@ -205,32 +281,34 @@ const ToppingChoice = () => {
             {/* Form Section */}
             <div className="space-y-4 w-full">
               {choices.map((choice, index) => (
-                <div key={index} className="grid grid-cols-2 gap-6 mb-4">
-                  {/* Left Column */}
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                      value={choice.name}
-                      onChange={(e) =>
-                        handleChoiceChange(index, "name", e.target.value)
-                      }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                    />
-                  </div>
-
-                  {/* Right Column */}
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="ยังไม่มีข้อมูล..."
-                      value={choice.price}
-                      onChange={(e) =>
-                        handleChoiceChange(index, "price", e.target.value)
-                      }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                    />
-                  </div>
+                <div
+                  key={index}
+                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
+                >
+                  <input
+                    type="text"
+                    placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                    value={choice.name}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "name", e.target.value)
+                    }
+                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  />
+                  <input
+                    type="text"
+                    placeholder="ยังไม่มีข้อมูล..."
+                    value={choice.price}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "price", e.target.value)
+                    }
+                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  />
+                  <button
+                    onClick={() => removeChoice(index)}
+                    className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                  >
+                    <AiOutlineDelete size={24} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -243,11 +321,57 @@ const ToppingChoice = () => {
             </button>
           </>
         );
+
       case 2:
         return (
           <>
             <div className="w-full flex justify-start text-lg mb-5 font-bold">
-              2. เลือกเมนูที่ต้องการใช้ตัวเลือก:
+              2. เพิ่มปริมาณที่ใช้ช้อยส์ในตัวเลือก:
+              <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
+            </div>
+
+            <div className="grid grid-cols-2 mb-4">
+              <div className="font-bold mb-2">ชื่อช้อยส์</div>
+              <div className="font-bold mb-2 ml-20">ปริมาณที่ใช้ (กรัม)</div>
+            </div>
+
+            {/* Form Section */}
+            <div className="space-y-4 w-full">
+              {choices.map((choice, index) => (
+                <div key={index} className="grid grid-cols-2 gap-6 mb-4">
+                  {/* Left Column */}
+                  <div>
+                    <input
+                      type="text"
+                      value={choice.name}
+                      disabled
+                      className="w-full border border-[#D4B28C] rounded-full p-3 bg-gray-200 text-gray-600"
+                    />
+                  </div>
+
+                  {/* Right Column */}
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="ยังไม่มีข้อมูล..."
+                      value={choice.quantity}
+                      onChange={(e) =>
+                        handleChoiceChange(index, "quantity", e.target.value)
+                      }
+                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        );
+
+      case 3:
+        return (
+          <>
+            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+              3. เลือกเมนูที่ต้องการใช้ตัวเลือก:
               <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
             </div>
 
@@ -274,29 +398,31 @@ const ToppingChoice = () => {
               เมนูทั้งหมด
             </label>
 
-            {/* Render grouped menus */}
-            {filteredGroups.map((group, groupIndex) => (
-              <div className="w-full flex justify-start mt-4">
-                <div key={groupIndex} className="w-full mb-8">
+            {filteredGroups.map((group) => (
+              <div
+                className="w-full flex justify-start mt-4"
+                key={group.category_id}
+              >
+                <div className="w-full mb-8">
                   <div className="flex items-center justify-between space-x-2 mb-3">
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         checked={group.menus.every((menu) =>
-                          selectedMenus.includes(menu)
+                          selectedMenus.includes(menu.menu_id)
                         )}
                         onChange={() => handleSelectAllInGroup(group)}
                         className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                       />
                       <span className="font-bold text-lg ml-4">
-                        {group.group}
+                        {group.category_name}
                       </span>
                     </div>
                     <button
-                      onClick={() => toggleGroup(group.group)}
+                      onClick={() => toggleGroup(group.category_id)}
                       className="ml-auto focus:outline-none"
                     >
-                      {expandedGroups[group.group] ? (
+                      {expandedGroups[group.category_id] ? (
                         <FaChevronUp className="text-[#DD9F52]" />
                       ) : (
                         <FaChevronDown className="text-[#DD9F52]" />
@@ -304,21 +430,21 @@ const ToppingChoice = () => {
                     </button>
                   </div>
 
-                  {/* Conditionally render menus if group is expanded */}
-                  {expandedGroups[group.group] && (
+                  {/* Render menus only if the group is expanded */}
+                  {expandedGroups[group.category_id] && (
                     <div className="ml-8 grid grid-cols-4 gap-4">
-                      {group.menus.map((menu, index) => (
+                      {group.menus.map((menu) => (
                         <label
-                          key={index}
+                          key={menu.menu_id}
                           className="flex items-center space-x-2"
                         >
                           <input
                             type="checkbox"
-                            checked={selectedMenus.includes(menu)}
-                            onChange={() => handleSelectMenu(menu)}
+                            checked={selectedMenus.includes(menu.menu_id)}
+                            onChange={() => handleSelectMenu(menu.menu_id)}
                             className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                           />
-                          <span>{menu}</span>
+                          <span>{menu.menu_name}</span>
                         </label>
                       ))}
                     </div>
@@ -328,11 +454,11 @@ const ToppingChoice = () => {
             ))}
           </>
         );
-      case 3:
+      case 4:
         return (
           <>
             <div className="w-full flex justify-start text-lg mb-5 font-bold">
-              3. สรุปตัวเลือก:
+              4. สรุปตัวเลือก:
               <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
             </div>
 
@@ -344,16 +470,26 @@ const ToppingChoice = () => {
                 เมนูทั้งหมดที่ใช้ในตัวเลือก
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-                {selectedMenus.map((menu, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={true}
-                      className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                    />
-                    <span>{menu}</span>
-                  </div>
-                ))}
+                {selectedMenus.map((menuId) => {
+                  const menu = menuData.available_menus.find(
+                    (m) => m.menu_id === menuId
+                  );
+
+                  return (
+                    <div
+                      key={menu.menu_id}
+                      className="flex items-center space-x-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={true}
+                        className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                        readOnly
+                      />
+                      <span>{menu.menu_name}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </>
