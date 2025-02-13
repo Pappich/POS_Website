@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import fetchApi from "../../../../Config/fetchApi";
 import { useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
+import IngredientDropdown from "../../../../Components/ingredientDropdown";
 
 const AddStockForm = () => {
   const location = useLocation();
@@ -181,10 +182,25 @@ const AddStockForm = () => {
     );
   };
 
-  const handleInputChange = (index, field, value) => {
+  // const handleInputChange = (index, field, value) => {
+  //   setRows((prevRows) =>
+  //     prevRows.map((row, idx) =>
+  //       idx === index ? { ...row, [field]: value } : row
+  //     )
+  //   );
+  // };
+
+  const handleInputChange = (index, field, value, label = "") => {
     setRows((prevRows) =>
       prevRows.map((row, idx) =>
-        idx === index ? { ...row, [field]: value } : row
+        idx === index
+          ? {
+              ...row,
+              [field]: value,
+              material:
+                field === "ingredientId" ? label || value : row.material,
+            }
+          : row
       )
     );
   };
@@ -397,14 +413,11 @@ const AddStockForm = () => {
               className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
             >
               <div>
-                <input
-                  type="text"
-                  placeholder="รายการวัตถุดิบ"
-                  value={ingredient.material}
-                  onChange={(e) => {
-                    handleInputChange(index, "material", e.target.value);
-                  }}
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                <IngredientDropdown
+                  value={ingredient.ingredientId}
+                  onChange={(value, label) =>
+                    handleInputChange(index, "ingredientId", value, label)
+                  }
                 />
               </div>
 

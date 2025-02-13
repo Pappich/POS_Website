@@ -7,6 +7,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
+import IngredientDropdown from "../../../../Components/ingredientDropdown";
 
 const ToppingChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -226,8 +227,13 @@ const ToppingChoice = () => {
     }
   };
 
-  const handleChoiceChange = (index, field, value) => {
+  const handleChoiceChange = (index, field, value, label = "") => {
     const updatedChoices = [...choices];
+
+    if (field === "ingredientId") {
+      updatedChoices[index].name = label || value;
+    }
+
     updatedChoices[index][field] = value;
     setChoices(updatedChoices);
   };
@@ -339,14 +345,11 @@ const ToppingChoice = () => {
                   className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-6 w-full items-center"
                 >
                   <div className=" w-full">
-                    <input
-                      type="text"
-                      placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                      value={choice.name}
-                      onChange={(e) =>
-                        handleChoiceChange(index, "name", e.target.value)
+                    <IngredientDropdown
+                      value={choice.ingredientId}
+                      onChange={(value, label) =>
+                        handleChoiceChange(index, "ingredientId", value, label)
                       }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     />
                     {errors.choiceName && (
                       <div className="absolute text-red-500 text-sm mt-1">
