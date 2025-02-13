@@ -28,6 +28,12 @@ const ToppingChoice = () => {
   ]);
   const [toppingData, setToppingData] = useState([]);
   const groupedMenus = [];
+  const [errors, setErrors] = useState({
+    price: "",
+    choiceName: "",
+    choiceQuantity: "",
+    menuSelection: "",
+  });
 
   console.log("CHOICE:", choices);
 
@@ -122,42 +128,89 @@ const ToppingChoice = () => {
   console.log(groupedMenus);
 
   const handleNext = async () => {
-    if (step === 4) {
-      const payload = {
-        options: choices.map((choice) => {
-          return {
-            [choice.name]: {
-              price: parseFloat(choice.price),
-              unit: parseFloat(choice.quantity),
-            },
-          };
-        }),
-        menu_id: selectedMenus,
-        is_required: isRequired,
-        is_multipled: isMultiple,
-      };
+    let valid = true;
+    const newErrors = {
+      price: "",
+      choiceName: "",
+      choiceQuantity: "",
+      menuSelection: "",
+    };
 
-      console.log("PAYLOAD:", payload);
-
-      try {
-        const response = await fetchApi(
-          `${URL}/owner/menus/options/add-ons`,
-          "POST",
-          payload
-        );
-        const data = await response.json();
-
-        if (response.ok) {
-          const text = await response.text();
-          console.log("Response text:", text);
-          console.log("Data saved successfully:", data);
-          navigate("/choice-list");
-        }
-      } catch (error) {
-        console.error("Error saving data:", error);
+    // case price
+    choices.forEach((choice, index) => {
+      if (!choice.price || isNaN(choice.price)) {
+        valid = false;
+        newErrors.price = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
+      } else {
+        newErrors.price = "";
       }
+
+      if (!choice.name) {
+        valid = false;
+        newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
+      } else if (index === choices.length - 1 && !choice.name) {
+        valid = false;
+        newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
+      } else {
+        newErrors.choiceName = "";
+      }
+
+      if (step === 2 && (!choice.quantity || isNaN(choice.quantity))) {
+        valid = false;
+        newErrors.choiceQuantity = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
+      } else {
+        newErrors.choiceQuantity = "";
+      }
+    });
+
+    console.log("ERROR:", errors);
+
+    // case select menu
+    if (step === 3 && selectedMenus.length === 0) {
+      valid = false;
+      newErrors.menuSelection = "กรุณาเลือกอย่างน้อย 1 เมนู";
     } else {
-      setStep(step + 1);
+      newErrors.menuSelection = "";
+    }
+
+    setErrors(newErrors);
+    if (valid) {
+      if (step === 4) {
+        const payload = {
+          options: choices.map((choice) => {
+            return {
+              [choice.name]: {
+                price: parseFloat(choice.price),
+                unit: parseFloat(choice.quantity),
+              },
+            };
+          }),
+          menu_id: selectedMenus,
+          is_required: isRequired,
+          is_multipled: isMultiple,
+        };
+
+        console.log("PAYLOAD:", payload);
+
+        try {
+          const response = await fetchApi(
+            `${URL}/owner/menus/options/add-ons`,
+            "POST",
+            payload
+          );
+          const data = await response.json();
+
+          if (response.ok) {
+            const text = await response.text();
+            console.log("Response text:", text);
+            navigate("/choice-list");
+          }
+        } catch (error) {
+          console.error("Error saving data:", error);
+        }
+      } else {
+        setStep(step + 1);
+      }
     }
   };
 
@@ -283,26 +336,40 @@ const ToppingChoice = () => {
               {choices.map((choice, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
+                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-6 w-full items-center"
                 >
-                  <input
-                    type="text"
-                    placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                    value={choice.name}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "name", e.target.value)
-                    }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  />
-                  <input
-                    type="text"
-                    placeholder="ยังไม่มีข้อมูล..."
-                    value={choice.price}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "price", e.target.value)
-                    }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  />
+                  <div className=" w-full">
+                    <input
+                      type="text"
+                      placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                      value={choice.name}
+                      onChange={(e) =>
+                        handleChoiceChange(index, "name", e.target.value)
+                      }
+                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                    />
+                    {errors.choiceName && (
+                      <div className="absolute text-red-500 text-sm mt-1">
+                        {errors.choiceName}
+                      </div>
+                    )}
+                  </div>
+                  <div className=" w-full">
+                    <input
+                      type="text"
+                      placeholder="ยังไม่มีข้อมูล..."
+                      value={choice.price}
+                      onChange={(e) =>
+                        handleChoiceChange(index, "price", e.target.value)
+                      }
+                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                    />
+                    {errors.price && (
+                      <div className="absolute text-red-500 text-sm mt-1">
+                        {errors.price}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={() => removeChoice(index)}
                     className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
@@ -315,7 +382,7 @@ const ToppingChoice = () => {
 
             <button
               onClick={addChoice}
-              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-4"
+              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-6"
             >
               + เพิ่มช้อยส์
             </button>
@@ -360,6 +427,11 @@ const ToppingChoice = () => {
                       }
                       className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     />
+                    {errors.choiceQuantity && (
+                      <div className="text-red-500 text-sm mt-2">
+                        {errors.choiceQuantity}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -452,6 +524,11 @@ const ToppingChoice = () => {
                 </div>
               </div>
             ))}
+            {errors.menuSelection && (
+              <div className="text-red-500 text-sm mt-2">
+                {errors.menuSelection}
+              </div>
+            )}
           </>
         );
       case 4:
@@ -522,7 +599,7 @@ const ToppingChoice = () => {
           className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
           onClick={handleNext}
         >
-          {step < 3 ? "ถัดไป" : "บันทึก"}
+          {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
     </div>

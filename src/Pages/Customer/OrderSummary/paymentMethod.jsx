@@ -4,10 +4,19 @@ import { useLocation } from "react-router-dom";
 import qrExample from "../../../Assets/Images/qrExample.jpg";
 import { BsCashCoin } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
+import { useSelector } from "react-redux";
 
 const PaymentMethod = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { selectedPayment, total } = location.state || {};
+  console.log("selectedPayment: ", selectedPayment);
+  console.log("TOTAL:", total);
+
+  const items = useSelector((state) => state.cart.items);
+  console.log("items in cart:", items);
+
   const bankIcons = [
     "BAAC.png",
     "BAY.png",
@@ -22,9 +31,6 @@ const PaymentMethod = () => {
   ];
 
   const handleBack = () => navigate("/summary");
-
-  const { selectedPayment, totalAmount } = location.state || {};
-  console.log("selectedPayment: ", selectedPayment);
 
   return (
     <div>
@@ -47,7 +53,7 @@ const PaymentMethod = () => {
               <h1 className="text-3xl font-bold mb-[8px]">ชำระด้วย QR Code</h1>
               <h1 className="text-xl mb-[48px]">โปรดแสกนเพื่อชำระเงิน</h1>
               <h2 className="text-3xl text-[#DD9F52] font-bold mb-[40px]">
-                รวมทั้งสิ้น {totalAmount} บาท
+                รวมทั้งสิ้น {total} บาท
               </h2>
               <p className="text-2xl font-bold mb-[8px]">
                 เมื่อชำระเงินเสร็จสิ้นแล้ว
@@ -82,7 +88,7 @@ const PaymentMethod = () => {
             <BsCashCoin className="w-[200px] h-[200px] text-[#cda777]" />
           </div>
           <h2 className="text-3xl text-[#DD9F52] font-bold mb-[40px]">
-            รวมทั้งสิ้น {totalAmount} บาท
+            รวมทั้งสิ้น {total} บาท
           </h2>
           <p className="text-2xl font-bold mb-[8px]">
             กรุณาชำระเงินที่เคาน์เตอร์พนักงาน

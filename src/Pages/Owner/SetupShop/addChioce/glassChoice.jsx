@@ -24,7 +24,12 @@ const GlassChoice = () => {
   const [choices, setChoices] = useState([{ name: "", price: "" }]);
   const [glassData, setGlassData] = useState([]);
   const [isRequired, setIsRequired] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    price: "",
+    choiceName: "",
+    menuSelection: "",
+  });
   const [menuData, setMenuData] = useState({
     available_category: [],
     available_menus: [],
@@ -115,41 +120,73 @@ const GlassChoice = () => {
   console.log("isRequired", isRequired);
 
   const handleNext = async () => {
-    console.log("choices:", choices);
-    if (step === 3) {
-      const formattedOptions = choices.map((option) => ({
-        [option.name]: option.price,
-      }));
+    let valid = true;
+    const newErrors = { price: "", choiceName: "", menuSelection: "" };
 
-      const requestData = {
-        options: formattedOptions,
-        menu_id: selectedMenus,
-        is_required: isRequired,
-      };
-
-      console.log("requestData:", requestData);
-
-      try {
-        if (owner_id) {
-          const response = await fetchApi(
-            `${URL}/owner/menus/options/size`,
-            "POST",
-            requestData
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log("Success:", data);
-            navigate("/choice-list");
-          } else {
-            console.error("Error:", response.statusText);
-          }
-        }
-      } catch (error) {
-        console.error("Request failed:", error);
+    // case price
+    choices.forEach((choice, index) => {
+      if (!choice.price || isNaN(choice.price)) {
+        valid = false;
+        newErrors.price = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
+      } else {
+        newErrors.price = "";
       }
+
+      if (!choice.name) {
+        valid = false;
+        newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
+      } else if (index === choices.length - 1 && !choice.name) {
+        valid = false;
+        newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
+      } else {
+        newErrors.choiceName = "";
+      }
+    });
+
+    // case select menu
+    if (step === 2 && selectedMenus.length === 0) {
+      valid = false;
+      newErrors.menuSelection = "กรุณาเลือกอย่างน้อย 1 เมนู";
     } else {
-      setStep(step + 1);
+      newErrors.menuSelection = "";
+    }
+
+    setErrors(newErrors);
+
+    if (valid) {
+      if (step === 3) {
+        const formattedOptions = choices.map((option) => ({
+          [option.name]: option.price,
+        }));
+
+        const requestData = {
+          options: formattedOptions,
+          menu_id: selectedMenus,
+          is_required: isRequired,
+        };
+
+        try {
+          if (owner_id) {
+            const response = await fetchApi(
+              `${URL}/owner/menus/options/size`,
+              "POST",
+              requestData
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log("Success:", data);
+              navigate("/choice-list");
+            } else {
+              console.error("Error:", response.statusText);
+            }
+          }
+        } catch (error) {
+          console.error("Request failed:", error);
+        }
+      } else {
+        setStep(step + 1);
+      }
     }
   };
 
@@ -253,26 +290,40 @@ const GlassChoice = () => {
             {choices.map((choice, index) => (
               <div
                 key={index}
-                className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
+                className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-6 w-full items-center"
               >
-                <input
-                  type="text"
-                  placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
-                  value={choice.name}
-                  onChange={(e) =>
-                    handleChoiceChange(index, "name", e.target.value)
-                  }
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                />
-                <input
-                  type="text"
-                  placeholder="ยังไม่มีข้อมูล..."
-                  value={choice.price}
-                  onChange={(e) =>
-                    handleChoiceChange(index, "price", e.target.value)
-                  }
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                />
+                <div className=" w-full">
+                  <input
+                    type="text"
+                    placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                    value={choice.name}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "name", e.target.value)
+                    }
+                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  />
+                  {errors.choiceName && (
+                    <div className="absolute text-red-500 text-sm mt-1">
+                      {errors.choiceName}
+                    </div>
+                  )}
+                </div>
+                <div className=" w-full">
+                  <input
+                    type="text"
+                    placeholder="ยังไม่มีข้อมูล..."
+                    value={choice.price}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "price", e.target.value)
+                    }
+                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  />
+                  {errors.price && (
+                    <div className="absolute text-red-500 text-sm mt-1">
+                      {errors.price}
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={() => removeChoice(index)}
                   className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
@@ -375,6 +426,11 @@ const GlassChoice = () => {
                 </div>
               </div>
             ))}
+            {errors.menuSelection && (
+              <div className="text-red-500 text-sm mt-2">
+                {errors.menuSelection}
+              </div>
+            )}
           </>
         );
       case 3:

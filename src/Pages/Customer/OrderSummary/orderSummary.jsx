@@ -1,35 +1,127 @@
-import React, { useState } from "react";
-import { IoChevronBack } from "react-icons/io5";
+import React, { useState, useEffect } from "react";
+import { IoChevronBack, IoTrashOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import PaymentMethod from "./paymentMethod";
-import { IoTrashOutline } from "react-icons/io5";
+import { useSelector } from "react-redux";
+import fetchApi from "../../../Config/fetchApi";
+import configureAPI from "../../../Config/configureAPI";
+import { useDispatch } from "react-redux";
+import { removeFromCart } from "../../../Config/redux/cartSlice";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const Summary = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("qr");
-  const totalAmount = 321;
+  const [menuData, setMenuData] = useState([]);
+
+  const items = useSelector((state) => state.cart.items);
+
+  console.log("cart item:", items);
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetchApi(`${URL}/customer/menus`, "GET");
+        const data = await response.json();
+
+        const selectedMenus = items.map((item) => {
+          return data.available_menus.find(
+            (menuItem) => menuItem.menu_id === item.menuId
+          );
+        });
+
+        console.log("selectedMenus:", selectedMenus);
+
+        if (selectedMenus) {
+          setMenuData(selectedMenus);
+          console.log(menuData);
+        } else {
+          console.error("Menu item not found");
+        }
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
+
+    fetchMenuData();
+  }, []);
+
+  const subtotal = items.reduce((acc, item) => acc + item.price, 0);
+  // const tax = (subtotal * 0.07).toFixed(2);
+  const tax = 0;
+  const total = subtotal + parseFloat(tax);
 
   const handleBack = () => navigate("/menu");
 
-  const items = [
-    { name: "ชาเขียว", quantity: 1, price: 69, total: 69 },
-    { name: "ชาเขียว", quantity: 2, price: 50, total: 100 },
-    { name: "ชาเขียว", quantity: 2, price: 50, total: 100 },
-  ];
-
-  const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-  const tax = (subtotal * 0.07).toFixed(2);
-  const total = (subtotal + parseFloat(tax)).toFixed(2);
-
   const handlePaymentClick = () => setShowPaymentPopup(true);
+
   const closePaymentPopup = () => setShowPaymentPopup(false);
+
   const handleSelectPayment = (method) => setSelectedPayment(method);
 
-  const handleConfirmPayment = () => {
-    console.log("Selected payment method :", selectedPayment);
-    navigate("/payment-method", { state: { selectedPayment, totalAmount } });
-    setShowPaymentPopup(false);
+  const handleConfirmPayment = async () => {
+    const createOrderDto = {
+      order_date: new Date().toISOString(),
+      total_price: total,
+      queue_number: 3,
+      status: "รอทำ",
+    };
+
+    // Format items array
+    const formattedItems = items.map((item) => {
+      return {
+        menu_id: item.menuId,
+        sweetness_id: item.selectedSweetness,
+        size_id: item.selectedSize,
+        add_on_id: item.selectedAddOn,
+        menu_type_id: item.selectedType,
+        quantity: item.quantity,
+        price: parseInt(item.price),
+      };
+    });
+
+    const payload = {
+      createOrderDto,
+      items: formattedItems,
+    };
+
+    console.log("Payload to send:", payload);
+
+    try {
+      const response = await fetchApi(
+        `${URL}/employee/orders`,
+        "POST",
+        payload
+      );
+
+      if (!response.ok) {
+        throw new Error("Error submitting the order");
+      }
+
+      const responseData = await response.json();
+      console.log("Order submission response:", responseData);
+      navigate("/payment-method", { state: { orderData: responseData } });
+    } catch (error) {
+      console.error("Error during order submission:", error);
+    }
+  };
+
+  const handleRemove = (item) => {
+    console.log("ITEM TO DELETE:", item);
+    dispatch(
+      removeFromCart({
+        menuId: item.menuId,
+        selectedSize: item.selectedSize,
+        selectedSweetness: item.selectedSweetness,
+        selectedType: item.selectedType,
+        selectedAddOn: item.selectedAddOn,
+      })
+    );
   };
 
   return (
@@ -50,53 +142,82 @@ const Summary = () => {
           <tr className="border-b border-gray-300 text-lg">
             <th className="text-left py-2">เมนู</th>
             <th className="text-center py-2">จำนวน</th>
-            <th className="text-center py-2">ราคา</th>
             <th className="text-center py-2">ราคาทั้งหมด</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => (
-            <tr key={index} className="border-b border-gray-200">
-              <td className="flex items-center py-2">
-                <img
-                  src="https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
-                  alt={item.name}
-                  className="mr-2 rounded flex items-center h-[50px] w-[50px] mb-2"
-                />
-                <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm text-gray-500">
-                    ชนิด: เย็น | หวาน: 50% | ขนาด: M | ท็อปปิ้ง: ไข่มุก
-                  </p>
-                </div>
-              </td>
-              <td className="text-center">{item.quantity}</td>
-              <td className="text-center">{item.price} ฿</td>
-              <td className="text-center">{item.total} ฿</td>
-              <td className="text-[#DD9F52]">
-                <IoTrashOutline
-                  className="w-6 h-6 transition-transform duration-200 ease-in-out transform hover:scale-125 hover:text-[#cda777]"
-                  onClick={null}
-                />
-              </td>
-            </tr>
-          ))}
+          {items.map((item, index) => {
+            const selectedMenu = menuData.find(
+              (menu) => menu.menu_id === item.menuId
+            );
+
+            return (
+              <tr key={index} className="border-b border-gray-200">
+                <td className="flex items-center py-2">
+                  <img
+                    src={
+                      selectedMenu?.image_url ||
+                      "https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
+                    }
+                    alt={selectedMenu?.menu_name}
+                    className="mr-2 rounded flex items-center h-[50px] w-[50px] mb-2"
+                  />
+                  <div>
+                    <p className="font-semibold">{selectedMenu?.menu_name}</p>
+                    <div className="text-sm text-gray-500">
+                      {item.selectedSize && (
+                        <span>ขนาด: {item.selectedSize} </span>
+                      )}
+                      {item.selectedSweetness && item.selectedSize && (
+                        <span>| หวาน: {item.selectedSweetness} </span>
+                      )}
+                      {item.selectedType &&
+                        (item.selectedSize || item.selectedSweetness) && (
+                          <span>| ชนิด: {item.selectedType} </span>
+                        )}
+                      {item.selectedAddOn.length > 0 &&
+                        (item.selectedSize ||
+                          item.selectedSweetness ||
+                          item.selectedType) && (
+                          <span>
+                            | ท็อปปิ้ง:{" "}
+                            {item.selectedAddOn
+                              .map((addon) => addon)
+                              .join(", ")}
+                          </span>
+                        )}
+                    </div>
+                  </div>
+                </td>
+                <td className="text-center">{item.quantity}</td>
+                <td className="text-center">{item.price} บาท</td>
+                <td>
+                  <button
+                    onClick={() => handleRemove(item)}
+                    className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                  >
+                    <AiOutlineDelete size={24} />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
-      {/* order summary */}
+      {/* Order summary */}
       <div className="w-full mt-4 border-t border-gray-300 pt-4 text-lg">
         <div className="flex justify-between mb-2 font-bold">
           <span>รวมเป็นเงิน</span>
-          <span>{subtotal} ฿</span>
+          <span>{subtotal} บาท</span>
         </div>
         <div className="flex font-bold justify-between mb-2">
           <span>ภาษีมูลค่าเพิ่ม 7%</span>
-          <span>{tax} ฿</span>
+          <span>{tax} บาท</span>
         </div>
-        <div className="flex justify-between text-xl font-bold">
+        <div className="flex justify-between text-2xl font-bold">
           <span>รวมทั้งหมด</span>
-          <span className="text-[#DD9F52]">{total} ฿</span>
+          <span className="text-[#DD9F52]">{total} บาท</span>
         </div>
       </div>
 
@@ -107,7 +228,7 @@ const Summary = () => {
         จ่ายเงิน
       </button>
 
-      {/* payment popup */}
+      {/* Payment popup */}
       {showPaymentPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-[500px] relative">

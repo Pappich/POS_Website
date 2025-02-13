@@ -43,7 +43,7 @@ const Login = () => {
         dispatch(setUser(userData)); //add user data to redux
         console.log("USER DATA in Redux:", userData);
 
-        navigate("/role");
+        navigate("/enter-new-password");
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -163,7 +163,7 @@ const Login = () => {
       </div>
 
       {/* Virtual Keyboard */}
-      {/* {showKeyboard && (
+      {showKeyboard && (
         <div
           className="keyboard-container fixed bottom-0 left-0 w-full z-50"
           ref={keyboardContainerRef}
@@ -177,7 +177,7 @@ const Login = () => {
             setLayout={setKeyboardLayout}
           />
         </div>
-      )} */}
+      )}
     </div>
   );
 };

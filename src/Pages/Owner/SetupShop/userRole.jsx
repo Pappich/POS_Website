@@ -36,7 +36,7 @@ const UserRole = () => {
     } else if (id === "employee") {
       navigate("/order-list");
     } else if (id === "customer") {
-      navigate("/menu");
+      window.open("/menu", "_blank");
     }
   };
 

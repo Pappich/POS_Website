@@ -5,6 +5,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { Form } from "react-router-dom";
 
 const AddProductForm = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -23,7 +24,13 @@ const AddProductForm = () => {
   const [productDetails, setProductDetails] = useState("");
   const [productImage, setProductImage] = useState(null);
   const [productPrice, setProductPrice] = useState("");
+  const [priceError, setPriceError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fileError, setFileError] = useState("");
+  const [errors, setErrors] = useState({
+    menuName: "",
+    productPrice: "",
+  });
   const { owner_id } = userData || {};
 
   console.log("user data: ", owner_id);
@@ -73,6 +80,9 @@ const AddProductForm = () => {
   };
 
   const handleNext = () => {
+    if (step === 1 || step === 4) {
+      if (!validateForm()) return;
+    }
     if (step === 5) {
       //ADD HANDLE SEND TO BACKEND
       console.log("save button click");
@@ -95,12 +105,51 @@ const AddProductForm = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        setFileError("Only PNG, JPG, JPEG, and WEBP files are allowed.");
+        setProductImage(null);
+        return;
+      }
+
+      setFileError("");
       const reader = new FileReader();
       reader.onloadend = () => {
         setProductImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handlePriceChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*\.?\d*$/.test(value)) {
+      setProductPrice(value);
+      setPriceError("");
+    } else {
+      setPriceError("กรุณากรอกเฉพาะตัวเลขเท่านั้น");
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!menuName.trim()) {
+      newErrors.menuName = "กรุณากรอกชื่อสินค้า";
+    }
+
+    if (!productPrice.trim()) {
+      newErrors.productPrice = "กรุณากรอกราคาสินค้า";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const renderStepContent = () => {
@@ -125,6 +174,9 @@ const AddProductForm = () => {
               placeholder="กรอกชื่อสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
+            {errors.menuName && (
+              <p className="text-red-500 text-sm mt-2">{errors.menuName}</p>
+            )}
           </>
         );
       case 2:
@@ -195,6 +247,11 @@ const AddProductForm = () => {
                 />
               </label>
             </div>
+            {fileError && (
+              <p className="text-red-500 text-sm mt-2 text-center">
+                {fileError}
+              </p>
+            )}
           </>
         );
       case 4:
@@ -213,10 +270,17 @@ const AddProductForm = () => {
               type="text"
               id="productPrice"
               value={productPrice}
-              onChange={(e) => setProductPrice(e.target.value)}
+              onChange={handlePriceChange}
+              isInvalid={!!priceError}
               placeholder="กรอกราคาสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
+            {priceError && (
+              <p className=" text-red-500 text-sm mt-2">{priceError}</p>
+            )}
+            {errors.productPrice && (
+              <p className="text-red-500 text-sm mt-2">{errors.productPrice}</p>
+            )}
           </>
         );
       case 5:

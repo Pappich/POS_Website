@@ -45,7 +45,7 @@ const EnterNewPassword = () => {
   };
 
   return (
-    <div className="font-noto flex flex-col items-center min-h-screen bg-white">
+    <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl text-black mb-2 text-left">ตั้งรหัสผ่านใหม่</h2>
         <p className="text-primaryRegular text-gray-500 mb-6 text-left">

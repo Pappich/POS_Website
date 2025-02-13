@@ -27,6 +27,8 @@ const AddGroupForm = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const { owner_id } = userData || {};
+  const [errors, setErrors] = useState("");
+  const [selectedMenuErrors, setSelectedMenuErrors] = useState("");
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -77,7 +79,7 @@ const AddGroupForm = () => {
   console.log("groupData", groupData);
   console.log("selectedMenus", selectedMenus);
 
-  const handleNext = async () => {
+  const handleAddGroup = async () => {
     setLoading(true);
     try {
       if (step === 3) {
@@ -103,6 +105,20 @@ const AddGroupForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (!validateForm()) return;
+    }
+    if (step === 2) {
+      if (!validateMenuSelect()) return;
+    }
+    if (step === 3) {
+      //ADD HANDLE SEND TO BACKEND
+      console.log("save button click");
+      handleAddGroup();
+    }
     if (step < 3) {
       setStep(step + 1);
     }
@@ -123,6 +139,27 @@ const AddGroupForm = () => {
         ? prev.filter((id) => id !== menuId)
         : [...prev, menuId]
     );
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!groupName.trim()) {
+      newErrors.groupName = "กรุณากรอกชื่อกลุ่มสินค้า";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateMenuSelect = () => {
+    const newErrors = {};
+
+    if (selectedMenus.length === 0) {
+      newErrors.selectedMenus = "กรุณาเลือกอย่างน้อย 1 เมนู";
+    }
+
+    setSelectedMenuErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const filteredMenus = menuItems.filter((menu) =>
@@ -151,6 +188,9 @@ const AddGroupForm = () => {
               placeholder="กรอกชื่อกลุ่ม..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
+            {errors.groupName && (
+              <p className="text-red-500 text-sm mt-2">{errors.groupName}</p>
+            )}
           </>
         );
       case 2:
@@ -200,6 +240,11 @@ const AddGroupForm = () => {
                 ))}
               </div>
             </div>
+            {selectedMenuErrors.selectedMenus && (
+              <p className="text-red-500 text-sm mt-2">
+                {selectedMenuErrors.selectedMenus}
+              </p>
+            )}
           </>
         );
       case 3:

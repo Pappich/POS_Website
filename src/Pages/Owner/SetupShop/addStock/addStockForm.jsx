@@ -5,6 +5,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import fetchApi from "../../../../Config/fetchApi";
 import { useEffect } from "react";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const AddStockForm = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const AddStockForm = () => {
   const [ingredientData, setIngredientData] = useState([]);
   const [menuIngredientData, setMenuIngredientData] = useState([]);
   const [filterIngredientData, setFilterIngredientData] = useState([]);
+  const [menuIngredientDataSet, setMenuIngredientDataSet] = useState([]);
 
   // List options
   const unitOptions = [
@@ -179,16 +181,6 @@ const AddStockForm = () => {
     );
   };
 
-  const handleAddRow = () => {
-    const newRow = { material: "", ingredient_id: null };
-
-    if (filterIngredientData.length > 0) {
-      setFilterIngredientData([...filterIngredientData, newRow]);
-    } else {
-      setRows([...rows, newRow]);
-    }
-  };
-
   const handleInputChange = (index, field, value) => {
     setRows((prevRows) =>
       prevRows.map((row, idx) =>
@@ -209,16 +201,28 @@ const AddStockForm = () => {
 
   // select each typ data ex. ร้อน เย็น ปั่น ให้ข้อมูลมันเป็น set
   const handleSizeDataChange = (rowIndex, sizeId, value) => {
-    setTypeData((prevData) => ({
-      ...prevData,
-      [selectedType]: {
-        ...(prevData[selectedType] || {}),
-        [rowIndex]: {
-          ...(prevData[selectedType]?.[rowIndex] || {}),
-          [sizeId]: value,
+    console.log(
+      "Updating typeData for row:",
+      rowIndex,
+      "size:",
+      sizeId,
+      "value:",
+      value
+    );
+    setTypeData((prevData) => {
+      const updatedData = {
+        ...prevData,
+        [selectedType]: {
+          ...(prevData[selectedType] || {}),
+          [rowIndex]: {
+            ...(prevData[selectedType]?.[rowIndex] || {}),
+            [sizeId]: value,
+          },
         },
-      },
-    }));
+      };
+      console.log("Updated typeData:", updatedData);
+      return updatedData;
+    });
   };
 
   const handleNext = async () => {
@@ -283,6 +287,91 @@ const AddStockForm = () => {
     }
   };
 
+  console.log("Step 3 Data:", rows);
+
+  // push filter ingredient data in to row
+  useEffect(() => {
+    const newRows = filterIngredientData.map((ingredient, index) => ({
+      id: ingredient.ingredient_id,
+      material: ingredient.ingredient_name,
+      unit: ingredient.ingredient_unit,
+    }));
+
+    console.log("Generated Rows:", newRows);
+
+    // Set the new rows
+    setRows(newRows);
+  }, [filterIngredientData]);
+
+  console.log("ROWS:", rows);
+
+  const handleAddRow = () => {
+    const newRow = {
+      id: Date.now(), // Unique ID
+      material: "",
+      unit: " ",
+    };
+
+    setRows((prevRows) => [...prevRows, newRow]);
+  };
+
+  console.log("ROWs:", rows);
+  const removeChoice = (id) => {
+    console.log("Removing:", { id });
+    // Remove from rows (only new rows have id)
+    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/owner/ingredient/menu/${menu_id}`
+        );
+        const data = await response.json();
+
+        setSizeItems(data.sizeItems || []);
+        setTypeItems(data.typeItems || []);
+        setRows(data.rows || []);
+
+        const ingredientMap = {};
+
+        if (data.menuIngredients) {
+          data.menuIngredients.forEach((item) => {
+            const menuType = item.menu_type || {};
+            const ingredient = item.ingredient || {};
+            const size = item.size || {};
+            const quantityUsed = item.quantity_used;
+
+            const { menu_type_id } = menuType;
+            const { ingredient_id } = ingredient;
+            const { size_id } = size;
+
+            if (!menu_type_id || !ingredient_id) return;
+
+            if (!ingredientMap[menu_type_id]) {
+              ingredientMap[menu_type_id] = {};
+            }
+
+            if (!ingredientMap[menu_type_id][ingredient_id]) {
+              ingredientMap[menu_type_id][ingredient_id] = {};
+            }
+
+            ingredientMap[menu_type_id][ingredient_id][size_id] = quantityUsed;
+          });
+        }
+
+        setMenuIngredientDataSet(ingredientMap);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [menu_id]);
+
+  console.log("MenuIngredientDataSet:", menuIngredientDataSet);
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
       <div className="text-center mb-8">
@@ -302,30 +391,18 @@ const AddStockForm = () => {
           </div>
 
           {/* Conditional Rendering */}
-          {(filterIngredientData.length === 0
-            ? rows
-            : filterIngredientData
-          ).map((ingredient, index) => (
+          {rows.map((ingredient, index) => (
             <div
-              key={ingredient.ingredient_id || index}
-              className="grid grid-cols-2 gap-6 mb-4"
+              key={ingredient.id}
+              className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
             >
               <div>
                 <input
                   type="text"
                   placeholder="รายการวัตถุดิบ"
-                  value={ingredient.material || ingredient.ingredient_name}
+                  value={ingredient.material}
                   onChange={(e) => {
-                    const field = "material";
-                    if (ingredient.ingredient_id) {
-                      handleInputChangeForFilter(
-                        ingredient.ingredient_id,
-                        field,
-                        e.target.value
-                      );
-                    } else {
-                      handleInputChange(index, field, e.target.value);
-                    }
+                    handleInputChange(index, "material", e.target.value);
                   }}
                   className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
@@ -333,18 +410,9 @@ const AddStockForm = () => {
 
               <div>
                 <select
-                  value={ingredient.unit || ingredient.ingredient_unit}
+                  value={ingredient.unit}
                   onChange={(e) => {
-                    const field = "unit";
-                    if (ingredient.ingredient_id) {
-                      handleInputChangeForFilter(
-                        ingredient.ingredient_id,
-                        field,
-                        e.target.value
-                      );
-                    } else {
-                      handleInputChange(index, field, e.target.value);
-                    }
+                    handleInputChange(index, "unit", e.target.value);
                   }}
                   className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 >
@@ -355,6 +423,15 @@ const AddStockForm = () => {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <button
+                  onClick={() => removeChoice(ingredient.id)}
+                  className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                >
+                  <AiOutlineDelete size={24} />
+                </button>
               </div>
             </div>
           ))}
@@ -423,31 +500,46 @@ const AddStockForm = () => {
             </thead>
             <tbody>
               {rows.map((row, index) => (
-                <tr key={index} className="bg-white text-start">
+                <tr
+                  key={row.id || row.ingredient_id || index}
+                  className="bg-white text-start"
+                >
                   <td className="border border-gray-300 px-4 py-2">
                     {index + 1}. {row.material} ({row.unit})
                   </td>
-                  {sizeItems.map((size) => (
-                    <td
-                      key={size.size_id}
-                      className="border border-gray-300 px-4 py-2 text-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          typeData[selectedType]?.[index]?.[size.size_id] || ""
-                        }
-                        onChange={(e) =>
-                          handleSizeDataChange(
-                            index, // This is your row index for the outer loop
-                            size.size_id,
-                            e.target.value
-                          )
-                        }
-                        className="w-full border rounded p-2"
-                      />
-                    </td>
-                  ))}
+
+                  {sizeItems.map((size) => {
+                    // Get the quantityUsed value from menuIngredientDataSet or allow user to input manually
+                    const ingredientData =
+                      menuIngredientDataSet[selectedType]?.[row.id];
+                    const quantityUsed = ingredientData
+                      ? ingredientData[size.size_id]
+                      : "";
+
+                    return (
+                      <td
+                        key={size.size_id}
+                        className="border border-gray-300 px-4 py-2 text-center"
+                      >
+                        <input
+                          type="text"
+                          value={
+                            typeData[selectedType]?.[row.id]?.[size.size_id] ||
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleSizeDataChange(
+                              row.id,
+                              size.size_id,
+                              e.target.value
+                            )
+                          }
+                          className="w-full border rounded p-2"
+                          placeholder="กรอกข้อมูล"
+                        />
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -501,17 +593,25 @@ const AddStockForm = () => {
                   <td className="border border-gray-300 px-4 py-2">
                     {rowIndex + 1}. {row.material} ({row.unit})
                   </td>
+
+                  {/* Iterate over each type and size */}
                   {typeItems.map((type) =>
-                    sizeItems.map((size) => (
-                      <td
-                        key={`${type.menu_type_id}-${size.size_id}`}
-                        className="border border-gray-300 px-4 py-2 text-center"
-                      >
-                        {typeData[type.menu_type_id]?.[rowIndex]?.[
-                          size.size_id
-                        ] || "-"}
-                      </td>
-                    ))
+                    sizeItems.map((size) => {
+                      // Access the data for the specific type, row, and size from typeData
+                      const enteredData =
+                        typeData[type.menu_type_id]?.[rowIndex]?.[size.size_id];
+                      console.log("enteredData:", enteredData);
+
+                      return (
+                        <td
+                          key={`${type.menu_type_id}-${size.size_id}`}
+                          className="border border-gray-300 px-4 py-2 text-center"
+                        >
+                          {/* Display entered data or "-" if no data is entered */}
+                          {enteredData || "hi"}
+                        </td>
+                      );
+                    })
                   )}
                 </tr>
               ))}
