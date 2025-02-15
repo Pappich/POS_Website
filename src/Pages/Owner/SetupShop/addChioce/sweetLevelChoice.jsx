@@ -130,8 +130,8 @@ const SweetLevelChoice = () => {
             );
 
             if (response.ok) {
-              const text = await response.text();
-              console.log("Response text:", text);
+              const data = await response.json();
+              console.log("Response JSON:", data);
               navigate("/choice-list");
             } else {
               console.error("Error:", response.statusText);

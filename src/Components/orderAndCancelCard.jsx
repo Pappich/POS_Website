@@ -5,7 +5,8 @@ import {
   MdOutlineShoppingCart,
 } from "react-icons/md";
 import { IoIosArrowForward } from "react-icons/io";
-const OrderAndCancelCard = () => {
+
+const OrderAndCancelCard = ({ total_orders, canceled_orders }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -22,7 +23,7 @@ const OrderAndCancelCard = () => {
         <div className="ml-3">
           <p>ยอดออเดอร์ทั้งหมด</p>
           <div className="flex">
-            <p className="font-bold">3674 ออเดอร์</p>
+            <p className="font-bold">{total_orders} ออเดอร์</p>
           </div>
         </div>
       </div>
@@ -38,7 +39,7 @@ const OrderAndCancelCard = () => {
           </div>
           <div className="ml-3">
             <p>จำนวนออเดอร์ที่ถูกยกเลิก</p>
-            <p className="font-bold">5 ออเดอร์</p>
+            <p className="font-bold">{canceled_orders} ออเดอร์</p>
           </div>
         </div>
         <IoIosArrowForward size={30} className="text-[#C6B399]" />

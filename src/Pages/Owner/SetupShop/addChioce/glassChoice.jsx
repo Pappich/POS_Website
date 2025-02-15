@@ -150,13 +150,14 @@ const GlassChoice = () => {
     } else {
       newErrors.menuSelection = "";
     }
+    console.log("ERROR:", errors);
 
     setErrors(newErrors);
 
     if (valid) {
       if (step === 3) {
         const formattedOptions = choices.map((option) => ({
-          [option.name]: option.price,
+          [option.name]: { price: Number(option.price).toFixed(2) },
         }));
 
         const requestData = {
@@ -165,12 +166,14 @@ const GlassChoice = () => {
           is_required: isRequired,
         };
 
+        console.log("REQUEST DATA:", requestData);
+
         try {
           if (owner_id) {
             const response = await fetchApi(
               `${URL}/owner/menus/options/size`,
               "POST",
-              requestData
+              { requestData }
             );
 
             if (response.ok) {
@@ -344,7 +347,7 @@ const GlassChoice = () => {
       case 2:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               2. เลือกเมนูที่ต้องการใช้ตัวเลือก:
               <span className="text-[#D4B28C] ml-2"> ขนาดแก้ว</span>
             </div>
@@ -433,6 +436,46 @@ const GlassChoice = () => {
                 {errors.menuSelection}
               </div>
             )}
+          </>
+        );
+      case 3:
+        return (
+          <>
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
+              3. สรุปตัวเลือก:
+              <span className="text-[#D4B28C] ml-2">ขนาดแก้ว</span>
+            </div>
+
+            <div className="w-full ml-16">
+              <label
+                htmlFor="selectedMenus"
+                className="text-2xl w-full text-start font-bold"
+              >
+                เมนูทั้งหมดที่ใช้ในตัวเลือก
+              </label>
+              <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
+                {selectedMenus.map((menuId) => {
+                  const menu = menuData.available_menus.find(
+                    (m) => m.menu_id === menuId
+                  );
+
+                  return (
+                    <div
+                      key={menu.menu_id}
+                      className="flex items-center space-x-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={true}
+                        className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                        readOnly
+                      />
+                      <span>{menu.menu_name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </>
         );
       default:

@@ -201,6 +201,8 @@ const ToppingChoice = () => {
           );
 
           if (response.ok) {
+            const data = await response.json();
+            console.log("Response JSON:", data);
             navigate("/choice-list");
           }
         } catch (error) {
