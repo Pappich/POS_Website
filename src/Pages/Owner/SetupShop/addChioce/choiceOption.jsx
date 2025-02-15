@@ -29,19 +29,22 @@ const ChoiceOptions = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center bg-white">
       <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">ตัวเลือกรายการสินค้า</h1>
+        <h1 className="text-3xl font-bold mb-2 mt-[40px]">
+          ตัวเลือกรายการสินค้า
+        </h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
       {/* Options Section */}
-      <div className="w-full ml-16 mt-8">
+      <div className="w-full ml-16 mt-[240px]">
         <div className="grid grid-cols-4 gap-8">
           {/* glass size */}
           <div className="flex flex-col items-center">
             <CiGlass
-              className="text-[#D4B28C] text-6xl mb-2"
+              className="text-[#D4B28C] mb-2"
+              size={120}
               onClick={handleGlassClick}
             />
             <p className="text-black font-semibold">ขนาดแก้ว</p>
@@ -50,7 +53,8 @@ const ChoiceOptions = () => {
           {/* sweet level */}
           <div className="flex flex-col items-center">
             <CiBoxList
-              className="text-[#D4B28C] text-6xl mb-2"
+              className="text-[#D4B28C] mb-2"
+              size={120}
               onClick={handleSweetLevelClick}
             />
             <p className="text-black font-semibold">ความหวาน</p>
@@ -59,7 +63,8 @@ const ChoiceOptions = () => {
           {/* topping */}
           <div className="flex flex-col items-center">
             <CgMenuGridO
-              className="text-[#D4B28C] text-6xl mb-2"
+              className="text-[#D4B28C] mb-2"
+              size={120}
               onClick={handleToppingClick}
             />
             <p className="text-black font-semibold">ท็อปปิ้ง</p>
@@ -68,7 +73,8 @@ const ChoiceOptions = () => {
           {/* type */}
           <div className="flex flex-col items-center">
             <LiaMugHotSolid
-              className="text-[#D4B28C] text-6xl mb-2"
+              className="text-[#D4B28C] mb-2"
+              size={120}
               onClick={handleTypeClick}
             />
             <p className="text-black font-semibold">ชนิดเครื่องดื่ม</p>
@@ -77,9 +83,9 @@ const ChoiceOptions = () => {
       </div>
 
       {/* Back Button */}
-      <div className="flex mt-24 w-full space-x-8 justify-between">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

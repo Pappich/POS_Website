@@ -67,17 +67,17 @@ const ProductList = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen bg-white">
+      <div className="flex flex-col items-center bg-white mt-[40px]">
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold mb-2">รายการสินค้า</h1>
+          <h1 className="text-3xl font-bold mb-2">รายการสินค้า</h1>
           <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
         </div>
 
         <div className="w-full flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">เมนูทั้งหมด</h1>
+          <h1 className="text-3xl font-bold">เมนูทั้งหมด</h1>
         </div>
 
-        <div className="w-full flex justify-start text-lg mb-8">
+        <div className="w-full flex justify-start text-2xl mb-8">
           <div className="relative flex items-center w-full">
             <FaSearch
               style={{ color: "#D4B28C" }}
@@ -99,7 +99,7 @@ const ProductList = () => {
             filteredItems.map((item) => (
               <div key={item.menu_id} className="w-full mb-4">
                 <div className="flex justify-between items-start">
-                  <p className="text-lg">{item.menu_name}</p>
+                  <p className="text-2xl">{item.menu_name}</p>
                   <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
                     <button
                       className="hover:underline font-bold"
@@ -124,15 +124,15 @@ const ProductList = () => {
           )}
         </div>
 
-        <div className="flex mt-[40px] w-full space-x-8 justify-between">
+        <div className="flex fixed bottom-4 left-0 w-full px-4 py-4 space-x-8 justify-between">
           <button
-            className="px-6 py-3 w-[250px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
             onClick={handleAddProduct}
           >
             เพิ่มรายการสินค้า

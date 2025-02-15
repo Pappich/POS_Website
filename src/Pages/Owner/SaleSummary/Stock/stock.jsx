@@ -330,13 +330,13 @@ const Stock = () => {
             {/* Buttons */}
             <div className="flex justify-between mt-auto">
               <button
-                className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
                 onClick={closeModal}
               >
                 ย้อนกลับ
               </button>
               <button
-                className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
                 onClick={closeModal}
               >
                 บันทึก

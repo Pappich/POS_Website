@@ -292,7 +292,7 @@ const ProductDetail = () => {
         </div>
         <div className="flex mt-8 justify-between">
           <button
-            className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ

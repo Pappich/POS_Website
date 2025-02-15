@@ -6,6 +6,11 @@ module.exports = {
       fontFamily: {
         noto: ["Noto Sans Thai", "sans-serif"],
       },
+      fontSize: {
+        base: "2rem",
+        xxl: "1.5rem",
+        xxxl: "2rem",
+      },
     },
   },
   plugins: [],

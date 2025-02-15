@@ -2,12 +2,12 @@ import React from "react";
 
 const QueueSummary = () => {
   return (
-    <div className="font-noto flex flex-col items-center min-h-screen bg-white">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl text-black mb-2 text-left">
+    <div className="w-full font-noto flex flex-col justify-center items-center">
+      <div className="w-[720px] bg-white p-12 rounded-lg shadow-md">
+        <h2 className="text-3xl text-black mb-2 text-left">
           ขอบคุณที่ใช้บริการ
         </h2>
-        <p className="text-primaryRegular text-gray-500 mb-2 text-left">
+        <p className="text-gray-500 mb-2 text-left">
           กรุณารอรับสินค้าทางซ้ายมือค่ะ
         </p>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>

@@ -228,7 +228,7 @@ const MenuDetail = () => {
       </div>
 
       <div className="text-center mb-6">
-        <h1 className="text-xl font-bold text-yellow-600">{menu.menu_name}</h1>
+        <h1 className="text-3xl font-bold text-yellow-600">{menu.menu_name}</h1>
         <p className="text-gray-500">{menu.description}</p>
       </div>
 
@@ -302,16 +302,16 @@ const MenuDetail = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={handleDelete}
-              className="w-10 h-10 font-bold text-white bg-[#DC9494] rounded-full flex items-center justify-center"
+              className="w-14 h-14 font-bold text-white bg-[#DC9494] rounded-full flex items-center justify-center"
             >
               -
             </button>
-            <div className="w-20 h-10 font-bold text-center border border-[#AD8B73] rounded-full flex items-center justify-center">
+            <div className="w-24 h-14 font-bold text-center border border-[#AD8B73] rounded-full flex items-center justify-center">
               {quantity}
             </div>
             <button
               onClick={handleAdd}
-              className="w-10 h-10 text-white bg-[#A2DC94] rounded-full flex items-center justify-center"
+              className="w-14 h-14 text-white bg-[#A2DC94] rounded-full flex items-center justify-center"
             >
               +
             </button>
@@ -320,7 +320,7 @@ const MenuDetail = () => {
 
         <div className="w-full flex flex-row items-center justify-between">
           <span className="font-bold">ราคา</span>
-          <div className="w-40 text-center border border-[#AD8B73] text-black font-bold text-xl px-6 py-2 rounded-full">
+          <div className="w-60 h-14 text-center flex items-center justify-center border border-[#AD8B73] text-black font-bold text-2xl rounded-full">
             {calculatePrice().toFixed(2)} บาท
           </div>
         </div>

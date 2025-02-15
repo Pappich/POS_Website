@@ -112,13 +112,13 @@ const StockList = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
-      <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">รายการสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] mx-auto mt-6"></div>
+      <div className="text-center mb-10 mt-[40px]">
+        <h1 className="text-3xl font-bold mb-2">รายการสินค้า</h1>
+        <div className="w-20 h-1 bg-[#D4B28C] mt-6"></div>
       </div>
 
       <div className="w-full flex justify-between items-center mb-6">
-        <h1 className="text-lg font-bold">เมนูทั้งหมด</h1>
+        <h1 className="text-2xl font-bold">เมนูทั้งหมด</h1>
       </div>
 
       <div className="w-full mb-8">
@@ -176,7 +176,7 @@ const StockList = () => {
           filteredItems.map((menu, index) => (
             <div key={index} className="w-full mb-4">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-lg">{menu.menu_name}</p>
+                <p className="text-2xl">{menu.menu_name}</p>
                 <button
                   onClick={() => handleEditClick(menu)}
                   className="text-[#D4B28C] font-bold"
@@ -192,10 +192,10 @@ const StockList = () => {
         )}
       </div>
 
-      <div className="flex mt-10 w-full justify-start">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full justify-start">
         <button
           onClick={handleBack}
-          className="px-6 py-3 w-64 rounded-full border border-[#D4B28C] text-[#D4B28C] bg-transparent font-bold transition duration-300 hover:bg-[#D4B28C] hover:text-white"
+          className="px-14 py-4 w-[300px] rounded-full border border-[#D4B28C] text-[#D4B28C] bg-transparent font-bold transition duration-300 hover:bg-[#D4B28C] hover:text-white"
         >
           ย้อนกลับ
         </button>

@@ -171,12 +171,12 @@ const AddGroupForm = () => {
       case 1:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               1. กรอกชื่อกลุ่มรายการสินค้าที่ต้องการ
             </div>
             <label
               htmlFor="groupName"
-              className="text-lg mb-2 w-full text-center"
+              className="text-2xl mb-2 w-full text-center"
             >
               ชื่อกลุ่ม
             </label>
@@ -196,12 +196,12 @@ const AddGroupForm = () => {
       case 2:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               2. เลือกเมนูที่ต้องการเพิ่มในกลุ่มรายการสินค้า
               <span className="text-[#DD9F52] ml-2"> {groupName}</span>
             </div>
 
-            <div className="w-full flex justify-start text-lg mb-8">
+            <div className="w-full flex justify-start text-xl mb-8">
               <div className="relative flex items-center w-full">
                 <FaSearch
                   style={{ color: "#D4B28C" }}
@@ -219,7 +219,7 @@ const AddGroupForm = () => {
             <div className="w-full ml-16">
               <label
                 htmlFor="productDetails"
-                className="text-lg w-full text-start font-bold"
+                className="text-2xl w-full text-start font-bold"
               >
                 เมนูทั้งหมด
               </label>
@@ -250,14 +250,14 @@ const AddGroupForm = () => {
       case 3:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               3. สรุปกลุ่มรายการสินค้า
               <span className="text-[#DD9F52] ml-2"> {groupName}</span>
             </div>
             <div className="w-full ml-16">
               <label
                 htmlFor="selectedMenus"
-                className="text-lg w-full text-start font-bold"
+                className="text-2xl w-full text-start font-bold"
               >
                 เมนูทั้งหมดในหมวดหมู่
               </label>
@@ -287,9 +287,9 @@ const AddGroupForm = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen bg-white">
+      <div className="flex flex-col items-center bg-white">
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
+          <h1 className="text-3xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
           <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
         </div>
 
@@ -298,15 +298,15 @@ const AddGroupForm = () => {
             {renderStepContent()}
           </div>
 
-          <div className="flex mt-8 w-full space-x-8 justify-between">
+          <div className="flex fixed bottom-4 left-0 px-4 py-4 mt-8 w-full space-x-8 justify-between">
             <button
-              className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+              className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
               onClick={handleBack}
             >
               ย้อนกลับ
             </button>
             <button
-              className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+              className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
               onClick={handleNext}
             >
               {step < 3 ? "ถัดไป" : "บันทึก"}

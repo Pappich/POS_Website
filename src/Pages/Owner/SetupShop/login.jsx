@@ -82,7 +82,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen">
+    <div className="w-screen h-screen font-noto flex flex-col justify-center items-center">
       <div
         ref={formRef}
         className="max-w-md w-full bg-white p-8 rounded-lg shadow-md"

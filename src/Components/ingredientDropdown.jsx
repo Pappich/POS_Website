@@ -37,7 +37,7 @@ const IngredientDropdown = ({ value, onChange }) => {
       padding: "6px",
       color: "#4B5563",
       //   outline: "none",
-      fontSize: "16px",
+      fontSize: "2xl",
       //   boxShadow: state.isFocused ? "0 0 0 1px #A86D3A" : "none",
     }),
   };

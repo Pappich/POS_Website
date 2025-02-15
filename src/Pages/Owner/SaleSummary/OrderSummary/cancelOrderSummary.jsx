@@ -230,7 +230,7 @@ const CancelOrderSummary = () => {
             </div>
             <div className="flex justify-center mt-3">
               <button
-                className="px-6 py-1 w-[200px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
                 onClick={closeModal}
               >
                 ย้อนกลับ

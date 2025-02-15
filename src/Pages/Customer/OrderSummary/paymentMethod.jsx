@@ -14,9 +14,6 @@ const PaymentMethod = () => {
   console.log("selectedPayment: ", selectedPayment);
   console.log("TOTAL:", total);
 
-  const items = useSelector((state) => state.cart.items);
-  console.log("items in cart:", items);
-
   const bankIcons = [
     "BAAC.png",
     "BAY.png",

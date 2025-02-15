@@ -15,14 +15,16 @@ const ChoiceMenu = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen bg-white">
+      <div className="flex flex-col items-center bg-white">
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold mb-2">ตัวเลือกรายการสินค้า</h1>
+          <h1 className="text-3xl font-bold mb-2 mt-[40px]">
+            ตัวเลือกรายการสินค้า
+          </h1>
           <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
         </div>
 
         <div className="w-full flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">
+          <h1 className="text-2xl font-bold">
             ตัวเลือก:
             <span className="text-[#DD9F52] ml-2">{groupName}</span>
           </h1>
@@ -30,7 +32,7 @@ const ChoiceMenu = () => {
         <div className="w-full ml-16">
           <label
             htmlFor="selectedMenus"
-            className="text-lg w-full text-start font-bold"
+            className="text-2xl w-full text-start font-bold"
           >
             เมนูทั้งหมดที่ใช้ตัวเลือก
           </label>
@@ -48,9 +50,9 @@ const ChoiceMenu = () => {
           </div>
         </div>
 
-        <div className="flex mt-8 w-full space-x-8 justify-between">
+        <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
           <button
-            className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ

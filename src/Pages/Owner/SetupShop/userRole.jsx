@@ -14,19 +14,19 @@ const UserRole = () => {
       id: "owner",
       label: "ฝั่งเจ้าของร้าน",
       details: "เว็บไซต์ตรวจสอบคลังสินค้าและยอดขาย ระบบสร้างรายการสินค้า",
-      icon: <HiOutlineDocumentChartBar size={60} />,
+      icon: <HiOutlineDocumentChartBar size={120} />,
     },
     {
       id: "employee",
       label: "ฝั่งพนักงาน",
       details: "เว็บไซต์ดูคำสั่งซื้อ",
-      icon: <HiOutlineClipboardDocumentList size={60} />,
+      icon: <HiOutlineClipboardDocumentList size={120} />,
     },
     {
       id: "customer",
       label: "ฝั่งลูกค้า",
       details: "เว็บไซต์สั่งอาหาร",
-      icon: <BiFoodMenu size={60} />,
+      icon: <BiFoodMenu size={120} />,
     },
   ];
 
@@ -41,16 +41,16 @@ const UserRole = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center justify-center mt-[120px]">
       <div className="text-start mb-10">
-        <h1 className="text-2xl font-bold mb-2">ผู้ใช้งาน</h1>
-        <h1 className="text-xl mb-2">
+        <h1 className="mt-4 text-3xl font-bold mb-2">ผู้ใช้งาน</h1>
+        <h1 className="text-2xl mb-2">
           โปรดเลือกเว็บไซต์ฝั่งผู้ใช้งานที่ต้องการ
         </h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
-      <div className="w-full ml-16 mt-8">
+      <div className="w-full h-full ml-16 mt-[120px]">
         <div className="grid grid-cols-3 gap-8">
           {icons.map(({ id, label, details, icon }) => (
             <div
@@ -67,8 +67,8 @@ const UserRole = () => {
               >
                 {icon}
               </div>
-              <p className={"mt-2 text-xl font-bold text-black"}>{label}</p>
-              <p className={"mt-2 text-lg text-black"}>{details}</p>
+              <p className={"mt-2 text-3xl font-bold text-black"}>{label}</p>
+              <p className={"mt-2 text-2xl text-black"}>{details}</p>
             </div>
           ))}
         </div>

@@ -390,12 +390,12 @@ const AddStockForm = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold mb-2">ระบบตัดคลังสินค้า</h1>
+      <div className="text-center mb-8 mt-[40px]">
+        <h1 className="text-3xl font-bold mb-2">ระบบตัดคลังสินค้า</h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
-      <div className="flex items-start w-full font-bold text-xl">
+      <div className="flex items-start w-full font-bold text-2xl">
         วัตถุดิบ และปริมาณที่ใช้: {menu}
       </div>
 
@@ -441,9 +441,9 @@ const AddStockForm = () => {
               <div>
                 <button
                   onClick={() => removeChoice(ingredient.id)}
-                  className="font-bold border border-red-300 text-red-300 w-14 h-8 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                  className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
                 >
-                  <AiOutlineDelete size={24} />
+                  <AiOutlineDelete size={36} />
                 </button>
               </div>
             </div>
@@ -452,7 +452,7 @@ const AddStockForm = () => {
           {/* Button to add new row */}
           <button
             onClick={handleAddRow}
-            className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold transition mt-4"
+            className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold transition mt-8"
           >
             + เพิ่มวัตถุดิบ
           </button>
@@ -461,7 +461,7 @@ const AddStockForm = () => {
       {step === 2 && (
         <>
           <div className="mb-4 items-start w-full flex">
-            <div className="w-[300px] font-bold text-xl mt-4">
+            <div className="w-[300px] font-bold text-2xl mt-4">
               ตัวเลือก:
               <span className="text-[#DD9F52]">ชนิดเครื่องดื่ม</span>
             </div>
@@ -633,15 +633,15 @@ const AddStockForm = () => {
         </div>
       )}
 
-      <div className="flex mt-8 w-full space-x-8 justify-between">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ
         </button>
         <button
-          className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
           onClick={handleNext}
         >
           {step < 3 ? "ถัดไป" : "บันทึก"}
