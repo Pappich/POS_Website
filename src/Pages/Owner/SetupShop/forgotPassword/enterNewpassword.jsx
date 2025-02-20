@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaLock } from "react-icons/fa";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
 
 const EnterNewPassword = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -11,11 +16,14 @@ const EnterNewPassword = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
+  const owner_id = sessionStorage.getItem("owner_id");
+  console.log("OWNER_ID FROM TOKEN:", owner_id);
+
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{10,}$/;
     let isValid = true;
 
@@ -36,12 +44,27 @@ const EnterNewPassword = () => {
     }
 
     if (isValid) {
-      navigate("/");
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/reset-password/${owner_id}`,
+          "PATCH",
+          { newPassword: password }
+        );
+
+        if (response.ok) {
+          sessionStorage.setItem("password_reset", "true");
+          navigate("/");
+        } else {
+          console.error("Failed to reset password");
+        }
+      } catch (error) {
+        console.error("Error resetting password:", error);
+      }
     }
   };
 
   const handleSignIn = () => {
-    navigate("/");
+    navigate("/login");
   };
 
   return (

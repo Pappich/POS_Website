@@ -146,62 +146,73 @@ const Summary = () => {
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => {
-            const selectedMenu = menuData.find(
-              (menu) => menu.menu_id === item.menuId
-            );
+          {items.length === 0 ? (
+            <tr>
+              <td
+                colSpan="4"
+                className="text-center py-4 text-gray-500 text-2xl"
+              >
+                ยังไม่มีสินค้าในตระกร้าขณะนี้
+              </td>
+            </tr>
+          ) : (
+            items.map((item, index) => {
+              const selectedMenu = menuData.find(
+                (menu) => menu.menu_id === item.menuId
+              );
 
-            return (
-              <tr key={index} className="border-b border-gray-200">
-                <td className="flex items-center py-2">
-                  <img
-                    src={
-                      selectedMenu?.image_url ||
-                      "https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
-                    }
-                    alt={selectedMenu?.menu_name}
-                    className="mr-2 rounded flex items-center h-[72px] w-[72px] mb-2"
-                  />
-                  <div>
-                    <p className="font-semibold">{selectedMenu?.menu_name}</p>
-                    <div className="text-xl text-gray-500">
-                      {item.selectedSize && (
-                        <span>ขนาด: {item.selectedSize} </span>
-                      )}
-                      {item.selectedSweetness && item.selectedSize && (
-                        <span>| หวาน: {item.selectedSweetness} </span>
-                      )}
-                      {item.selectedType &&
-                        (item.selectedSize || item.selectedSweetness) && (
-                          <span>| ชนิด: {item.selectedType} </span>
+              return (
+                <tr key={index} className="border-b border-gray-200">
+                  <td className="flex items-center py-2">
+                    <img
+                      src={
+                        selectedMenu?.image_url ||
+                        "https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
+                      }
+                      alt={selectedMenu?.menu_name}
+                      className="mr-2 rounded flex items-center h-[72px] w-[72px] mb-2"
+                    />
+                    <div>
+                      <p className="font-semibold">{selectedMenu?.menu_name}</p>
+                      <div className="text-xl text-gray-500">
+                        {item.selectedSize && (
+                          <span>ขนาด: {item.selectedSize} </span>
                         )}
-                      {item.selectedAddOn.length > 0 &&
-                        (item.selectedSize ||
-                          item.selectedSweetness ||
-                          item.selectedType) && (
-                          <span>
-                            | ท็อปปิ้ง:{" "}
-                            {item.selectedAddOn
-                              .map((addon) => addon)
-                              .join(", ")}
-                          </span>
+                        {item.selectedSweetness && item.selectedSize && (
+                          <span>| หวาน: {item.selectedSweetness} </span>
                         )}
+                        {item.selectedType &&
+                          (item.selectedSize || item.selectedSweetness) && (
+                            <span>| ชนิด: {item.selectedType} </span>
+                          )}
+                        {item.selectedAddOn.length > 0 &&
+                          (item.selectedSize ||
+                            item.selectedSweetness ||
+                            item.selectedType) && (
+                            <span>
+                              | ท็อปปิ้ง:{" "}
+                              {item.selectedAddOn
+                                .map((addon) => addon)
+                                .join(", ")}
+                            </span>
+                          )}
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="text-center">{item.quantity}</td>
-                <td className="text-center">{item.price} บาท</td>
-                <td>
-                  <button
-                    onClick={() => handleRemove(item)}
-                    className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
-                  >
-                    <AiOutlineDelete size={36} />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
+                  </td>
+                  <td className="text-center">{item.quantity}</td>
+                  <td className="text-center">{item.price} บาท</td>
+                  <td>
+                    <button
+                      onClick={() => handleRemove(item)}
+                      className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                    >
+                      <AiOutlineDelete size={36} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
 

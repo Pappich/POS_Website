@@ -57,7 +57,6 @@ const cartSlice = createSlice({
             JSON.stringify(action.payload.selectedAddOn)
       );
     },
-
     clearCart: (state) => {
       state.items = [];
     },

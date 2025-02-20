@@ -209,13 +209,15 @@ const MenuDetail = () => {
 
   return (
     <div className="font-noto flex flex-col min-h-screen bg-white">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 relative">
         <button onClick={handleBack}>
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
-        <button onClick={handleAddToCart}>
+        <button onClick={handleAddToCart} className="relative">
           <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
-          <span>{getCartItemCount()}</span>
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            {getCartItemCount()}
+          </span>
         </button>
       </div>
 
@@ -236,7 +238,7 @@ const MenuDetail = () => {
         <OptionGroup
           title="ชนิดเครื่องดื่ม"
           options={menu.type_name.map((item) => ({
-            id: item.menu_type_id, // Assuming `menu_type_id` is present
+            id: item.menu_type_id,
             name: item.menu_type_name,
           }))}
           selected={selectedType ? [selectedType] : []}

@@ -24,6 +24,7 @@ const SweetLevelChoice = () => {
   const [choices, setChoices] = useState([{ name: "" }]);
   const [sweetnessData, setSweetnessData] = useState([]);
   const [isRequired, setIsRequired] = useState(false);
+  const [groupName, setGroupName] = useState();
   const [errors, setErrors] = useState({
     choiceName: "",
     menuSelection: "",
@@ -83,14 +84,24 @@ const SweetLevelChoice = () => {
   const handleNext = async () => {
     console.log("choices:", choices);
     let valid = true;
-    const newErrors = { price: "", choiceName: "", menuSelection: "" };
+    const newErrors = {
+      groupName: "",
+      price: "",
+      choiceName: "",
+      menuSelection: "",
+    };
+
+    // case group name
+    if (!groupName) {
+      newErrors.groupName = "กรุณากรอกชื่อกลุ่ม";
+    }
 
     // case price
     choices.forEach((choice, index) => {
-      if (!choice.name) {
+      if (step === 2 && !choice.name) {
         valid = false;
         newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
-      } else if (index === choices.length - 1 && !choice.name) {
+      } else if (step === 2 && index === choices.length - 1 && !choice.name) {
         valid = false;
         newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
       } else {
@@ -99,7 +110,7 @@ const SweetLevelChoice = () => {
     });
 
     // case select menu
-    if (step === 2 && selectedMenus.length === 0) {
+    if (step === 3 && selectedMenus.length === 0) {
       valid = false;
       newErrors.menuSelection = "กรุณาเลือกอย่างน้อย 1 เมนู";
     } else {
@@ -109,11 +120,12 @@ const SweetLevelChoice = () => {
     setErrors(newErrors);
 
     if (valid) {
-      if (step === 3) {
+      if (step === 4) {
         const formattedOptions = choices.map((option) => option.name);
         console.log("formattedOptions", formattedOptions);
 
         const requestData = {
+          sweetness_group_name: groupName,
           options: formattedOptions,
           menu_id: selectedMenus,
           is_required: isRequired,
@@ -215,7 +227,32 @@ const SweetLevelChoice = () => {
         return (
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
-              1. เพิ่มช้อยส์ในตัวเลือก:
+              1. กรอกชื่อกลุ่มระดับความหวานที่ต้องการ
+            </div>
+            <label
+              htmlFor="groupName"
+              className="text-2xl mb-2 w-full text-center"
+            >
+              ชื่อกลุ่ม
+            </label>
+            <input
+              type="text"
+              id="groupName"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              placeholder="กรอกชื่อกลุ่ม..."
+              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+            />
+            {errors.groupName && (
+              <p className="text-red-500 text-sm mt-2">{errors.groupName}</p>
+            )}
+          </>
+        );
+      case 2:
+        return (
+          <>
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
+              2. เพิ่มช้อยส์ในตัวเลือก:
               <span className="text-[#D4B28C] ml-2">ความหวาน</span>
             </div>
 
@@ -276,11 +313,11 @@ const SweetLevelChoice = () => {
             </button>
           </>
         );
-      case 2:
+      case 3:
         return (
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
-              2. เลือกเมนูที่ต้องการใช้ตัวเลือก:
+              3. เลือกเมนูที่ต้องการใช้ตัวเลือก:
               <span className="text-[#D4B28C] ml-2">ความหวาน</span>
             </div>
 
@@ -370,11 +407,11 @@ const SweetLevelChoice = () => {
             )}
           </>
         );
-      case 3:
+      case 4:
         return (
           <>
             <div className="w-full flex justify-start text-lg mb-5 font-bold">
-              3. สรุปตัวเลือก:
+              4. สรุปตัวเลือก:
               <span className="text-[#D4B28C] ml-2">ความหวาน</span>
             </div>
 
@@ -438,7 +475,7 @@ const SweetLevelChoice = () => {
           className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
           onClick={handleNext}
         >
-          {step < 3 ? "ถัดไป" : "บันทึก"}
+          {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
     </div>

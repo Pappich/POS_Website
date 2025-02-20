@@ -2,16 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineHome } from "react-icons/hi";
 import { TbLogout } from "react-icons/tb";
-import { PiUserCircleBold } from "react-icons/pi";
 
-const Navbar = () => {
+const NavbarCustomer = () => {
   const navigate = useNavigate();
-  const role = sessionStorage.getItem("role");
-
-  const handleLogout = () => {
-    sessionStorage.clear();
-    navigate("/");
-  };
 
   return (
     <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md w-full">
@@ -45,7 +38,7 @@ const Navbar = () => {
           </span>
         </a>
 
-        {/* menu list */}
+        {/* menu list
         <div className="flex items-center space-x-6 w-auto">
           <button
             onClick={() => navigate("/role")}
@@ -55,24 +48,16 @@ const Navbar = () => {
             <span className="text-xl font-bold">หน้าหลัก</span>
           </button>
           <button
-            onClick={handleLogout}
+            onClick={() => navigate("/")}
             className="flex p-2 text-black hover:text-red-600 transition-all duration-300"
           >
             <TbLogout size={24} />
             <span className="text-xl font-bold">ออกจากระบบ</span>
           </button>
-          {role && (
-            <div className="flex items-center justify-center w-[150px] p-1 space-x-1 bg-[#D4B28C] rounded-full">
-              <PiUserCircleBold size={24} />
-              <span className="text-xl font-bold text-black">
-                {role == "admin" ? "เจ้าของร้าน" : "พนักงาน"}
-              </span>
-            </div>
-          )}
-        </div>
+        </div> */}
       </div>
     </nav>
   );
 };
 
-export default Navbar;
+export default NavbarCustomer;

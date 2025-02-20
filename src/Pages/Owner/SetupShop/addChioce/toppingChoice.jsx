@@ -25,7 +25,7 @@ const ToppingChoice = () => {
   const [isRequired, setIsRequired] = useState(false);
   const [isMultiple, setIsMultiple] = useState(false);
   const [choices, setChoices] = useState([
-    { name: "", price: "", quantity: "" },
+    { name: "", price: "", quantity: "", unit: "" },
   ]);
   const [toppingData, setToppingData] = useState([]);
   const groupedMenus = [];
@@ -48,6 +48,15 @@ const ToppingChoice = () => {
     mode: "add",
     choices: {},
   };
+
+  // List options
+  const unitOptions = [
+    { value: "กรัม", label: "กรัม (g)" },
+    { value: "กิโลกรัม", label: "กิโลกรัม (kg)" },
+    { value: "มิลลิลิตร", label: "มิลลิลิตร (ml)" },
+    { value: "ลิตร", label: "ลิตร (l)" },
+    { value: "ชิ้น", label: "ชิ้น (unit)" },
+  ];
 
   useEffect(() => {
     if (mode === "edit") {
@@ -329,11 +338,9 @@ const ToppingChoice = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 mb-4">
-              <div className="font-bold mr-[930px]">ชื่อช้อยส์</div>
-              <div className="font-bold mb-2">
-                ส่วนต่างของราคาที่คิดเพิ่ม (บาท)
-              </div>
+            <div className="grid grid-cols-2 mb-4 items-start text-start w-full">
+              <div className="font-bold">ชื่อช้อยส์</div>
+              <div className="font-bold">ส่วนต่างของราคาที่คิดเพิ่ม (บาท)</div>
             </div>
 
             {/* Form Section */}
@@ -343,7 +350,7 @@ const ToppingChoice = () => {
                   key={index}
                   className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-6 w-full items-center"
                 >
-                  <div className=" w-full">
+                  <div className=" w-full grid grid-cols-2">
                     <IngredientDropdown
                       value={choice.ingredientId}
                       onChange={(value, label) =>
@@ -355,6 +362,22 @@ const ToppingChoice = () => {
                         {errors.choiceName}
                       </div>
                     )}
+                    <div className="ml-4">
+                      <select
+                        value={choice.unit}
+                        onChange={(e) =>
+                          handleChoiceChange(index, "unit", e.target.value)
+                        }
+                        className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                      >
+                        <option value="">เลือกหน่วย</option>
+                        {unitOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className=" w-full">
                     <input

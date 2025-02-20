@@ -8,6 +8,7 @@ import configureAPI from "../../../Config/configureAPI";
 import bcrypt from "bcryptjs";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../Config/redux/userSlice";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -31,19 +32,30 @@ const Login = () => {
 
   const handleLogin = async (email, password) => {
     try {
-      const hashedPassword = bcrypt.hashSync(password);
-
-      const response = await fetchApi(`${URL}/owner/login`, "POST", {
+      const response = await fetchApi(`${URL}/auth/login`, "POST", {
         email,
         password,
       });
 
       if (response.ok) {
         const userData = await response.json();
-        dispatch(setUser(userData)); //add user data to redux
-        console.log("USER DATA in Redux:", userData);
+        console.log("USER DATA FROM JWT:", userData);
+        const decodedToken = jwtDecode(userData.token);
+        console.log("JWT PAYLOAD:", decodedToken);
 
-        navigate("/enter-new-password");
+        // Save JWT token and user data to sessionStorage
+        sessionStorage.setItem("token", userData.token);
+        sessionStorage.setItem("owner_id", decodedToken.owner_id);
+        sessionStorage.setItem("branch_id", decodedToken.branch_id);
+        sessionStorage.setItem("role", decodedToken.role);
+
+        const passwordReset = sessionStorage.getItem("password_reset");
+
+        if (passwordReset === "true") {
+          navigate("/role");
+        } else {
+          navigate("/enter-new-password");
+        }
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -82,7 +94,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="w-screen h-screen font-noto flex flex-col justify-center items-center">
+    <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen">
       <div
         ref={formRef}
         className="max-w-md w-full bg-white p-8 rounded-lg shadow-md"

@@ -24,7 +24,7 @@ const Order = () => {
     navigate("/pause-section");
   };
   const [orders, setOrders] = useState([]);
-  const [order, setOrder] = useState({});
+  // const [order, setOrder] = useState({});
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,10 +72,12 @@ const Order = () => {
   if (error) return <div>Error: {error}</div>;
 
   console.log("ORDER DATA:", orders);
+  console.log(orders[0]); // Check the first order
+  console.log(orders[0].order_items); // Check order items
 
   return (
-    <div className="grid grid-cols-3 gap-4 bg-gray-100">
-      <div className="bg-[#FFFFFF] rounded-2xl shadow-md col-span-1">
+    <div className="grid grid-cols-3 gap-4 bg-gray-200">
+      <div className="bg-[#FFFFFF] rounded-2xl shadow-md col-span-1 flex flex-col">
         {orders.length > 0 && orders[0]?.order_id ? (
           <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
             <h1 className="flex items-center justify-center font-bold w-full rounded-full py-2 px-4 text-3xl">
@@ -109,18 +111,18 @@ const Order = () => {
         )}
         <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
         <div className="pl-4 pr-4 mt-2">
-          <span className="font-bold flex justify-center mt-4">
+          <span className="font-bold flex justify-center mt-4 text-2xl">
             รายการคำสั่งซื้อ
           </span>
-          <div className="flex justify-between font-bold">
+          <div className="flex justify-between font-bold text-2xl">
             <div>รายการสินค้า</div>
             <div>จำนวน</div>
           </div>
-          {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
-            <div className="h-[680px] overflow-y-auto mt-4">
-              {orders[0].order_items.map((item, idx) => (
+          {orders[0]?.order_item && orders[0].order_item.length > 0 ? (
+            <div className="h-[400px] overflow-y-auto mt-4">
+              {orders[0].order_item.map((item, idx) => (
                 <div key={idx} className="mb-4">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-2xl">
                     <div>{item.menu.menu_name}</div>
                     <div>{item.quantity}</div>
                   </div>
@@ -134,7 +136,7 @@ const Order = () => {
           ) : (
             <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
           )}
-          <div className="space-y-2 w-full pt-2 pb-2 mb-auto">
+          <div className="space-y-2 w-full pb-2 mb-auto pt-[200px]">
             <CancelOrderButtonEm order={orders[0].order_id} />
             <DoneOrderButton order={orders[0].order_id} />
           </div>
@@ -146,7 +148,9 @@ const Order = () => {
           {/* Calendar */}
           <div className="py-2 flex justify-center items-center rounded-full w-full gap-2">
             <CiCalendar className="text-black" size={36} />
-            <span className="pl-1 text-black">17 ธันวาคม พ.ศ. 2567</span>
+            <span className="pl-1 text-black text-2xl">
+              17 ธันวาคม พ.ศ. 2567
+            </span>
           </div>
 
           {/* Button */}
@@ -154,7 +158,7 @@ const Order = () => {
             onClick={handlePauseSection}
             className="py-2 bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full w-full"
           >
-            <div className="flex justify-center items-center gap-2">
+            <div className="flex justify-center items-center gap-2 text-2xl">
               <MdOutlinePauseCircleOutline size={36} />
               พักวัตถุดิบ / รายการสินค้า
             </div>
@@ -168,7 +172,7 @@ const Order = () => {
               <MdOutlineShoppingCart color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
-              <p className="text-gray-600">ออเดอร์วันนี้</p>
+              <p className="text-gray-600 text-2xl">ออเดอร์วันนี้</p>
               <p className="font-bold text-2xl">15 ออเดอร์</p>
             </div>
           </div>
@@ -178,7 +182,7 @@ const Order = () => {
               <IoMdStopwatch color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
-              <p className="text-gray-600">ออเดอร์ที่รอ</p>
+              <p className="text-gray-600 text-2xl">ออเดอร์ที่รอ</p>
               <p className="font-bold text-2xl">17 ออเดอร์</p>
             </div>
           </div>
@@ -188,7 +192,7 @@ const Order = () => {
               <MdDone color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
-              <p className="text-gray-600">ออเดอร์ที่เสร็จ</p>
+              <p className="text-gray-600 text-2xl">ออเดอร์ที่เสร็จ</p>
               <p className="font-bold text-2xl">10 ออเดอร์</p>
             </div>
           </div>
@@ -220,23 +224,23 @@ const Order = () => {
                     </div>
                     <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
                     <div className="pl-4 pr-4 pt-2">
-                      <span className="font-bold flex justify-center">
+                      <span className="font-bold flex justify-center text-2xl">
                         รายการคำสั่งซื้อ
                       </span>
-                      <div className="flex justify-between font-bold">
+                      <div className="flex justify-between font-bold text-2xl">
                         <div>รายการสินค้า</div>
                         <div>จำนวน</div>
                       </div>
 
                       <div className="h-[620px] overflow-y-auto">
-                        {order.order_items && order.order_items.length > 0 ? (
-                          order.order_items.map((item, idx) => (
+                        {order.order_item && order.order_item.length > 0 ? (
+                          order.order_item.map((item, idx) => (
                             <div key={idx} className="mb-2">
-                              <div className="flex justify-between">
+                              <div className="flex justify-between text-2xl">
                                 <div>{item.menu.menu_name}</div>
                                 <div>{item.quantity}</div>
                               </div>
-                              <span className="text-[#5B5B5B] text-lg">
+                              <span className="text-[#5B5B5B] text-xl">
                                 ชนิด: {item.menu_type.type_name} | หวาน:{" "}
                                 {item.sweetness.level_name} | ขนาด:{" "}
                                 {item.size.size_name}

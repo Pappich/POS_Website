@@ -65,7 +65,7 @@ const OwnerMenu = () => {
         </div>
       </div>
 
-      <div className="flex w-full mt-[360px]">
+      <div className="flex w-full fixed bottom-4 left-0 px-4 py-4">
         <button
           className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}

@@ -2,17 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
-import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Form } from "react-router-dom";
 
 const AddProductForm = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.userData);
   const location = useLocation();
   const { mode, productData } = location.state || {
     mode: "add",
@@ -23,6 +20,7 @@ const AddProductForm = () => {
   const [menuName, setMenuName] = useState("");
   const [productDetails, setProductDetails] = useState("");
   const [productImage, setProductImage] = useState(null);
+  const [productFile, setProductFile] = useState(null);
   const [productPrice, setProductPrice] = useState("");
   const [priceError, setPriceError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,24 +29,57 @@ const AddProductForm = () => {
     menuName: "",
     productPrice: "",
   });
-  const { owner_id } = userData || {};
-
-  console.log("user data: ", owner_id);
 
   useEffect(() => {
     if (mode === "edit" && productData) {
+      const imageUrl = `${URL}/${productData.image_url.replace(/\\/g, "/")}`;
+
+      console.log("image url:", imageUrl);
       setMenuName(productData.menu_name || null);
       setProductDetails(productData.description || null);
-      setProductImage(productData.image_url || null);
+      setProductImage(imageUrl || null);
       setProductPrice(productData.price || null);
     }
   }, [mode, productData]);
 
+  console.log("IMAGE:", productFile);
+
+  const handleUploadImage = async (productFile) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", productFile);
+
+      console.log("Uploading file:", productFile);
+
+      const response = await fetch(`${URL}/owner/menus/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("FILE DATA", formData);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("File uploaded successfully", data);
+        return data.filePath;
+      } else {
+        console.error("Image upload failed");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
+  };
+
   const handleAddProduct = async () => {
     console.log("add product");
     setLoading(true);
+
     try {
-      if (owner_id) {
+      const imagePath = await handleUploadImage(productFile);
+
+      if (imagePath) {
         const endpoint =
           mode === "add"
             ? `${URL}/owner/menus`
@@ -58,15 +89,17 @@ const AddProductForm = () => {
         const response = await fetchApi(endpoint, method, {
           menu_name: menuName,
           description: productDetails,
-          price: productPrice,
-          image_url:
-            "https://images.app.goo.gl/ufVikgddcd26KVwPA" ||
-            "https://images.app.goo.gl/ufVikgddcd26KVwPA",
-          store_id: 1,
-          owner_id,
-          branch_id: 1,
-          category_id: 1,
+          price: parseInt(productPrice),
+          image_url: imagePath,
         });
+
+        console.log(
+          "DATA TO SEND:",
+          menuName,
+          productDetails,
+          parseFloat(productPrice),
+          imagePath
+        );
 
         if (response.ok) {
           navigate("/product-list");
@@ -86,7 +119,7 @@ const AddProductForm = () => {
     if (step === 5) {
       //ADD HANDLE SEND TO BACKEND
       console.log("save button click");
-      handleAddProduct(menuName, productDetails, productPrice, productImage);
+      handleAddProduct(menuName, productDetails, productPrice, productFile);
     }
     if (step < 5) {
       setStep(step + 1);
@@ -119,11 +152,8 @@ const AddProductForm = () => {
       }
 
       setFileError("");
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProductImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setProductImage(window.URL.createObjectURL(file));
+      setProductFile(file);
     }
   };
 
@@ -144,13 +174,15 @@ const AddProductForm = () => {
       newErrors.menuName = "กรุณากรอกชื่อสินค้า";
     }
 
-    if (!productPrice.trim()) {
+    if (step == 2 && !productPrice.trim()) {
       newErrors.productPrice = "กรุณากรอกราคาสินค้า";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  console.log("ERROR:", errors);
 
   const renderStepContent = () => {
     switch (step) {

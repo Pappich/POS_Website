@@ -12,15 +12,19 @@ const Menu = () => {
 
   const userData = useSelector((state) => state.user.userData);
   const { owner_id } = userData || {};
+  const cartItems = useSelector((state) => state.cart.items);
 
   const navigate = useNavigate();
-  const handleCart = () => navigate("/summary");
   const [menuData, setMenuData] = useState({
     available_category: [],
     available_menus: [],
   });
   const { available_category, available_menus } = menuData;
   const [activeCategory, setActiveCategory] = useState("");
+
+  const getCartItemCount = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
 
   useEffect(() => {
     fetchApi(`${URL}/customer/menus`, "GET")
@@ -116,15 +120,21 @@ const Menu = () => {
     });
   };
 
+  const handleAddToCart = () => {
+    navigate("/summary");
+  };
+
   return (
     <div className="font-noto flex flex-col min-h-screen bg-white">
       {/* cart */}
-      <button
-        onClick={handleCart}
-        className="flex justify-end p-2 text-[#DD9F52] hover:text-orange-500 transition-all duration-300"
-      >
-        <PiShoppingCart size={36} />
-      </button>
+      <div className="flex justify-end items-center mb-6 relative">
+        <button onClick={handleAddToCart} className="relative">
+          <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            {getCartItemCount()}
+          </span>
+        </button>
+      </div>
 
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 ml-2 space-x-4 mb-4">
         {available_category.map((category) => (
@@ -143,20 +153,20 @@ const Menu = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-4 gap-6">
         {filteredMenus.map((menu, index) => (
           <button
-            className={"px-6 py-3 rounded-md border border-[#D4B28C] ml-2"}
+            className="px-6 py-3 rounded-md border border-[#D4B28C] shadow-md ml-2"
             key={index}
             onClick={() => handleMenuClick(menu.menu_id)}
           >
             <img
-              className="w-full h-40 object-cover rounded-md mb-2"
+              className="w-full aspect-[4/3] object-cover rounded-md mb-2 border border-gray-200 shadow-sm"
               src={menu.image_url}
               alt={menu.menu_name}
             />
-            <div className="font-bold">{menu.menu_name}</div>
-            <div>{menu.description}</div>
+            <div className="font-bold text-lg">{menu.menu_name}</div>
+            <div className="text-gray-600">{menu.description}</div>
           </button>
         ))}
       </div>

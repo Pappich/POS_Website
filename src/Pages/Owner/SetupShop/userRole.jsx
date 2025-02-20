@@ -5,6 +5,7 @@ import {
   HiOutlineClipboardDocumentList,
 } from "react-icons/hi2";
 import { BiFoodMenu } from "react-icons/bi";
+import CameraDetector from "../../../Components/cameraDetector";
 
 const UserRole = () => {
   const navigate = useNavigate();
@@ -73,6 +74,8 @@ const UserRole = () => {
           ))}
         </div>
       </div>
+
+      <CameraDetector />
     </div>
   );
 };
