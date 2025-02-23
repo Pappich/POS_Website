@@ -51,30 +51,46 @@ const AddGroupForm = () => {
   console.log("mode:", mode);
   console.log("owner id:", owner_id);
 
+  // fetch group data
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        const categoryId = groupData.category_id;
-        const response = await fetchApi(
-          `${URL}/owner/categories/${categoryId}/menus`,
-          "GET"
-        );
-        const group = await response.json();
-        console.log("Group data:", group);
-
         if (mode === "edit" && groupData) {
-          const menuNames = group.map((menu) => menu.menu_id);
+          const categoryId = groupData.category_id;
+          const response = await fetchApi(
+            `${URL}/owner/categories/${categoryId}/menus`,
+            "GET"
+          );
+          const groupMenus = await response.json();
+          console.log("Group menus:", groupMenus);
 
-          setGroupName(groupData.category_name || null);
-          setSelectedMenus(menuNames || []);
+          setGroupName(groupData.category_name || "");
+
+          // Find menu IDs based on menu names from the response
+          if (Array.isArray(groupMenus)) {
+            const menuIds = menuItems
+              .filter((menuItem) => groupMenus.includes(menuItem.menu_name))
+              .map((menu) => menu.menu_id);
+
+            console.log("Matched menu IDs:", menuIds);
+            setSelectedMenus(menuIds);
+          }
         }
       } catch (error) {
         console.error("Error fetching group data:", error);
       }
     };
 
-    fetchGroupData();
-  }, []);
+    // Only fetch group data if menuItems is populated
+    if (menuItems.length > 0) {
+      fetchGroupData();
+    }
+  }, [mode, groupData, URL, menuItems]); // Add menuItems to dependencies
+
+  // Add a debug useEffect to monitor selectedMenus changes
+  useEffect(() => {
+    console.log("Selected Menus Updated:", selectedMenus);
+  }, [selectedMenus]);
 
   console.log("groupData", groupData);
   console.log("selectedMenus", selectedMenus);
@@ -83,21 +99,19 @@ const AddGroupForm = () => {
     setLoading(true);
     try {
       if (step === 3) {
-        if (owner_id) {
-          const endpoint =
-            mode === "add"
-              ? `${URL}/owner/categories`
-              : `${URL}/owner/categories/${groupData.category_id}`;
-          const method = mode === "add" ? "POST" : "PATCH";
+        const endpoint =
+          mode === "add"
+            ? `${URL}/owner/categories`
+            : `${URL}/owner/categories/${groupData.category_id}`;
+        const method = mode === "add" ? "POST" : "PATCH";
 
-          const response = await fetchApi(endpoint, method, {
-            category_name: groupName,
-            menu_id: selectedMenus,
-          });
+        const response = await fetchApi(endpoint, method, {
+          category_name: groupName,
+          menu_id: selectedMenus,
+        });
 
-          if (response.ok) {
-            navigate("/group-list");
-          }
+        if (response.ok) {
+          navigate("/group-list");
         }
       }
     } catch (error) {
@@ -134,11 +148,14 @@ const AddGroupForm = () => {
   };
 
   const handleSelectMenu = (menuId) => {
-    setSelectedMenus((prev) =>
-      prev.includes(menuId)
+    console.log("Toggling menu ID:", menuId);
+    setSelectedMenus((prev) => {
+      const newSelection = prev.includes(menuId)
         ? prev.filter((id) => id !== menuId)
-        : [...prev, menuId]
-    );
+        : [...prev, menuId];
+      console.log("New selection:", newSelection);
+      return newSelection;
+    });
   };
 
   const validateForm = () => {
@@ -209,7 +226,7 @@ const AddGroupForm = () => {
                 />
                 <input
                   type="text"
-                  placeholder="ค้นหาด้วยชื่อกลุ่ม..."
+                  placeholder="ค้นหาด้วยชื่อเมนู..."
                   value={searchTerm}
                   onChange={handleSearch}
                   className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
@@ -224,20 +241,27 @@ const AddGroupForm = () => {
                 เมนูทั้งหมด
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-                {filteredMenus.map((menu) => (
-                  <label
-                    key={menu.menu_id}
-                    className="flex items-center space-x-2"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedMenus.includes(menu.menu_id)}
-                      onChange={() => handleSelectMenu(menu.menu_id)}
-                      className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                    />
-                    <span>{menu.menu_name}</span>
-                  </label>
-                ))}
+                {filteredMenus.map((menu) => {
+                  const isChecked = selectedMenus.includes(menu.menu_id);
+                  console.log(
+                    `Menu ${menu.menu_name} (${menu.menu_id}) checked:`,
+                    isChecked
+                  );
+                  return (
+                    <label
+                      key={menu.menu_id}
+                      className="flex items-center space-x-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleSelectMenu(menu.menu_id)}
+                        className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                      />
+                      <span>{menu.menu_name}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
             {selectedMenuErrors.selectedMenus && (

@@ -20,7 +20,7 @@ const GlassChoice = () => {
   const [step, setStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
-  const [groupName, setGroupName] = useState();
+  const [groupName, setGroupName] = useState("");
   const [expandedGroups, setExpandedGroups] = useState({});
   const [choices, setChoices] = useState([{ name: "", price: "" }]);
   const [glassData, setGlassData] = useState([]);
@@ -33,89 +33,70 @@ const GlassChoice = () => {
   });
   const [menuData, setMenuData] = useState({
     available_category: [],
-    available_menus: [],
+    categories: [],
+    menus: [],
   });
   const location = useLocation();
-  const { mode } = location.state || {
+  const { mode, groupName: initialGroupName } = location.state || {
     mode: "add",
-    choices: {},
+    groupName: "",
   };
 
+  const [oldGroupName, setOldGroupName] = useState("");
+
   useEffect(() => {
-    fetchApi(`${URL}/customer/menus`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/categories/all/menus`,
+          "GET"
+        );
+        const data = await response.json();
         setMenuData(data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching menu data:", error);
-      });
-  }, []);
+      }
+    };
+
+    fetchMenuData();
+  }, [URL]);
 
   useEffect(() => {
-    if (mode === "edit") {
-      fetchApi(`${URL}/owner/menus/options/size`, "GET")
-        .then((response) => response.json())
-        .then((data) => {
-          setGlassData(data);
+    const fetchSizeData = async () => {
+      if (mode === "edit" && groupName) {
+        try {
+          const response = await fetchApi(
+            `${URL}/owner/menus/options/size/${groupName}`,
+            "GET"
+          );
+          const data = await response.json();
+          console.log("Fetched size data:", data);
 
-          const uniqueNames = new Set();
+          setGroupName(data.size_group_name);
+          setOldGroupName(data.size_group_name);
 
-          const updatedChoices = data
-            .filter((item) => {
-              if (!uniqueNames.has(item.name)) {
-                uniqueNames.add(item.name);
-                return true;
-              }
-              return false;
-            })
-            .map((item) => ({
-              id: item.id,
-              name: item.name,
-              price: item.size_price,
-            }));
+          const existingChoices = data.options.map((option) => ({
+            size_id: option.size_id || null,
+            name: option.size_name,
+            price: option.price,
+          }));
+          setChoices(existingChoices);
 
-          setChoices(updatedChoices);
-        })
-        .catch((error) => {
-          console.error("Error fetching glass size data:", error);
-        });
-    }
-  }, [mode]);
+          setSelectedMenus(data.menu_id || []);
+        } catch (error) {
+          console.error("Error fetching size data:", error);
+        }
+      }
+    };
+
+    fetchSizeData();
+  }, [mode, groupName, URL]);
 
   useEffect(() => {
     if (mode !== "edit") {
       setChoices([{ name: "", price: "" }]);
     }
   }, [mode]);
-
-  menuData.available_menus.forEach((menu) => {
-    menu.category.forEach((category) => {
-      let group = groupedMenus.find(
-        (g) => g.category_name === category.category_name
-      );
-
-      if (!group) {
-        // If the group doesn't exist, create a new one
-        groupedMenus.push({
-          category_name: category.category_name,
-          category_id: category.category_id,
-          menus: [
-            {
-              menu_id: menu.menu_id,
-              menu_name: menu.menu_name,
-            },
-          ],
-        });
-      } else {
-        // If the group exists, add the menu to the existing group
-        group.menus.push({
-          menu_id: menu.menu_id,
-          menu_name: menu.menu_name,
-        });
-      }
-    });
-  });
 
   console.log(groupedMenus);
   console.log("isRequired", isRequired);
@@ -167,37 +148,47 @@ const GlassChoice = () => {
 
     if (valid) {
       if (step === 4) {
-        const formattedOptions = choices.map((option) => ({
-          [option.name]: { price: Number(option.price).toFixed(2) },
-        }));
-
-        const requestData = {
-          size_group_name: groupName,
-          options: formattedOptions,
-          menu_id: selectedMenus,
-          is_required: isRequired,
-        };
-
-        console.log("REQUEST DATA:", requestData);
-
         try {
-          if (owner_id) {
-            const response = await fetchApi(
-              `${URL}/owner/menus/options/size`,
-              "POST",
-              { requestData }
-            );
+          let endpoint = `${URL}/owner/menus/options/size`;
+          let method = "POST";
+          let requestData;
 
-            if (response.ok) {
-              const data = await response.json();
-              console.log("Success:", data);
-              navigate("/choice-list");
-            } else {
-              console.error("Error:", response.statusText);
-            }
+          if (mode === "edit") {
+            method = "PATCH";
+            requestData = {
+              old_size_group_name: oldGroupName,
+              new_size_group_name: groupName,
+              options: choices.map((choice) => ({
+                size_id: choice.size_id || null,
+                size_name: choice.name,
+                price: Number(choice.price).toFixed(2),
+              })),
+              menu_id: selectedMenus,
+            };
+          } else {
+            requestData = {
+              size_group_name: groupName,
+              options: choices.map((choice) => ({
+                [choice.name]: { price: Number(choice.price).toFixed(2) },
+              })),
+              menu_id: selectedMenus,
+            };
+          }
+
+          console.log("Sending request:", { method, endpoint, requestData });
+
+          const response = await fetchApi(endpoint, method, requestData);
+
+          if (response.ok) {
+            navigate("/choice-list");
+          } else {
+            const errorData = await response.json();
+            console.error("Error response:", errorData);
+            alert("Failed to save size options");
           }
         } catch (error) {
-          console.error("Request failed:", error);
+          console.error("Error saving size options:", error);
+          alert("An error occurred while saving");
         }
       } else {
         setStep(step + 1);
@@ -305,20 +296,6 @@ const GlassChoice = () => {
               <span className="text-[#D4B28C] ml-2"> ขนาดแก้ว</span>
             </div>
 
-            <div className="flex mb-4 w-full items-center">
-              <div className="mr-12">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={isRequired}
-                    onChange={() => setIsRequired(!isRequired)}
-                    className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-2"
-                  />
-                  ลูกค้าจำเป็นต้องเลือก
-                </label>
-              </div>
-            </div>
-
             <div className="grid grid-cols-2 mb-4 w-full">
               <div className="font-bold mb-2">ชื่อช้อยส์</div>
               <div className="font-bold mb-2">
@@ -386,7 +363,7 @@ const GlassChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               3. เลือกเมนูที่ต้องการใช้ตัวเลือก:
-              <span className="text-[#D4B28C] ml-2"> ขนาดแก้ว</span>
+              <span className="text-[#D4B28C] ml-2">ขนาดแก้ว</span>
             </div>
 
             <div className="w-full flex justify-start text-xl mb-8">
@@ -405,51 +382,95 @@ const GlassChoice = () => {
               </div>
             </div>
 
-            <label
-              htmlFor="selectedMenus"
-              className="text-2xl w-full text-start font-bold"
-            >
+            <label className="text-2xl w-full text-start font-bold">
               เมนูทั้งหมด
             </label>
 
-            {filteredGroups.map((group) => (
-              <div
-                className="w-full flex justify-start mt-2"
-                key={group.category_id}
-              >
-                <div className="w-full mb-8">
-                  <div
-                    className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
-                    onClick={() => toggleGroup(group.category_id)}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={group.menus.every((menu) =>
-                          selectedMenus.includes(menu.menu_id)
+            {/* Render categorized menus */}
+            {menuData.categories
+              .filter((category) =>
+                category.menus.some((menu) =>
+                  menu.menu_name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                )
+              )
+              .map((category) => (
+                <div
+                  className="w-full flex justify-start mt-2"
+                  key={category.id}
+                >
+                  <div className="w-full mb-8">
+                    <div
+                      className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
+                      onClick={() => toggleGroup(category.id)}
+                    >
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={category.menus.every((menu) =>
+                            selectedMenus.includes(menu.menu_id)
+                          )}
+                          onChange={() => handleSelectAllInGroup(category)}
+                          className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <span className="font-bold text-2xl">
+                          {category.name}
+                        </span>
+                      </div>
+                      <button className="ml-auto focus:outline-none">
+                        {expandedGroups[category.id] ? (
+                          <FaChevronUp className="text-[#DD9F52]" />
+                        ) : (
+                          <FaChevronDown className="text-[#DD9F52]" />
                         )}
-                        onChange={() => handleSelectAllInGroup(group)}
-                        className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <span className="font-bold text-2xl">
-                        {group.category_name}
-                      </span>
+                      </button>
                     </div>
-                    <button className="ml-auto focus:outline-none">
-                      {expandedGroups[group.category_id] ? (
-                        <FaChevronUp className="text-[#DD9F52]" />
-                      ) : (
-                        <FaChevronDown className="text-[#DD9F52]" />
-                      )}
-                    </button>
-                    {/* <div className="w-full h-[1px] bg-gray-300 mt-2"></div> */}
-                  </div>
 
-                  {/* Render menus only if the group is expanded */}
-                  {expandedGroups[group.category_id] && (
-                    <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                      {group.menus.map((menu) => (
+                    {expandedGroups[category.id] && (
+                      <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
+                        {category.menus
+                          .filter((menu) =>
+                            menu.menu_name
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())
+                          )
+                          .map((menu) => (
+                            <label
+                              key={menu.menu_id}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedMenus.includes(menu.menu_id)}
+                                onChange={() => handleSelectMenu(menu.menu_id)}
+                                className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                              />
+                              <span>{menu.menu_name}</span>
+                            </label>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+            {/* Render uncategorized menus */}
+            {menuData.menus.length > 0 && (
+              <div className="w-full flex justify-start mt-2">
+                <div className="w-full mb-8">
+                  <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full">
+                    <span className="font-bold text-2xl">เมนูอื่นๆ</span>
+                  </div>
+                  <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
+                    {menuData.menus
+                      .filter((menu) =>
+                        menu.menu_name
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
+                      )
+                      .map((menu) => (
                         <label
                           key={menu.menu_id}
                           className="flex items-center space-x-2"
@@ -463,13 +484,13 @@ const GlassChoice = () => {
                           <span>{menu.menu_name}</span>
                         </label>
                       ))}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
-            ))}
+            )}
+
             {errors.menuSelection && (
-              <div className="text-red-500 text-lg mt-2">
+              <div className="text-red-500 text-sm mt-2">
                 {errors.menuSelection}
               </div>
             )}
@@ -492,14 +513,26 @@ const GlassChoice = () => {
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
                 {selectedMenus.map((menuId) => {
-                  const menu = menuData.available_menus.find(
-                    (m) => m.menu_id === menuId
-                  );
+                  // Find menu in both categorized and uncategorized menus
+                  const findMenu = (menuId) => {
+                    // Search in categorized menus
+                    for (const category of menuData.categories) {
+                      const menu = category.menus.find(
+                        (m) => m.menu_id === menuId
+                      );
+                      if (menu) return menu;
+                    }
+                    // Search in uncategorized menus
+                    return menuData.menus.find((m) => m.menu_id === menuId);
+                  };
+
+                  const menu = findMenu(menuId);
+                  if (!menu) return null;
 
                   return (
                     <div
-                      key={menu.menu_id}
-                      className="flex items-center space-x-2"
+                      key={menuId}
+                      className="flex items-center space-x-2 text-xl"
                     >
                       <input
                         type="checkbox"

@@ -67,25 +67,14 @@ const GroupList = () => {
   const handleGroupClick = async (group) => {
     try {
       const categoryId = group.category_id;
-      const response = await fetchApi(
-        `${URL}/owner/categories/${categoryId}/menus`,
-        "GET"
-      );
-
-      const data = await response.json();
-      const menus = data;
-      if (menus && menus.length > 0) {
-        navigate("/group-menu", {
-          state: {
-            groupName: group.category_name,
-            selectedMenus: menus,
-          },
-        });
-      } else {
-        console.error("API response does not contain any menus.");
-      }
+      navigate("/group-menu", {
+        state: {
+          groupName: group.category_name,
+          categoryId: categoryId,
+        },
+      });
     } catch (error) {
-      console.error("Error fetching group menus:", error);
+      console.error("Error handling group click:", error);
     }
   };
 
@@ -151,7 +140,7 @@ const GroupList = () => {
               </div>
             ))
           ) : (
-            <p className="text-gray-500 text-center">ไม่กลุ่มรายการสินค้า</p>
+            <p className="text-gray-500 text-center">ไม่มีกลุ่มรายการสินค้า</p>
           )}
         </div>
 

@@ -5,10 +5,10 @@ function fetchApi(url, method, body) {
   // const branchId = sessionStorage.getItem("branch_id");
 
   // manual branch = 1 for now
-  const branchId = 1;
-
-  const role = sessionStorage.getItem("role");
-
+  const branchId = sessionStorage.getItem("branch_id");
+  const role = sessionStorage.getItem("roles");
+  const email = sessionStorage.getItem("email");
+  
   // set data in header
   const headers = {
     Accept: "application/json",

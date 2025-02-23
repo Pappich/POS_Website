@@ -40,14 +40,19 @@ const ToppingChoice = () => {
 
   const [menuData, setMenuData] = useState({
     available_category: [],
+    categories: [],
+    menus: [],
     available_menus: [],
   });
 
   const location = useLocation();
-  const { mode } = location.state || {
+  const { mode, groupName: initialGroupName } = location.state || {
     mode: "add",
-    choices: {},
+    groupName: "",
   };
+
+  const [oldGroupName, setOldGroupName] = useState("");
+  const [groupName, setGroupName] = useState(initialGroupName);
 
   // List options
   const unitOptions = [
@@ -59,83 +64,60 @@ const ToppingChoice = () => {
   ];
 
   useEffect(() => {
-    if (mode === "edit") {
-      fetchApi(`${URL}/owner/menus/options/add-ons`, "GET")
-        .then((response) => response.json())
-        .then((data) => {
-          setToppingData(data);
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/categories/all/menus`,
+          "GET"
+        );
+        const data = await response.json();
+        setMenuData(data);
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
 
-          const uniqueNames = new Set();
+    fetchMenuData();
+  }, [URL]);
 
-          const updatedChoices = data
-            .filter((item) => {
-              if (!uniqueNames.has(item.name)) {
-                uniqueNames.add(item.name);
-                return true;
-              }
-              return false;
-            })
-            .map((item) => ({
-              id: item.id,
-              name: item.name,
-              price: item.add_on_price,
-              quantity: item.unit,
-            }));
+  useEffect(() => {
+    const fetchToppingData = async () => {
+      if (mode === "edit" && groupName) {
+        try {
+          const response = await fetchApi(
+            `${URL}/owner/menus/options/add-ons/${groupName}`,
+            "GET"
+          );
+          const data = await response.json();
+          console.log("Fetched topping data:", data);
 
-          setChoices(updatedChoices);
-        })
-        .catch((error) => {
-          console.error("Error fetching add on data:", error);
-        });
-    }
-  }, [mode]);
+          // Set the existing choices
+          const existingChoices = data.options.map((option) => ({
+            add_on_id: option.add_on_id || null,
+            name: option.add_on_name,
+            price: option.price,
+            quantity: option.quantity,
+            unit: option.unit,
+          }));
+
+          setChoices(existingChoices);
+          setSelectedMenus(data.menu_id || []);
+          setIsRequired(data.is_required || false);
+          setIsMultiple(data.is_multiple || false);
+        } catch (error) {
+          console.error("Error fetching topping data:", error);
+        }
+      }
+    };
+
+    fetchToppingData();
+  }, [mode, groupName, URL]);
 
   useEffect(() => {
     if (mode !== "edit") {
       setChoices([{ name: "", price: "", quantity: "" }]);
     }
   }, [mode]);
-
-  useEffect(() => {
-    fetchApi(`${URL}/customer/menus`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
-        setMenuData(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching menu data:", error);
-      });
-  }, []);
-
-  menuData.available_menus.forEach((menu) => {
-    menu.category.forEach((category) => {
-      let group = groupedMenus.find(
-        (g) => g.category_name === category.category_name
-      );
-
-      if (!group) {
-        // If the group doesn't exist, create a new one
-        groupedMenus.push({
-          category_name: category.category_name,
-          category_id: category.category_id,
-          menus: [
-            {
-              menu_id: menu.menu_id,
-              menu_name: menu.menu_name,
-            },
-          ],
-        });
-      } else {
-        // If the group exists, add the menu to the existing group
-        group.menus.push({
-          menu_id: menu.menu_id,
-          menu_name: menu.menu_name,
-        });
-      }
-    });
-  });
-
-  console.log(groupedMenus);
 
   const handleNext = async () => {
     let valid = true;
@@ -186,36 +168,54 @@ const ToppingChoice = () => {
     setErrors(newErrors);
     if (valid) {
       if (step === 4) {
-        const payload = {
-          options: choices.map((choice) => {
-            return {
-              [choice.name]: {
-                price: parseFloat(choice.price),
-                unit: parseFloat(choice.quantity),
-              },
-            };
-          }),
-          menu_id: selectedMenus,
-          is_required: isRequired,
-          is_multipled: isMultiple,
-        };
-
-        console.log("PAYLOAD:", payload);
-
         try {
-          const response = await fetchApi(
-            `${URL}/owner/menus/options/add-ons`,
-            "POST",
-            payload
-          );
+          let endpoint = `${URL}/owner/menus/options/add-ons`;
+          let method = "POST";
+          let requestData;
+
+          if (mode === "edit") {
+            method = "PATCH";
+            requestData = {
+              options: choices.map((choice) => ({
+                add_on_id: choice.add_on_id || null,
+                add_on_name: choice.name,
+                price: choice.price,
+                quantity: Number(choice.quantity),
+                unit: choice.unit,
+              })),
+              menu_id: selectedMenus,
+              is_required: isRequired,
+              is_multiple: isMultiple,
+            };
+          } else {
+            requestData = {
+              options: choices.map((choice) => ({
+                [choice.name]: {
+                  price: choice.price,
+                  unit: choice.unit,
+                  quantity: Number(choice.quantity),
+                },
+              })),
+              menu_id: selectedMenus,
+              is_required: isRequired,
+              is_multipled: isMultiple,
+            };
+          }
+
+          console.log("Sending request:", { method, endpoint, requestData });
+
+          const response = await fetchApi(endpoint, method, requestData);
 
           if (response.ok) {
-            const data = await response.json();
-            console.log("Response JSON:", data);
             navigate("/choice-list");
+          } else {
+            const errorData = await response.json();
+            console.error("Error response:", errorData);
+            alert("Failed to save topping options");
           }
         } catch (error) {
-          console.error("Error saving data:", error);
+          console.error("Error saving topping options:", error);
+          alert("An error occurred while saving");
         }
       } else {
         setStep(step + 1);
@@ -292,16 +292,6 @@ const ToppingChoice = () => {
   const removeChoice = (index) => {
     setChoices((prev) => prev.filter((_, i) => i !== index));
   };
-
-  // const handleChoiceChange = (index, field, value) => {
-  //   const updatedChoices = [...choices];
-  //   updatedChoices[index][field] = value;
-  //   setChoices(updatedChoices);
-  // };
-
-  // const addChoice = () => {
-  //   setChoices((prev) => [...prev, { name: "", price: "" }]);
-  // };
 
   const renderStepContent = () => {
     switch (step) {
@@ -424,7 +414,7 @@ const ToppingChoice = () => {
 
             <div className="grid grid-cols-2 mb-4">
               <div className="font-bold mb-2">ชื่อช้อยส์</div>
-              <div className="font-bold mb-2 ml-20">ปริมาณที่ใช้ (กรัม)</div>
+              <div className="font-bold mb-2 ml-20">ปริมาณที่ใช้</div>
             </div>
 
             {/* Form Section */}
@@ -495,43 +485,90 @@ const ToppingChoice = () => {
               เมนูทั้งหมด
             </label>
 
-            {filteredGroups.map((group) => (
-              <div
-                className="w-full flex justify-start mt-2"
-                key={group.category_id}
-              >
-                <div className="w-full mb-8">
-                  <div
-                    className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
-                    onClick={() => toggleGroup(group.category_id)}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={group.menus.every((menu) =>
-                          selectedMenus.includes(menu.menu_id)
+            {menuData.categories
+              .filter((category) =>
+                category.menus.some((menu) =>
+                  menu.menu_name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                )
+              )
+              .map((category) => (
+                <div
+                  className="w-full flex justify-start mt-2"
+                  key={category.id}
+                >
+                  <div className="w-full mb-8">
+                    <div
+                      className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
+                      onClick={() => toggleGroup(category.id)}
+                    >
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={category.menus.every((menu) =>
+                            selectedMenus.includes(menu.menu_id)
+                          )}
+                          onChange={() => handleSelectAllInGroup(category)}
+                          className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <span className="font-bold text-2xl">
+                          {category.name}
+                        </span>
+                      </div>
+                      <button className="ml-auto focus:outline-none">
+                        {expandedGroups[category.id] ? (
+                          <FaChevronUp className="text-[#DD9F52]" />
+                        ) : (
+                          <FaChevronDown className="text-[#DD9F52]" />
                         )}
-                        onChange={() => handleSelectAllInGroup(group)}
-                        className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <span className="font-bold text-2xl">
-                        {group.category_name}
-                      </span>
+                      </button>
                     </div>
-                    <button className="ml-auto focus:outline-none">
-                      {expandedGroups[group.category_id] ? (
-                        <FaChevronUp className="text-[#DD9F52]" />
-                      ) : (
-                        <FaChevronDown className="text-[#DD9F52]" />
-                      )}
-                    </button>
-                  </div>
 
-                  {/* Render menus only if the group is expanded */}
-                  {expandedGroups[group.category_id] && (
-                    <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                      {group.menus.map((menu) => (
+                    {expandedGroups[category.id] && (
+                      <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
+                        {category.menus
+                          .filter((menu) =>
+                            menu.menu_name
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())
+                          )
+                          .map((menu) => (
+                            <label
+                              key={menu.menu_id}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedMenus.includes(menu.menu_id)}
+                                onChange={() => handleSelectMenu(menu.menu_id)}
+                                className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                              />
+                              <span>{menu.menu_name}</span>
+                            </label>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+            {/* Render uncategorized menus */}
+            {menuData.menus.length > 0 && (
+              <div className="w-full flex justify-start mt-2">
+                <div className="w-full mb-8">
+                  <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full">
+                    <span className="font-bold text-2xl">เมนูอื่นๆ</span>
+                  </div>
+                  <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
+                    {menuData.menus
+                      .filter((menu) =>
+                        menu.menu_name
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
+                      )
+                      .map((menu) => (
                         <label
                           key={menu.menu_id}
                           className="flex items-center space-x-2"
@@ -545,13 +582,13 @@ const ToppingChoice = () => {
                           <span>{menu.menu_name}</span>
                         </label>
                       ))}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
-            ))}
+            )}
+
             {errors.menuSelection && (
-              <div className="text-red-500 text-lg mt-2">
+              <div className="text-red-500 text-sm mt-2">
                 {errors.menuSelection}
               </div>
             )}
@@ -574,15 +611,24 @@ const ToppingChoice = () => {
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
                 {selectedMenus.map((menuId) => {
-                  const menu = menuData.available_menus.find(
-                    (m) => m.menu_id === menuId
-                  );
+                  // Find menu in both categorized and uncategorized menus
+                  const findMenu = (menuId) => {
+                    // Search in categorized menus
+                    for (const category of menuData.categories) {
+                      const menu = category.menus.find(
+                        (m) => m.menu_id === menuId
+                      );
+                      if (menu) return menu;
+                    }
+                    // Search in uncategorized menus
+                    return menuData.menus.find((m) => m.menu_id === menuId);
+                  };
+
+                  const menu = findMenu(menuId);
+                  if (!menu) return null;
 
                   return (
-                    <div
-                      key={menu.menu_id}
-                      className="flex items-center space-x-2"
-                    >
+                    <div key={menuId} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={true}

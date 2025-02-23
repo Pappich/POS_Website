@@ -43,6 +43,7 @@ import NavbarLayout from "./NavbarLayout";
 import PauseMenu from "./Pages/Employee/main/pauseMenu";
 import NavbarCustomerLayout from "./NavbarCustomerLayout";
 import NavbarEmployeeLayout from "./NavbarEmployeeLayout";
+import CreateAccount from "./Pages/Owner/SetupShop/createAccount";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/enter-otp" element={<EnterOTP />} />
         <Route path="/enter-new-password" element={<EnterNewPassword />} />
+        <Route path="/create-account" element={<CreateAccount />} />
 
         {/* Sale summary */}
         <Route path="/overview" element={<Home />} />

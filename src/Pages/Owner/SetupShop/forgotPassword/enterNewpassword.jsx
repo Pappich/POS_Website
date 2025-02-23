@@ -18,6 +18,8 @@ const EnterNewPassword = () => {
 
   const owner_id = sessionStorage.getItem("owner_id");
   console.log("OWNER_ID FROM TOKEN:", owner_id);
+  const email = sessionStorage.getItem("email");
+  console.log("email FROM TOKEN:", email);
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
@@ -46,14 +48,14 @@ const EnterNewPassword = () => {
     if (isValid) {
       try {
         const response = await fetchApi(
-          `${URL}/owner/reset-password/${owner_id}`,
+          `${URL}/owner/reset-password`,
           "PATCH",
-          { newPassword: password }
+          { email: email, newPassword: password }
         );
 
         if (response.ok) {
           sessionStorage.setItem("password_reset", "true");
-          navigate("/");
+          navigate("/create-account");
         } else {
           console.error("Failed to reset password");
         }
@@ -143,7 +145,7 @@ const EnterNewPassword = () => {
           )}
         </div>
 
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <button
             onClick={handleSignIn}
             style={{ color: "#D4B28C" }}
@@ -151,7 +153,7 @@ const EnterNewPassword = () => {
           >
             กลับไปเข้าสู่ระบบ
           </button>
-        </div>
+        </div> */}
 
         <button
           onClick={handleConfirm}

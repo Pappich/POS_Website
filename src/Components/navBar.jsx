@@ -7,6 +7,7 @@ import { PiUserCircleBold } from "react-icons/pi";
 const Navbar = () => {
   const navigate = useNavigate();
   const role = sessionStorage.getItem("role");
+  console.log("ROLE FROM TOKEN:", role);
 
   const handleLogout = () => {
     sessionStorage.clear();
@@ -65,7 +66,7 @@ const Navbar = () => {
             <div className="flex items-center justify-center w-[150px] p-1 space-x-1 bg-[#D4B28C] rounded-full">
               <PiUserCircleBold size={24} />
               <span className="text-xl font-bold text-black">
-                {role == "admin" ? "เจ้าของร้าน" : "พนักงาน"}
+                {role == "owner" ? "เจ้าของร้าน" : "พนักงาน"}
               </span>
             </div>
           )}

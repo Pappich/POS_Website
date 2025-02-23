@@ -11,45 +11,109 @@ const ChoiceList = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
-  const userData = useSelector((state) => state.user.userData);
-  const { owner_id } = userData || {};
-
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
-  const [menuItems, setMenuItems] = useState([]);
+  const [groupsData, setGroupsData] = useState({
+    sweetness_groups: [],
+    size_groups: [],
+    menu_type_groups: [],
+    add_ons: [],
+  });
+
+  const fetchGroupsData = async () => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/menus/options/groups`,
+        "GET"
+      );
+      const data = await response.json();
+      setGroupsData(data);
+    } catch (error) {
+      console.error("Error fetching groups data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const urls = {
-          ขนาดแก้ว: `${URL}/owner/menus/options/size`,
-          ความหวาน: `${URL}/owner/menus/options/sweetness`,
-          ท็อปปิ้ง: `${URL}/owner/menus/options/add-ons`,
-          ชนิด: `${URL}/owner/menus/options/menu-type`,
-        };
+    fetchGroupsData();
+  }, [URL]);
 
-        const results = await Promise.all(
-          Object.entries(urls).map(async ([key, url]) => {
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.length > 0 ? key : null;
-          })
-        );
+  // Group items by type
+  const groupedItems = {
+    ขนาดแก้ว: groupsData.size_groups || [],
+    ความหวาน: groupsData.sweetness_groups || [],
+    ...(groupsData.add_ons?.length > 0 && { ท็อปปิ้ง: ["ท็อปปิ้ง"] }),
+    ชนิด: groupsData.menu_type_groups || [],
+  };
 
-        setMenuItems(results.filter(Boolean));
-      } catch (error) {
-        console.error("Error fetching menu data:", error);
-      }
-    };
+  // Add console log to check the data structure
+  console.log("Groups Data:", groupsData);
+  console.log("Grouped Items:", groupedItems);
 
-    fetchData();
-  }, []);
+  // Filter items based on search term
+  const getFilteredItems = (items, type) => {
+    // Ensure items is an array
+    if (!Array.isArray(items)) {
+      console.warn(`Items for type ${type} is not an array:`, items);
+      return [];
+    }
 
-  const filteredItems = menuItems.filter((item) =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    return items
+      .filter((name) => {
+        if (typeof name !== "string") {
+          console.warn(`Non-string name found in ${type}:`, name);
+          return false;
+        }
+        return name.toLowerCase().includes(searchTerm.toLowerCase());
+      })
+      .map((name) => ({ name, type }));
+  };
+
+  // Render section if it has items
+  const renderSection = (title, items) => {
+    // Skip if items is undefined (which will happen for ท็อปปิ้ง when there's no data)
+    if (!items) return null;
+
+    const filteredItems = getFilteredItems(items, title);
+    if (filteredItems.length === 0) return null;
+
+    return (
+      <div key={title} className="mb-8">
+        <h2 className="text-2xl font-bold mb-4 text-[#D4B28C]">{title}</h2>
+        {filteredItems.map((item, index) => (
+          <div key={index} className="w-full mb-4">
+            <div className="flex justify-between items-center">
+              <p className="text-xl">{item.name}</p>
+              <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+                <button
+                  className="hover:underline font-bold"
+                  onClick={() => handleMenuClick(item)}
+                >
+                  สินค้าที่ใช้ตัวเลือก
+                </button>
+                <span className="text-gray-300">|</span>
+                <button
+                  className="hover:underline font-bold"
+                  onClick={() => handleEditClick(item)}
+                >
+                  แก้ไข
+                </button>
+                <span className="text-gray-300">|</span>
+                <button
+                  className="hover:underline font-bold"
+                  onClick={() => handleDeleteClick(item)}
+                >
+                  ลบ
+                </button>
+              </div>
+            </div>
+            <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -61,46 +125,101 @@ const ChoiceList = () => {
     navigate("/choice-option");
   };
 
-  const handleDeleteClick = (product) => {
-    setProductToDelete(product);
+  const handleDeleteClick = (item) => {
+    setProductToDelete({
+      name: item.name,
+      type: item.type, // This will help us determine which endpoint to use
+    });
     setIsDeletePopupOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    // DELETE PRODUCT API PATH
-    console.log("Deleting:", productToDelete);
-    setIsDeletePopupOpen(false);
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+
+    let endpoint;
+    switch (productToDelete.type) {
+      case "ขนาดแก้ว":
+        endpoint = `${URL}/owner/menus/options/size/${productToDelete.name}`;
+        break;
+      case "ความหวาน":
+        endpoint = `${URL}/owner/menus/options/sweetness/${productToDelete.name}`;
+        break;
+      case "ท็อปปิ้ง":
+        endpoint = `${URL}/owner/menus/options/add-ons`;
+        break;
+      case "ชนิด":
+        endpoint = `${URL}/owner/menus/options/menu_type/${productToDelete.name}`;
+        break;
+      default:
+        console.error("Unknown option type");
+        return;
+    }
+
+    try {
+      const response = await fetchApi(endpoint, "DELETE");
+
+      if (response.ok) {
+        await fetchGroupsData();
+        setIsDeletePopupOpen(false);
+        setProductToDelete(null);
+      } else {
+        const errorData = await response.json();
+        console.error("Error deleting option:", errorData);
+        alert("Failed to delete option");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while deleting");
+    }
   };
 
   const handleCancelDelete = () => {
     setIsDeletePopupOpen(false);
+    setProductToDelete(null);
   };
 
-  const handleEditClick = (product) => {
-    switch (product) {
+  const handleEditClick = (item) => {
+    switch (item.type) {
       case "ขนาดแก้ว":
-        navigate("/glass-choice", { state: { mode: "edit" } });
+        navigate("/glass-choice", {
+          state: {
+            mode: "edit",
+            groupName: item.name,
+          },
+        });
         break;
       case "ความหวาน":
-        navigate("/sweet-level-choice", { state: { mode: "edit" } });
+        navigate("/sweet-level-choice", {
+          state: {
+            mode: "edit",
+            groupName: item.name,
+          },
+        });
         break;
       case "ท็อปปิ้ง":
-        navigate("/topping-choice", { state: { mode: "edit" } });
+        navigate("/topping-choice", {
+          state: {
+            mode: "edit",
+            groupName: item.name,
+          },
+        });
         break;
       case "ชนิด":
-        navigate("/type-choice", { state: { mode: "edit" } });
+        navigate("/type-choice", {
+          state: {
+            mode: "edit",
+            groupName: item.name,
+          },
+        });
         break;
     }
   };
 
-  const handleMenuClick = (option) => {
-    console.log(option);
+  const handleMenuClick = (item) => {
     navigate("/choice-menu", {
-      // CHANGE TO SEND MENU IN EACH GROUP
-      // EXAMPLE
       state: {
-        groupName: option,
-        selectedMenus: ["กาแฟดำ", "เอสเปรสโซ่", "อเมริกาโน่", "มอคค่า"],
+        groupName: item.name,
+        groupType: item.type,
       },
     });
   };
@@ -119,6 +238,7 @@ const ChoiceList = () => {
           <h1 className="text-2xl font-bold">ตัวเลือกรายการสินค้าทั้งหมด</h1>
         </div>
 
+        {/* Search Bar */}
         <div className="w-full flex justify-start text-xl mb-8">
           <div className="relative flex items-center w-full">
             <FaSearch
@@ -135,44 +255,20 @@ const ChoiceList = () => {
           </div>
         </div>
 
-        {/* RENDER MENU */}
+        {/* Render Groups */}
         <div className="w-full">
-          {filteredItems.length > 0 ? (
-            filteredItems.map((item, index) => (
-              <div key={index} className="w-full mb-4">
-                <div className="flex justify-between items-start">
-                  <p className="text-2xl">{item}</p>
-                  <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleMenuClick(item)}
-                    >
-                      สินค้าที่ใช้ตัวเลือก
-                    </button>
-                    <span className="text-gray-300">|</span>
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleEditClick(item)}
-                    >
-                      แก้ไข
-                    </button>
-                    <span className="text-gray-300">|</span>
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleDeleteClick(item)}
-                    >
-                      ลบ
-                    </button>
-                  </div>
-                </div>
-                <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
-              </div>
-            ))
+          {Object.entries(groupedItems).some(
+            ([_, items]) => items.length > 0
+          ) ? (
+            Object.entries(groupedItems).map(([type, items]) =>
+              renderSection(type, items)
+            )
           ) : (
             <p className="text-gray-500 text-center">ไม่มีกลุ่มรายการสินค้า</p>
           )}
         </div>
 
+        {/* Buttons */}
         <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
           <button
             className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
@@ -189,7 +285,6 @@ const ChoiceList = () => {
         </div>
       </div>
 
-      {/* DELETE PRODUCT POPUP */}
       <DeleteChoice
         isOpen={isDeletePopupOpen}
         onClose={handleCancelDelete}

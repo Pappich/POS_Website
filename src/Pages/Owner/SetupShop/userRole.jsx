@@ -75,7 +75,7 @@ const UserRole = () => {
         </div>
       </div>
 
-      <CameraDetector />
+      {/* <CameraDetector /> */}
     </div>
   );
 };

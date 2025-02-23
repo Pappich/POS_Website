@@ -5,11 +5,12 @@ import { useNavigate } from "react-router-dom";
 import ThaiVirtualKeyboard from "../../../Components/thaiVirtualKeyboard";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
+import bcrypt from "bcryptjs";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../Config/redux/userSlice";
 import { jwtDecode } from "jwt-decode";
 
-const Login = () => {
+const CreateAccount = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,43 +32,16 @@ const Login = () => {
 
   const handleLogin = async (email, password) => {
     try {
-      if (!email || !password) {
-        alert("Please enter both email and password");
-        return;
-      }
-
-      const response = await fetchApi(`${URL}/owner/login`, "POST", {
+      const response = await fetchApi(`${URL}/owner/create-employee`, "POST", {
         email: email,
         password: password,
       });
 
       if (response.ok) {
-        const userData = await response.json();
-        console.log("USER DATA FROM JWT:", userData);
-        const decodedToken = jwtDecode(userData.token);
-        console.log("JWT PAYLOAD:", decodedToken);
-
-        sessionStorage.setItem("token", userData.token);
-        sessionStorage.setItem("owner_id", decodedToken.owner_id);
-        sessionStorage.setItem("branch_id", decodedToken.branch_id);
-        sessionStorage.setItem("role", decodedToken.role);
-
-        const passwordReset = sessionStorage.getItem("password_reset");
-
-        if (passwordReset === "true") {
-          navigate("/role");
-        } else {
-          navigate("/enter-new-password");
-        }
-      } else {
-        const errorData = await response.json();
-        alert(
-          errorData.message || "Login failed. Please check your credentials."
-        );
+        navigate("/role");
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      alert("An error occurred while logging in. Please try again.");
     }
   };
 
@@ -75,9 +49,9 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleForgotPassword = () => {
-    navigate("/forgot-password");
-  };
+  //   const handleForgotPassword = () => {
+  //     navigate("/forgot-password");
+  //   };
 
   const handleFocus = (field) => {
     setFocusedField(field);
@@ -109,17 +83,17 @@ const Login = () => {
         className="max-w-md w-full bg-white p-8 rounded-lg shadow-md"
       >
         <h2 className="text-2xl text-black mb-2 text-left">
-          ยินดีต้อนรับสู่ระบบการขายหน้าร้าน
+          สร้างบัญชีสำหรับพนักงาน
         </h2>
         <p className="text-primaryRegular text-gray-500 mb-6 text-left">
-          โปรดลงทะเบียนเพื่อเข้าสู่ระบบ
+          โปรดสร้างบัญชีสำหรับพนักงานของคุณ เพื่อใช้งานระบบการขายหน้าร้าน
         </p>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
 
         {/* Username Input */}
         <div className="mb-4 relative">
           <label className="block text-black mb-2 text-left" htmlFor="username">
-            ชื่อผู้ใช้
+            อีเมลล์
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
             <FaUserAlt style={{ color: "#D4B28C" }} className="mr-2" />
@@ -127,7 +101,7 @@ const Login = () => {
               type="text"
               id="username"
               value={usernameInput}
-              placeholder="กรอกชื่อผู้ใช้..."
+              placeholder="กรอกอีเมลล์ผู้ใช้..."
               className="w-full py-2 px-3 bg-transparent outline-none text-gray-700"
               onFocus={() => handleFocus("username")}
               onChange={(e) => setUsernameInput(e.target.value)}
@@ -165,21 +139,11 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleForgotPassword}
-            style={{ color: "#D4B28C" }}
-            className="block mb-6"
-          >
-            ลืมรหัสผ่าน?
-          </button>
-        </div>
-
         <button
           onClick={() => handleLogin(usernameInput, passwordInput)}
           className="w-full py-2 bg-[#D4B28C] text-white rounded-full font-semibold hover:bg-[#c9a07e] transition"
         >
-          เข้าสู่ระบบ
+          สร้างบัญชี
         </button>
       </div>
 
@@ -203,4 +167,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default CreateAccount;

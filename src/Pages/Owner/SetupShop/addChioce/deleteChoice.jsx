@@ -1,14 +1,13 @@
 import React from "react";
 
 const DeleteChoice = ({ isOpen, onClose, onConfirm, product }) => {
-  if (!isOpen) return null;
-  console.log("PRODUCT: ", product);
+  if (!isOpen || !product) return null;
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-1">
       <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
         <h2 className="text-3xl mb-4">
-          ลบตัวเลือก <span className="font-bold">{product}</span> หรือไม่ ?
+          ลบตัวเลือก <span className="font-bold">{product.name}</span> หรือไม่ ?
         </h2>
         <p className="text-gray-600 mb-8">
           การลบตัวเลือกจะไม่สามารถย้อนกลับมาแก้ไขได้อีก

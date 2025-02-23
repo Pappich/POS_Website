@@ -16,70 +16,81 @@ const SweetLevelChoice = () => {
   const { owner_id } = userData || {};
 
   const navigate = useNavigate();
-  const groupedMenus = [];
   const [step, setStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
   const [choices, setChoices] = useState([{ name: "" }]);
   const [sweetnessData, setSweetnessData] = useState([]);
-  const [isRequired, setIsRequired] = useState(false);
-  const [groupName, setGroupName] = useState();
+
+  // Add back the errors state
   const [errors, setErrors] = useState({
+    groupName: "",
     choiceName: "",
     menuSelection: "",
   });
+
   const location = useLocation();
-  const { mode } = location.state || {
+  const { mode, groupName: initialGroupName } = location.state || {
     mode: "add",
-    choices: {},
+    groupName: "",
   };
 
   const [menuData, setMenuData] = useState({
     available_category: [],
-    available_menus: [],
+    categories: [],
+    menus: [],
   });
+
+  const [oldGroupName, setOldGroupName] = useState("");
+  const [groupName, setGroupName] = useState(initialGroupName);
 
   useEffect(() => {
-    fetchApi(`${URL}/customer/menus`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/categories/all/menus`,
+          "GET"
+        );
+        const data = await response.json();
         setMenuData(data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching menu data:", error);
-      });
-  }, []);
-
-  menuData.available_menus.forEach((menu) => {
-    menu.category.forEach((category) => {
-      let group = groupedMenus.find(
-        (g) => g.category_name === category.category_name
-      );
-
-      if (!group) {
-        // If the group doesn't exist, create a new one
-        groupedMenus.push({
-          category_name: category.category_name,
-          category_id: category.category_id,
-          menus: [
-            {
-              menu_id: menu.menu_id,
-              menu_name: menu.menu_name,
-            },
-          ],
-        });
-      } else {
-        // If the group exists, add the menu to the existing group
-        group.menus.push({
-          menu_id: menu.menu_id,
-          menu_name: menu.menu_name,
-        });
       }
-    });
-  });
+    };
 
-  console.log(groupedMenus);
+    fetchMenuData();
+  }, [URL]);
+
+  useEffect(() => {
+    const fetchSweetnessData = async () => {
+      if (mode === "edit" && groupName) {
+        try {
+          const response = await fetchApi(
+            `${URL}/owner/menus/options/sweetness/${groupName}`,
+            "GET"
+          );
+          const data = await response.json();
+          console.log("Fetched sweetness data:", data);
+
+          setGroupName(data.sweetness_group_name);
+          setOldGroupName(data.sweetness_group_name);
+
+          const existingChoices = data.options.map((option) => ({
+            sweetness_id: option.sweetness_id || null,
+            name: option.level_name,
+          }));
+          setChoices(existingChoices);
+
+          setSelectedMenus(data.menu_id || []);
+        } catch (error) {
+          console.error("Error fetching sweetness data:", error);
+        }
+      }
+    };
+
+    fetchSweetnessData();
+  }, [mode, groupName, URL]);
 
   const handleNext = async () => {
     console.log("choices:", choices);
@@ -121,36 +132,44 @@ const SweetLevelChoice = () => {
 
     if (valid) {
       if (step === 4) {
-        const formattedOptions = choices.map((option) => option.name);
-        console.log("formattedOptions", formattedOptions);
-
-        const requestData = {
-          sweetness_group_name: groupName,
-          options: formattedOptions,
-          menu_id: selectedMenus,
-          is_required: isRequired,
-        };
-
-        console.log("requestData:", requestData);
-
         try {
-          if (owner_id) {
-            const response = await fetchApi(
-              `${URL}/owner/menus/options/sweetness`,
-              "POST",
-              requestData
-            );
+          let endpoint = `${URL}/owner/menus/options/sweetness`;
+          let method = "POST";
+          let requestData;
 
-            if (response.ok) {
-              const data = await response.json();
-              console.log("Response JSON:", data);
-              navigate("/choice-list");
-            } else {
-              console.error("Error:", response.statusText);
-            }
+          if (mode === "edit") {
+            method = "PATCH";
+            requestData = {
+              old_sweetness_group_name: oldGroupName,
+              new_sweetness_group_name: groupName,
+              options: choices.map((choice) => ({
+                sweetness_id: choice.sweetness_id || null,
+                level_name: choice.name,
+              })),
+              menu_id: selectedMenus,
+            };
+          } else {
+            requestData = {
+              sweetness_group_name: groupName,
+              options: choices.map((choice) => choice.name),
+              menu_id: selectedMenus,
+            };
+          }
+
+          console.log("Sending request:", { method, endpoint, requestData });
+
+          const response = await fetchApi(endpoint, method, requestData);
+
+          if (response.ok) {
+            navigate("/choice-list");
+          } else {
+            const errorData = await response.json();
+            console.error("Error response:", errorData);
+            alert("Failed to save sweetness options");
           }
         } catch (error) {
-          console.error("Request failed:", error);
+          console.error("Error saving sweetness options:", error);
+          alert("An error occurred while saving");
         }
       } else {
         setStep(step + 1);
@@ -172,12 +191,15 @@ const SweetLevelChoice = () => {
 
   const handleChoiceChange = (index, field, value) => {
     const updatedChoices = [...choices];
-    updatedChoices[index][field] = value;
+    updatedChoices[index] = {
+      ...updatedChoices[index],
+      [field]: value,
+    };
     setChoices(updatedChoices);
   };
 
   const addChoice = () => {
-    setChoices((prev) => [...prev, { name: "" }]);
+    setChoices((prev) => [...prev, { sweetness_id: null, name: "" }]);
   };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
@@ -190,8 +212,8 @@ const SweetLevelChoice = () => {
     );
   };
 
-  const handleSelectAllInGroup = (group) => {
-    const groupMenuIds = group.menus.map((menu) => menu.menu_id);
+  const handleSelectAllInGroup = (category) => {
+    const groupMenuIds = category.menus.map((menu) => menu.menu_id);
     const allSelected = groupMenuIds.every((id) => selectedMenus.includes(id));
 
     if (allSelected) {
@@ -202,13 +224,6 @@ const SweetLevelChoice = () => {
       setSelectedMenus((prev) => [...new Set([...prev, ...groupMenuIds])]);
     }
   };
-
-  const filteredGroups = groupedMenus.map((group) => ({
-    ...group,
-    menus: group.menus.filter((menu) =>
-      menu.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
-    ),
-  }));
 
   const toggleGroup = (groupName) => {
     setExpandedGroups((prev) => ({
@@ -254,20 +269,6 @@ const SweetLevelChoice = () => {
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               2. เพิ่มช้อยส์ในตัวเลือก:
               <span className="text-[#D4B28C] ml-2">ความหวาน</span>
-            </div>
-
-            <div className="flex mb-4 w-full items-center">
-              <div className="mr-12">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={isRequired}
-                    onChange={() => setIsRequired(!isRequired)}
-                    className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-2"
-                  />
-                  ลูกค้าจำเป็นต้องเลือก
-                </label>
-              </div>
             </div>
 
             {/* Form Section */}
@@ -337,51 +338,95 @@ const SweetLevelChoice = () => {
               </div>
             </div>
 
-            <label
-              htmlFor="selectedMenus"
-              className="text-2xl w-full text-start font-bold"
-            >
+            <label className="text-2xl w-full text-start font-bold">
               เมนูทั้งหมด
             </label>
 
-            {/* Render grouped menus */}
-            {filteredGroups.map((group) => (
-              <div
-                className="w-full flex justify-start mt-2"
-                key={group.category_id}
-              >
-                <div className="w-full mb-8">
-                  <div
-                    className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
-                    onClick={() => toggleGroup(group.category_id)}
-                  >
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={group.menus.every((menu) =>
-                          selectedMenus.includes(menu.menu_id)
+            {/* Render categorized menus */}
+            {menuData.categories
+              .filter((category) =>
+                category.menus.some((menu) =>
+                  menu.menu_name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
+                )
+              )
+              .map((category) => (
+                <div
+                  className="w-full flex justify-start mt-2"
+                  key={category.id}
+                >
+                  <div className="w-full mb-8">
+                    <div
+                      className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
+                      onClick={() => toggleGroup(category.id)}
+                    >
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={category.menus.every((menu) =>
+                            selectedMenus.includes(menu.menu_id)
+                          )}
+                          onChange={() => handleSelectAllInGroup(category)}
+                          className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <span className="font-bold text-2xl">
+                          {category.name}
+                        </span>
+                      </div>
+                      <button className="ml-auto focus:outline-none">
+                        {expandedGroups[category.id] ? (
+                          <FaChevronUp className="text-[#DD9F52]" />
+                        ) : (
+                          <FaChevronDown className="text-[#DD9F52]" />
                         )}
-                        onChange={() => handleSelectAllInGroup(group)}
-                        className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <span className="font-bold text-2xl">
-                        {group.category_name}
-                      </span>
+                      </button>
                     </div>
-                    <button className="ml-auto focus:outline-none">
-                      {expandedGroups[group.category_id] ? (
-                        <FaChevronUp className="text-[#DD9F52]" />
-                      ) : (
-                        <FaChevronDown className="text-[#DD9F52]" />
-                      )}
-                    </button>
-                  </div>
 
-                  {/* Render menus only if the group is expanded */}
-                  {expandedGroups[group.category_id] && (
-                    <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                      {group.menus.map((menu) => (
+                    {expandedGroups[category.id] && (
+                      <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
+                        {category.menus
+                          .filter((menu) =>
+                            menu.menu_name
+                              .toLowerCase()
+                              .includes(searchTerm.toLowerCase())
+                          )
+                          .map((menu) => (
+                            <label
+                              key={menu.menu_id}
+                              className="flex items-center space-x-2"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedMenus.includes(menu.menu_id)}
+                                onChange={() => handleSelectMenu(menu.menu_id)}
+                                className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                              />
+                              <span>{menu.menu_name}</span>
+                            </label>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+            {/* Render uncategorized menus */}
+            {menuData.menus.length > 0 && (
+              <div className="w-full flex justify-start mt-2">
+                <div className="w-full mb-8">
+                  <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full">
+                    <span className="font-bold text-2xl">เมนูอื่นๆ</span>
+                  </div>
+                  <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
+                    {menuData.menus
+                      .filter((menu) =>
+                        menu.menu_name
+                          .toLowerCase()
+                          .includes(searchTerm.toLowerCase())
+                      )
+                      .map((menu) => (
                         <label
                           key={menu.menu_id}
                           className="flex items-center space-x-2"
@@ -395,11 +440,11 @@ const SweetLevelChoice = () => {
                           <span>{menu.menu_name}</span>
                         </label>
                       ))}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
-            ))}
+            )}
+
             {errors.menuSelection && (
               <div className="text-red-500 text-sm mt-2">
                 {errors.menuSelection}
@@ -410,7 +455,7 @@ const SweetLevelChoice = () => {
       case 4:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               4. สรุปตัวเลือก:
               <span className="text-[#D4B28C] ml-2">ความหวาน</span>
             </div>
@@ -418,20 +463,33 @@ const SweetLevelChoice = () => {
             <div className="w-full ml-16">
               <label
                 htmlFor="selectedMenus"
-                className="text-lg w-full text-start font-bold"
+                className="text-2xl w-full text-start font-bold"
               >
                 เมนูทั้งหมดที่ใช้ในตัวเลือก
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
                 {selectedMenus.map((menuId) => {
-                  const menu = menuData.available_menus.find(
-                    (m) => m.menu_id === menuId
-                  );
+                  // Find menu in both categorized and uncategorized menus
+                  const findMenu = (menuId) => {
+                    // Search in categorized menus
+                    for (const category of menuData.categories) {
+                      const menu = category.menus.find(
+                        (m) => m.menu_id === menuId
+                      );
+                      if (menu) return menu;
+                    }
+                    // Search in uncategorized menus
+                    return menuData.menus.find((m) => m.menu_id === menuId);
+                  };
+
+                  const menu = findMenu(menuId);
+
+                  if (!menu) return null; // Skip if menu not found
 
                   return (
                     <div
-                      key={menu.menu_id}
-                      className="flex items-center space-x-2"
+                      key={menuId}
+                      className="flex items-center space-x-2 text-xl"
                     >
                       <input
                         type="checkbox"
