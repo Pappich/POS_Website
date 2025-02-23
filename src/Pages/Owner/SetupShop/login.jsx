@@ -95,6 +95,10 @@ const Login = () => {
     }
   };
 
+  const handleCloseKeyboard = () => {
+    setShowKeyboard(false);
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleBlur);
     return () => {
@@ -185,10 +189,7 @@ const Login = () => {
 
       {/* Virtual Keyboard */}
       {showKeyboard && (
-        <div
-          className="keyboard-container fixed bottom-0 left-0 w-full z-50"
-          ref={keyboardContainerRef}
-        >
+        <div ref={keyboardContainerRef}>
           <ThaiVirtualKeyboard
             input={focusedField === "username" ? usernameInput : passwordInput}
             setInput={
@@ -196,6 +197,8 @@ const Login = () => {
             }
             layout={keyboardLayout}
             setLayout={setKeyboardLayout}
+            inputRef={inputContainerRef}
+            onClose={handleCloseKeyboard}
           />
         </div>
       )}
