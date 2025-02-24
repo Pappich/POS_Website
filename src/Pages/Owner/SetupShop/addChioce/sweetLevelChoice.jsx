@@ -42,8 +42,10 @@ const SweetLevelChoice = () => {
     menus: [],
   });
 
-  const [oldGroupName, setOldGroupName] = useState("");
+  // Initialize states with proper values
+  const [oldGroupName, setOldGroupName] = useState(initialGroupName);
   const [groupName, setGroupName] = useState(initialGroupName);
+  const [editData, setEditData] = useState(null);
 
   useEffect(() => {
     const fetchMenuData = async () => {
@@ -62,35 +64,38 @@ const SweetLevelChoice = () => {
     fetchMenuData();
   }, [URL]);
 
+  // Fetch edit data
   useEffect(() => {
-    const fetchSweetnessData = async () => {
-      if (mode === "edit" && groupName) {
+    const fetchEditData = async () => {
+      if (mode === "edit" && initialGroupName) {
         try {
           const response = await fetchApi(
-            `${URL}/owner/menus/options/sweetness/${groupName}`,
+            `${URL}/owner/menus/options/sweetness/${initialGroupName}`,
             "GET"
           );
           const data = await response.json();
           console.log("Fetched sweetness data:", data);
 
-          setGroupName(data.sweetness_group_name);
-          setOldGroupName(data.sweetness_group_name);
+          setEditData(data);
+          setGroupName(data.group_name);
+          setOldGroupName(data.group_name);
 
-          const existingChoices = data.options.map((option) => ({
-            sweetness_id: option.sweetness_id || null,
-            name: option.level_name,
+          const existingChoices = data.levels.map((level) => ({
+            id: level.sweetness_id,
+            name: level.level_name,
           }));
           setChoices(existingChoices);
 
-          setSelectedMenus(data.menu_id || []);
+          const menuIds = data.menus.map((menu) => menu.menu_id);
+          setSelectedMenus(menuIds);
         } catch (error) {
           console.error("Error fetching sweetness data:", error);
         }
       }
     };
 
-    fetchSweetnessData();
-  }, [mode, groupName, URL]);
+    fetchEditData();
+  }, [mode, initialGroupName, URL]);
 
   const handleNext = async () => {
     console.log("choices:", choices);
@@ -143,11 +148,13 @@ const SweetLevelChoice = () => {
               old_sweetness_group_name: oldGroupName,
               new_sweetness_group_name: groupName,
               options: choices.map((choice) => ({
-                sweetness_id: choice.sweetness_id || null,
+                sweetness_id: choice.id || null,
                 level_name: choice.name,
               })),
               menu_id: selectedMenus,
             };
+
+            console.log("REQUEST TO SEND:", requestData);
           } else {
             requestData = {
               sweetness_group_name: groupName,
@@ -155,6 +162,15 @@ const SweetLevelChoice = () => {
               menu_id: selectedMenus,
             };
           }
+
+          // Log the state values before sending
+          console.log("Current state:", {
+            oldGroupName,
+            groupName,
+            choices,
+            selectedMenus,
+            mode,
+          });
 
           console.log("Sending request:", { method, endpoint, requestData });
 

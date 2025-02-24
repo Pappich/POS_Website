@@ -269,7 +269,7 @@ const ChoiceList = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
+        <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-white">
           <button
             className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}

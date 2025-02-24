@@ -20,7 +20,7 @@ const TypeChoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenus, setSelectedMenus] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState({});
-  const [choices, setChoices] = useState([{ name: "", price: "" }]);
+  const [choices, setChoices] = useState([{ id: "", name: "", price: "" }]);
   const [typeData, setTypeData] = useState([]);
   const [isRequired, setIsRequired] = useState(false);
   const [isMultiple, setIsMultiple] = useState(false);
@@ -63,26 +63,30 @@ const TypeChoice = () => {
 
   useEffect(() => {
     const fetchTypeData = async () => {
-      if (mode === "edit" && groupName) {
+      if (mode === "edit" && initialGroupName) {
         try {
           const response = await fetchApi(
-            `${URL}/owner/menus/options/menu_type/${groupName}`,
+            `${URL}/owner/menus/options/menu-type/${initialGroupName}`,
             "GET"
           );
           const data = await response.json();
           console.log("Fetched type data:", data);
 
-          setGroupName(data.menu_type_group_name);
-          setOldGroupName(data.menu_type_group_name);
+          // Set group name
+          setGroupName(data.group_name);
+          setOldGroupName(data.group_name);
 
-          const existingChoices = data.options.map((option) => ({
-            menu_type_id: option.menu_type_id || null,
-            name: option.type_name,
-            price: option.price_difference,
+          // Transform types data to match our choices structure
+          const existingChoices = data.types.map((type) => ({
+            id: type.menu_type_id,
+            name: type.type_name,
+            price: type.price_difference,
           }));
           setChoices(existingChoices);
-
-          setSelectedMenus(data.menu_id || []);
+          console.log("existingChoices:", existingChoices);
+          // Set selected menus
+          const menuIds = data.menus.map((menu) => menu.menu_id);
+          setSelectedMenus(menuIds);
         } catch (error) {
           console.error("Error fetching type data:", error);
         }
@@ -90,7 +94,7 @@ const TypeChoice = () => {
     };
 
     fetchTypeData();
-  }, [mode, groupName, URL]);
+  }, [mode, initialGroupName, URL]);
 
   useEffect(() => {
     if (mode !== "edit") {
@@ -158,9 +162,9 @@ const TypeChoice = () => {
               old_menu_type_group_name: oldGroupName,
               new_menu_type_group_name: groupName,
               options: choices.map((choice) => ({
-                menu_type_id: choice.menu_type_id || null,
+                menu_type_id: choice.id || null,
                 type_name: choice.name,
-                price_difference: Number(choice.price),
+                price_difference: Number(choice.price).toFixed(2),
               })),
               menu_id: selectedMenus,
             };
@@ -168,7 +172,8 @@ const TypeChoice = () => {
             requestData = {
               menu_type_group_name: groupName,
               options: choices.map((choice) => ({
-                [choice.name]: Number(choice.price),
+                type_name: choice.name,
+                price_difference: Number(choice.price).toFixed(2),
               })),
               menu_id: selectedMenus,
             };
@@ -186,7 +191,7 @@ const TypeChoice = () => {
             alert("Failed to save menu type options");
           }
         } catch (error) {
-          console.error("Error saving menu type options:", error);
+          console.error("Error saving type options:", error);
           alert("An error occurred while saving");
         }
       } else {

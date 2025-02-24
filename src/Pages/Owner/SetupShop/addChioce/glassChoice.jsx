@@ -63,26 +63,27 @@ const GlassChoice = () => {
 
   useEffect(() => {
     const fetchSizeData = async () => {
-      if (mode === "edit" && groupName) {
+      if (mode === "edit" && initialGroupName) {
         try {
           const response = await fetchApi(
-            `${URL}/owner/menus/options/size/${groupName}`,
+            `${URL}/owner/menus/options/size/${initialGroupName}`,
             "GET"
           );
           const data = await response.json();
           console.log("Fetched size data:", data);
 
-          setGroupName(data.size_group_name);
-          setOldGroupName(data.size_group_name);
+          setGroupName(data.group_name);
+          setOldGroupName(data.group_name);
 
-          const existingChoices = data.options.map((option) => ({
-            size_id: option.size_id || null,
-            name: option.size_name,
-            price: option.price,
+          const existingChoices = data.sizes.map((size) => ({
+            size_id: size.size_id,
+            name: size.size_name,
+            price: size.size_price,
           }));
           setChoices(existingChoices);
 
-          setSelectedMenus(data.menu_id || []);
+          const menuIds = data.menus.map((menu) => menu.menu_id);
+          setSelectedMenus(menuIds);
         } catch (error) {
           console.error("Error fetching size data:", error);
         }
@@ -90,7 +91,7 @@ const GlassChoice = () => {
     };
 
     fetchSizeData();
-  }, [mode, groupName, URL]);
+  }, [mode, initialGroupName, URL]);
 
   useEffect(() => {
     if (mode !== "edit") {
@@ -161,7 +162,7 @@ const GlassChoice = () => {
               options: choices.map((choice) => ({
                 size_id: choice.size_id || null,
                 size_name: choice.name,
-                price: Number(choice.price).toFixed(2),
+                size_price: Number(choice.price).toFixed(2),
               })),
               menu_id: selectedMenus,
             };
@@ -169,7 +170,8 @@ const GlassChoice = () => {
             requestData = {
               size_group_name: groupName,
               options: choices.map((choice) => ({
-                [choice.name]: { price: Number(choice.price).toFixed(2) },
+                size_name: choice.name,
+                size_price: Number(choice.price).toFixed(2),
               })),
               menu_id: selectedMenus,
             };
