@@ -13,8 +13,8 @@ const AddStockForm = () => {
   const { menu, menu_id } = location.state || {};
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
+
   const userData = useSelector((state) => state.user.userData);
-  const { owner_id } = userData || {};
 
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -67,54 +67,49 @@ const AddStockForm = () => {
 
   console.log("ingredient data:", ingredientData);
 
-  //fetch size
+  // Update the fetch for size and type data
   useEffect(() => {
-    fetchApi(`${URL}/owner/menus/options/size/${menu_id}`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
+    const fetchMenuOptions = async () => {
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/menus/stock/option/${menu_id}`,
+          "GET"
+        );
+        const data = await response.json();
+        console.log("Menu options data:", data);
+
+        // Set size items
+        if (data.sizes && Array.isArray(data.sizes)) {
           setSizeItems(
-            data.map((item) => ({
-              size_id: item.size_id,
-              size_name: item.size_name,
+            data.sizes.map((size) => ({
+              size_id: size.size_id,
+              size_name: size.size_name,
             }))
           );
-        } else {
-          console.error("Unexpected size data format:", data);
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching size data:", error);
-      });
-  }, []);
 
-  //fetch type
-  useEffect(() => {
-    fetchApi(`${URL}/owner/menus/options/menu-type/${menu_id}`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setTypeItems(
-            data.map((item) => ({
-              menu_type_id: item.menu_type_id,
-              menu_type_name: item.type_name,
-            }))
-          );
-        } else {
-          console.error("Unexpected type data format:", data);
+        // Set type items and default selected type
+        if (data.menu_types && Array.isArray(data.menu_types)) {
+          const formattedTypes = data.menu_types.map((type) => ({
+            menu_type_id: type.type_id,
+            menu_type_name: type.type_name,
+          }));
+          setTypeItems(formattedTypes);
+
+          // Set first type as default selected
+          if (formattedTypes.length > 0) {
+            setSelectedType(formattedTypes[0].menu_type_id);
+          }
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching type data:", error);
-      });
-  }, []);
+      } catch (error) {
+        console.error("Error fetching menu options:", error);
+      }
+    };
 
-  //set first select type
-  useEffect(() => {
-    if (typeItems.length > 0 && !selectedType) {
-      setSelectedType(typeItems[0].menu_type_id);
+    if (menu_id) {
+      fetchMenuOptions();
     }
-  }, [typeItems, selectedType]);
+  }, [URL, menu_id]);
 
   //fetch add on
   useEffect(() => {
@@ -223,7 +218,9 @@ const AddStockForm = () => {
       "size:",
       sizeId,
       "value:",
-      value
+      value,
+      "selectedType:",
+      selectedType
     );
     setTypeData((prevData) => {
       const updatedData = {
@@ -241,51 +238,85 @@ const AddStockForm = () => {
     });
   };
 
-  const handleNext = async () => {
-    if (step === 3) {
-      const data = {
-        owner_id: 16,
-        branch_id: 2,
-        menuData: rows.map((row, index) => {
-          return {
-            ingredient_name: row.material,
-            unit: row.unit,
-            ingredientListForStock: sizeItems
-              .map((size) => {
-                return typeItems.map((menuType) => {
-                  const size_id = size.size_id;
-                  const menu_type_id = menuType.menu_type_id;
-
-                  const quantityUsed = parseFloat(
-                    typeData[menu_type_id]?.[index]?.[size_id]
-                  );
-
-                  return {
-                    size_id,
-                    menu_type_id,
-                    quantity_used: quantityUsed,
-                  };
-                });
-              })
-              .flat(),
-          };
-        }),
-      };
-
-      console.log("DATA:", data);
-
+  // เพิ่ม useEffect สำหรับดึงข้อมูล stock เดิม (ถ้ามี)
+  useEffect(() => {
+    const fetchExistingStock = async () => {
       try {
         const response = await fetchApi(
           `${URL}/owner/menus/stock/${menu_id}`,
-          "PATCH",
-          data
+          "GET"
+        );
+        const data = await response.json();
+        console.log("Existing stock data:", data);
+
+        if (data.menuData && data.menuData.length > 0) {
+          // Set rows with existing data
+          const existingRows = data.menuData.map((item, index) => ({
+            id: index, // หรือใช้ ID อื่นที่เหมาะสม
+            material: item.ingredient_name,
+            unit: item.unit,
+          }));
+          setRows(existingRows);
+
+          // Set type data for table
+          const newTypeData = {};
+          data.menuData.forEach((ingredient, rowIndex) => {
+            ingredient.ingredientListForStock.forEach((stock) => {
+              if (!newTypeData[stock.menu_type_id]) {
+                newTypeData[stock.menu_type_id] = {};
+              }
+              if (!newTypeData[stock.menu_type_id][rowIndex]) {
+                newTypeData[stock.menu_type_id][rowIndex] = {};
+              }
+              newTypeData[stock.menu_type_id][rowIndex][stock.size_id] =
+                stock.quantity_used;
+            });
+          });
+          setTypeData(newTypeData);
+        }
+      } catch (error) {
+        console.error("Error fetching existing stock:", error);
+      }
+    };
+
+    if (menu_id) {
+      fetchExistingStock();
+    }
+  }, [URL, menu_id]);
+
+  // แก้ไข handleNext สำหรับการ POST ข้อมูล
+  const handleNext = async () => {
+    if (step === 3) {
+      try {
+        const requestData = {
+          menuData: rows.map((row, rowIndex) => ({
+            ingredient_name: row.material,
+            unit: row.unit,
+            ingredientListForStock: sizeItems.flatMap((size) =>
+              typeItems.map((type) => ({
+                size_id: size.size_id,
+                menu_type_id: type.menu_type_id,
+                quantity_used: parseFloat(
+                  typeData[type.menu_type_id]?.[rowIndex]?.[size.size_id] || 0
+                ),
+              }))
+            ),
+          })),
+        };
+
+        console.log("Sending stock data:", requestData);
+
+        const response = await fetchApi(
+          `${URL}/owner/menus/stock/${menu_id}`,
+          "POST",
+          requestData
         );
 
         if (response.ok) {
-          console.log("stock saved successfully!");
+          console.log("Stock data saved successfully!");
           navigate("/stock-list");
         } else {
-          console.error("Failed to link stock data");
+          console.error("Failed to save stock data");
         }
       } catch (error) {
         console.error("Error:", error);
@@ -315,8 +346,8 @@ const AddStockForm = () => {
 
     console.log("Generated Rows:", newRows);
 
-    // Set the new rows
-    setRows(newRows);
+    // Set rows เฉพาะเมื่อยังไม่มีข้อมูลเดิม
+    setRows((prevRows) => (prevRows.length === 0 ? newRows : prevRows));
   }, [filterIngredientData]);
 
   console.log("ROWS:", rows);
@@ -337,56 +368,6 @@ const AddStockForm = () => {
     // Remove from rows (only new rows have id)
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/owner/ingredient/menu/${menu_id}`
-        );
-        const data = await response.json();
-
-        setSizeItems(data.sizeItems || []);
-        setTypeItems(data.typeItems || []);
-        setRows(data.rows || []);
-
-        const ingredientMap = {};
-
-        if (data.menuIngredients) {
-          data.menuIngredients.forEach((item) => {
-            const menuType = item.menu_type || {};
-            const ingredient = item.ingredient || {};
-            const size = item.size || {};
-            const quantityUsed = item.quantity_used;
-
-            const { menu_type_id } = menuType;
-            const { ingredient_id } = ingredient;
-            const { size_id } = size;
-
-            if (!menu_type_id || !ingredient_id) return;
-
-            if (!ingredientMap[menu_type_id]) {
-              ingredientMap[menu_type_id] = {};
-            }
-
-            if (!ingredientMap[menu_type_id][ingredient_id]) {
-              ingredientMap[menu_type_id][ingredient_id] = {};
-            }
-
-            ingredientMap[menu_type_id][ingredient_id][size_id] = quantityUsed;
-          });
-        }
-
-        setMenuIngredientDataSet(ingredientMap);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, [menu_id]);
-
-  console.log("MenuIngredientDataSet:", menuIngredientDataSet);
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
@@ -414,7 +395,7 @@ const AddStockForm = () => {
             >
               <div>
                 <IngredientDropdown
-                  value={ingredient.ingredientId}
+                  value={ingredient.material}
                   onChange={(value, label) =>
                     handleInputChange(index, "ingredientId", value, label)
                   }
@@ -423,7 +404,7 @@ const AddStockForm = () => {
 
               <div>
                 <select
-                  value={ingredient.unit}
+                  value={ingredient.unit || ""}
                   onChange={(e) => {
                     handleInputChange(index, "unit", e.target.value);
                   }}
@@ -499,16 +480,14 @@ const AddStockForm = () => {
                 </th>
               </tr>
               <tr className="bg-gray-100">
-                {sizeItems &&
-                  sizeItems.length > 0 &&
-                  sizeItems.map((size) => (
-                    <th
-                      key={size.size_id}
-                      className="border border-gray-300 px-4 py-2 text-center"
-                    >
-                      {size.size_name}
-                    </th>
-                  ))}
+                {sizeItems.map((size) => (
+                  <th
+                    key={size.size_id}
+                    className="border border-gray-300 px-4 py-2 text-center"
+                  >
+                    {size.size_name}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -537,12 +516,12 @@ const AddStockForm = () => {
                         <input
                           type="text"
                           value={
-                            typeData[selectedType]?.[row.id]?.[size.size_id] ||
+                            typeData[selectedType]?.[index]?.[size.size_id] ||
                             ""
                           }
                           onChange={(e) =>
                             handleSizeDataChange(
-                              row.id,
+                              index,
                               size.size_id,
                               e.target.value
                             )
@@ -602,7 +581,7 @@ const AddStockForm = () => {
             {/* Table Body */}
             <tbody>
               {rows.map((row, rowIndex) => (
-                <tr key={rowIndex} className="bg-white text-start">
+                <tr key={row.id || rowIndex} className="bg-white text-start">
                   <td className="border border-gray-300 px-4 py-2">
                     {rowIndex + 1}. {row.material} ({row.unit})
                   </td>
@@ -610,18 +589,18 @@ const AddStockForm = () => {
                   {/* Iterate over each type and size */}
                   {typeItems.map((type) =>
                     sizeItems.map((size) => {
-                      // Access the data for the specific type, row, and size from typeData
-                      const enteredData =
-                        typeData[type.menu_type_id]?.[rowIndex]?.[size.size_id];
-                      console.log("enteredData:", enteredData);
-
+                      const value =
+                        typeData[type.menu_type_id]?.[row.id]?.[size.size_id] ||
+                        typeData[type.menu_type_id]?.[rowIndex]?.[
+                          size.size_id
+                        ] ||
+                        "-";
                       return (
                         <td
                           key={`${type.menu_type_id}-${size.size_id}`}
                           className="border border-gray-300 px-4 py-2 text-center"
                         >
-                          {/* Display entered data or "-" if no data is entered */}
-                          {enteredData || "hi"}
+                          {value}
                         </td>
                       );
                     })

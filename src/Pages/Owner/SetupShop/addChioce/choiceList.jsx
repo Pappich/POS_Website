@@ -142,7 +142,7 @@ const ChoiceList = () => {
         endpoint = `${URL}/owner/menus/options/size/${productToDelete.name}`;
         break;
       case "ความหวาน":
-        endpoint = `${URL}/owner/menus/options/sweetness/${productToDelete.name}`;
+        endpoint = `${URL}owner/menus/options/sweetness/${productToDelete.name}`;
         break;
       case "ท็อปปิ้ง":
         endpoint = `${URL}/owner/menus/options/add-ons`;

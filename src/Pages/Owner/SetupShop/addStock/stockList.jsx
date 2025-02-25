@@ -14,16 +14,16 @@ const StockList = () => {
 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const groupedMenus = [];
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
   const [menuData, setMenuData] = useState({
     available_category: [],
-    available_menus: [],
+    categories: [],
+    menus: []
   });
-  const { available_category, available_menus } = menuData;
 
+  // Fetch menu data
   useEffect(() => {
-    fetchApi(`${URL}/customer/menus`, "GET")
+    fetchApi(`${URL}/owner/categories/all/menus`, "GET")
       .then((response) => response.json())
       .then((data) => {
         setMenuData(data);
@@ -31,81 +31,61 @@ const StockList = () => {
       .catch((error) => {
         console.error("Error fetching menu data:", error);
       });
-  }, []);
+  }, [URL]);
 
-  menuData.available_menus.forEach((menu) => {
-    menu.category.forEach((category) => {
-      let group = groupedMenus.find(
-        (g) => g.category_name === category.category_name
-      );
-
-      if (!group) {
-        // If the group doesn't exist, create a new one
-        groupedMenus.push({
-          category_name: category.category_name,
-          category_id: category.category_id,
-          menus: [
-            {
-              menu_id: menu.menu_id,
-              menu_name: menu.menu_name,
-            },
-          ],
-        });
-      } else {
-        // If the group exists, add the menu to the existing group
-        group.menus.push({
-          menu_id: menu.menu_id,
-          menu_name: menu.menu_name,
-        });
-      }
+  // Get all menus including those in categories and standalone menus
+  const getAllMenus = () => {
+    const allMenus = new Set();
+    
+    // Add standalone menus
+    menuData.menus?.forEach(menu => {
+      allMenus.add(JSON.stringify(menu));
     });
-  });
 
-  console.log("GROUP MENU:", groupedMenus);
+    // Add menus from categories
+    menuData.categories?.forEach(category => {
+      category.menus?.forEach(menu => {
+        allMenus.add(JSON.stringify(menu));
+      });
+    });
 
-  const categoryItems = available_category;
-  const allMenuItems = available_menus.map((menu) => ({
-    menu_id: menu.menu_id,
-    menu_name: menu.menu_name,
-  }));
+    return Array.from(allMenus).map(menu => JSON.parse(menu));
+  };
 
-  console.log("MENU:", allMenuItems);
-  console.log("categoryItems:", categoryItems);
+  // Get filtered menus based on selected category and search term
+  const getFilteredMenus = () => {
+    let menus = [];
 
-  // filter by search
-  const filteredItems = selectedCategory
-    ? groupedMenus
-        .find((group) => group.category_name === selectedCategory)
-        ?.menus.filter((menu) =>
-          menu.menu_name
-            .toLowerCase()
-            .normalize("NFC")
-            .includes(searchTerm.toLowerCase().normalize("NFC"))
-        ) || []
-    : allMenuItems.filter((item) =>
-        item.menu_name
-          .toLowerCase()
-          .normalize("NFC")
-          .includes(searchTerm.toLowerCase().normalize("NFC"))
-      );
+    if (selectedCategory === "ทั้งหมด") {
+      menus = getAllMenus();
+    } else {
+      const category = menuData.categories?.find(cat => cat.name === selectedCategory);
+      menus = category?.menus || [];
+    }
+
+    return menus.filter(menu =>
+      menu.menu_name
+        .toLowerCase()
+        .normalize("NFC")
+        .includes(searchTerm.toLowerCase().normalize("NFC"))
+    );
+  };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const handleCategoryClick = (category) => {
-    setSelectedCategory(category === selectedCategory ? null : category);
+    setSelectedCategory(category);
   };
 
   const handleBack = () => {
     navigate("/main-menu");
   };
 
-  const handleEditClick = (item) => {
-    console.log("item click", item);
+  const handleEditClick = (menu) => {
     navigate("/add-stock", {
       state: {
-        menu: item.menu_name,
-        menu_id: item.menu_id,
-        // available_menus: available_menus,
+        menu: menu.menu_name,
+        menu_id: menu.menu_id,
       },
     });
   };
@@ -135,59 +115,51 @@ const StockList = () => {
       </div>
 
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 mb-6">
-        {groupedMenus.map((group, index) => (
+        {/* Add "ทั้งหมด" category button */}
+        <button
+          onClick={() => handleCategoryClick("ทั้งหมด")}
+          className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold mr-2 ${
+            selectedCategory === "ทั้งหมด"
+              ? "bg-[#D4B28C] text-white"
+              : "bg-white text-[#DD9F52]"
+          }`}
+        >
+          ทั้งหมด
+        </button>
+
+        {/* Category buttons */}
+        {menuData.available_category?.map((category, index) => (
           <button
             key={index}
-            onClick={() => handleCategoryClick(group.category_name)}
-            className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold ml-2 ${
-              selectedCategory === group.category_name
+            onClick={() => handleCategoryClick(category)}
+            className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold mr-2 ${
+              selectedCategory === category
                 ? "bg-[#D4B28C] text-white"
                 : "bg-white text-[#DD9F52]"
             }`}
           >
-            {group.category_name}
+            {category}
           </button>
         ))}
       </div>
 
       <div className="w-full">
-        {selectedCategory ? (
-          filteredItems.length > 0 ? (
-            filteredItems.map((menu, menuIndex) => (
-              <div key={menuIndex} className="w-full mb-4">
-                <div className="flex justify-between items-start">
-                  <p className="text-lg">{menu.menu_name}</p>
-                  <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleEditClick(menu)}
-                    >
-                      แก้ไข
-                    </button>
-                  </div>
-                </div>
-                <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-400 text-center">ไม่พบสินค้า</p>
-          )
-        ) : filteredItems.length > 0 ? (
-          filteredItems.map((menu, index) => (
-            <div key={index} className="w-full mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <p className="text-2xl">{menu.menu_name}</p>
-                <button
-                  onClick={() => handleEditClick(menu)}
-                  className="text-[#D4B28C] font-bold"
-                >
-                  แก้ไข
-                </button>
-              </div>
-              <div className="w-full h-px bg-gray-300 mt-2"></div>
+        {getFilteredMenus().map((menu, index) => (
+          <div key={index} className="w-full mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-2xl">{menu.menu_name}</p>
+              <button
+                onClick={() => handleEditClick(menu)}
+                className="text-[#D4B28C] font-bold"
+              >
+                แก้ไข
+              </button>
             </div>
-          ))
-        ) : (
+            <div className="w-full h-px bg-gray-300 mt-2"></div>
+          </div>
+        ))}
+        
+        {getFilteredMenus().length === 0 && (
           <p className="text-gray-400 text-center">ไม่พบสินค้า</p>
         )}
       </div>

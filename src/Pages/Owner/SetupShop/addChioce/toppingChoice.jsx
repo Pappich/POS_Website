@@ -25,7 +25,7 @@ const ToppingChoice = () => {
   const [isRequired, setIsRequired] = useState(false);
   const [isMultiple, setIsMultiple] = useState(false);
   const [choices, setChoices] = useState([
-    { name: "", price: "", quantity: "", unit: "" },
+    { id: "", name: "", price: "", quantity: "", unit: "" },
   ]);
   const [toppingData, setToppingData] = useState([]);
   const groupedMenus = [];
@@ -82,18 +82,21 @@ const ToppingChoice = () => {
 
   useEffect(() => {
     const fetchToppingData = async () => {
-      if (mode === "edit" && groupName) {
+      if (mode === "edit" && initialGroupName) {
         try {
           const response = await fetchApi(
-            `${URL}/owner/menus/options/add-ons/${groupName}`,
+            `${URL}/owner/menus/options/add-on`,
             "GET"
           );
           const data = await response.json();
           console.log("Fetched topping data:", data);
 
-          // Set the existing choices
+          setGroupName(data.group_name);
+          setOldGroupName(data.group_name);
+
+          // Transform backend data format to match component state
           const existingChoices = data.options.map((option) => ({
-            add_on_id: option.add_on_id || null,
+            id: option.add_on_id,
             name: option.add_on_name,
             price: option.price,
             quantity: option.quantity,
@@ -101,8 +104,8 @@ const ToppingChoice = () => {
           }));
 
           setChoices(existingChoices);
-          setSelectedMenus(data.menu_id || []);
-          setIsRequired(data.is_required || false);
+          setSelectedMenus(data.menu_id);
+          setIsRequired(data.is_require || false);
           setIsMultiple(data.is_multiple || false);
         } catch (error) {
           console.error("Error fetching topping data:", error);
@@ -111,11 +114,11 @@ const ToppingChoice = () => {
     };
 
     fetchToppingData();
-  }, [mode, groupName, URL]);
+  }, [mode, initialGroupName, URL]);
 
   useEffect(() => {
     if (mode !== "edit") {
-      setChoices([{ name: "", price: "", quantity: "" }]);
+      setChoices([{ id: "", name: "", price: "", quantity: "", unit: "" }]);
     }
   }, [mode]);
 
@@ -176,33 +179,40 @@ const ToppingChoice = () => {
           if (mode === "edit") {
             method = "PATCH";
             requestData = {
+              old_add_on_group_name: oldGroupName,
+              new_add_on_group_name: groupName,
               options: choices.map((choice) => ({
-                add_on_id: choice.add_on_id || null,
+                add_on_id: choice.id?.toString() || "null",
                 add_on_name: choice.name,
                 price: choice.price,
-                quantity: Number(choice.quantity),
+                quantity: choice.quantity,
                 unit: choice.unit,
               })),
               menu_id: selectedMenus,
-              is_required: isRequired,
+              is_require: isRequired,
               is_multiple: isMultiple,
             };
+            console.log("PATCH requestData:", requestData);
           } else {
+            // POST format remains the same
+            const formattedOptions = choices.map((choice) => {
+              const option = {};
+              option[choice.name] = {
+                price: choice.price,
+                unit: choice.unit,
+                quantity: parseInt(choice.quantity),
+              };
+              return option;
+            });
+
             requestData = {
-              options: choices.map((choice) => ({
-                [choice.name]: {
-                  price: choice.price,
-                  unit: choice.unit,
-                  quantity: Number(choice.quantity),
-                },
-              })),
+              options: formattedOptions,
               menu_id: selectedMenus,
               is_required: isRequired,
               is_multipled: isMultiple,
             };
+            console.log("POST requestData:", requestData);
           }
-
-          console.log("Sending request:", { method, endpoint, requestData });
 
           const response = await fetchApi(endpoint, method, requestData);
 
@@ -247,7 +257,10 @@ const ToppingChoice = () => {
   };
 
   const addChoice = () => {
-    setChoices((prev) => [...prev, { name: "", price: "", quantity: "" }]);
+    setChoices((prev) => [
+      ...prev,
+      { id: "", name: "", price: "", quantity: "", unit: "" },
+    ]);
   };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
@@ -340,9 +353,9 @@ const ToppingChoice = () => {
                   key={index}
                   className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-6 w-full items-center"
                 >
-                  <div className=" w-full grid grid-cols-2">
+                  <div className="w-full grid grid-cols-2">
                     <IngredientDropdown
-                      value={choice.ingredientId}
+                      value={choice.name || choice.ingredientId}
                       onChange={(value, label) =>
                         handleChoiceChange(index, "ingredientId", value, label)
                       }
@@ -352,39 +365,30 @@ const ToppingChoice = () => {
                         {errors.choiceName}
                       </div>
                     )}
-                    <div className="ml-4">
-                      <select
-                        value={choice.unit}
-                        onChange={(e) =>
-                          handleChoiceChange(index, "unit", e.target.value)
-                        }
-                        className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                      >
-                        <option value="">เลือกหน่วย</option>
-                        {unitOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div className=" w-full">
-                    <input
-                      type="text"
-                      placeholder="ยังไม่มีข้อมูล..."
-                      value={choice.price}
+                    <select
+                      value={choice.unit || ""}
                       onChange={(e) =>
-                        handleChoiceChange(index, "price", e.target.value)
+                        handleChoiceChange(index, "unit", e.target.value)
                       }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                    />
-                    {errors.price && (
-                      <div className="absolute text-red-500 text-lg mt-1">
-                        {errors.price}
-                      </div>
-                    )}
+                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 ml-2"
+                    >
+                      <option value="">เลือกหน่วย...</option>
+                      {unitOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
+                  <input
+                    type="text"
+                    placeholder="ราคา..."
+                    value={choice.price || ""}
+                    onChange={(e) =>
+                      handleChoiceChange(index, "price", e.target.value)
+                    }
+                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  />
                   <button
                     onClick={() => removeChoice(index)}
                     className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"

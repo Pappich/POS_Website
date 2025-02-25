@@ -66,7 +66,8 @@ const Navbar = () => {
             <div className="flex items-center justify-center w-[150px] p-1 space-x-1 bg-[#D4B28C] rounded-full">
               <PiUserCircleBold size={24} />
               <span className="text-xl font-bold text-black">
-                {role == "owner" ? "เจ้าของร้าน" : "พนักงาน"}
+                {/* {role == "owner" ? "เจ้าของร้าน" : "พนักงาน"} */}
+                เจ้าของร้าน
               </span>
             </div>
           )}

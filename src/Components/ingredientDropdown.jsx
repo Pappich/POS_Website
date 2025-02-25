@@ -13,20 +13,24 @@ const IngredientDropdown = ({ value, onChange }) => {
   const owner_id = 16;
 
   useEffect(() => {
-    fetchApi(`${URL}/owner/ingredients/${owner_id}`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchIngredients = async () => {
+      try {
+        const response = await fetchApi(`${URL}/owner/ingredient`, "GET");
+        const data = await response.json();
+        console.log("Fetched ingredients:", data);
         setIngredients(
           data.map((ingredient) => ({
             value: ingredient.ingredient_id,
             label: ingredient.ingredient_name,
           }))
         );
-      })
-      .catch((error) => {
-        console.error("Error fetching menu data:", error);
-      });
-  }, []);
+      } catch (error) {
+        console.error("Error fetching ingredients:", error);
+      }
+    };
+
+    fetchIngredients();
+  }, [URL, owner_id]);
 
   const customStyles = {
     control: (provided, state) => ({

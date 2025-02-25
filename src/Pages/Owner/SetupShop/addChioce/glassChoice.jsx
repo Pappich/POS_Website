@@ -95,7 +95,7 @@ const GlassChoice = () => {
 
   useEffect(() => {
     if (mode !== "edit") {
-      setChoices([{ name: "", price: "" }]);
+      setChoices([{ id: "", name: "", price: "" }]);
     }
   }, [mode]);
 
@@ -159,27 +159,44 @@ const GlassChoice = () => {
             requestData = {
               old_size_group_name: oldGroupName,
               new_size_group_name: groupName,
-              options: choices.map((choice) => ({
-                size_id: choice.size_id || null,
-                size_name: choice.name,
-                size_price: Number(choice.price).toFixed(2),
-              })),
+              options: choices.map((choice) => {
+                const priceValue = parseFloat(choice.price || "0");
+                return {
+                  size_id: choice.id?.toString() || "null",
+                  size_name: choice.name,
+                  price: priceValue,
+                };
+              }),
               menu_id: selectedMenus,
             };
+
+            console.log("PATCH requestData:", requestData);
+            
           } else {
+            const formattedOptions = choices.map((choice) => {
+              const option = {};
+              const priceValue = parseFloat(choice.price || "0");
+              option[choice.name] = {
+                price: priceValue,
+              };
+              return option;
+            });
+
             requestData = {
               size_group_name: groupName,
-              options: choices.map((choice) => ({
-                size_name: choice.name,
-                size_price: Number(choice.price).toFixed(2),
-              })),
+              options: formattedOptions,
               menu_id: selectedMenus,
             };
+            console.log("POST requestData:", requestData);
           }
 
           console.log("Sending request:", { method, endpoint, requestData });
 
-          const response = await fetchApi(endpoint, method, requestData);
+          const response = await fetchApi(endpoint, method, requestData, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
           if (response.ok) {
             navigate("/choice-list");

@@ -162,21 +162,25 @@ const TypeChoice = () => {
               old_menu_type_group_name: oldGroupName,
               new_menu_type_group_name: groupName,
               options: choices.map((choice) => ({
-                menu_type_id: choice.id || null,
+                menu_type_id: choice.id?.toString() || "null",
                 type_name: choice.name,
-                price_difference: Number(choice.price).toFixed(2),
+                price_difference: choice.price,
               })),
               menu_id: selectedMenus,
             };
+            console.log("PATCH requestData:", requestData);
           } else {
+            // Transform choices into the required format for POST
+            const formattedOptions = choices.map((choice) => ({
+              [choice.name]: choice.price,
+            }));
+
             requestData = {
               menu_type_group_name: groupName,
-              options: choices.map((choice) => ({
-                type_name: choice.name,
-                price_difference: Number(choice.price).toFixed(2),
-              })),
+              options: formattedOptions,
               menu_id: selectedMenus,
             };
+            console.log("POST requestData:", requestData);
           }
 
           console.log("Sending request:", { method, endpoint, requestData });
@@ -191,7 +195,7 @@ const TypeChoice = () => {
             alert("Failed to save menu type options");
           }
         } catch (error) {
-          console.error("Error saving type options:", error);
+          console.error("Error saving menu type options:", error);
           alert("An error occurred while saving");
         }
       } else {
