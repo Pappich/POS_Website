@@ -4,7 +4,7 @@ import { BsCashCoin } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { QRCodeCanvas } from "qrcode.react";
-import { promptPay } from "promptpay-qr";
+import generatePayload from "promptpay-qr";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 
@@ -14,12 +14,19 @@ const PaymentMethod = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { selectedPayment, total } = location.state || {};
+  const { orderDetails } = location.state || {};
+  const total = orderDetails?.total;
+  const items = orderDetails?.items;
+  const selectedPayment = orderDetails?.selectedPayment;
+
+  console.log("orderDetails: ", orderDetails);
   console.log("selectedPayment: ", selectedPayment);
   console.log("TOTAL:", total);
 
   const accountNumber = "0869201512";
-  const qrData = promptPay(accountNumber, total);
+  const qrData = generatePayload(accountNumber, { amount: parseFloat(total) });
+
+  console.log("qrData: ", qrData);
 
   const bankIcons = [
     "BAAC.png",

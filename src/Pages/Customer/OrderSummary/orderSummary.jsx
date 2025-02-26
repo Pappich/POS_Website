@@ -68,8 +68,10 @@ const Summary = () => {
     // Prepare order details to pass to the payment method
     const orderDetails = {
       total,
-      items, // Pass the items array if needed
+      items,
+      selectedPayment, // Pass the items array if needed
     };
+    console.log("orderDetails: ", orderDetails);
 
     // Navigate to the payment method page with order details
     navigate("/payment-method", { state: { orderDetails } });
