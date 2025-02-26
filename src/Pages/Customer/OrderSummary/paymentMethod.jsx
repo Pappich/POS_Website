@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BsCashCoin } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
@@ -7,6 +7,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import generatePayload from "promptpay-qr";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
+import { useWebSocket } from "../../../webSocketContext";
 
 const PaymentMethod = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -41,9 +42,31 @@ const PaymentMethod = () => {
     "TTB.png",
   ];
 
+  const socket = useWebSocket();
+  const [slipImage, setSlipImage] = useState(null);
+
   const handleBack = () => navigate("/summary");
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSlipImage(file);
+    }
+  };
+
   const handleConfirmPayment = async () => {
+    // send to web socket
+    if (slipImage) {
+      const base64Image = await getBase64Image(slipImage);
+      const message = {
+        type: "NEW_SLIP",
+        data: "SLIPJA",
+      };
+      if (socket) {
+        socket.send(JSON.stringify(message));
+      }
+    }
+
     const createOrderDto = {
       order_date: new Date().toISOString(),
       total_price: total,
@@ -70,10 +93,19 @@ const PaymentMethod = () => {
 
       const responseData = await response.json();
       console.log("Order submission response:", responseData);
-      navigate("/order-summary", { state: { orderData: responseData } });
+      navigate("/queue-summary", { state: { orderData: responseData } });
     } catch (error) {
       console.error("Error during order submission:", error);
     }
+  };
+
+  const getBase64Image = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   return (
@@ -83,6 +115,8 @@ const PaymentMethod = () => {
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
       </div>
+
+      <input type="file" accept="image/*" onChange={handleFileChange} />
 
       {/* QR code */}
       {selectedPayment === "qr" && (
@@ -121,7 +155,7 @@ const PaymentMethod = () => {
               </div>
               <button
                 onClick={handleConfirmPayment}
-                className="px-4 py-2 bg-[#DD9F52] text-white rounded"
+                className="w-full mt-8 px-4 py-2 bg-[#DD9F52] text-white rounded-full"
               >
                 ยืนยันการชำระเงิน
               </button>

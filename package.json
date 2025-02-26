@@ -29,7 +29,8 @@
     "simple-keyboard": "^3.7.106",
     "simple-keyboard-layouts": "^3.4.21",
     "thai-banks-logo": "^1.0.6",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "ws": "^8.18.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -31,6 +31,37 @@ const Order = () => {
     completed_orders: 0,
   });
 
+  //connect web socket
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8080");
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+
+    socket.onmessage = async (event) => {
+      try {
+        const text = await event.data.text(); 
+        const message = JSON.parse(text); 
+
+        if (message.type === "NEW_SLIP") {
+          console.log("New slip received:", message.data);
+          // display popup
+        }
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
