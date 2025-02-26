@@ -44,6 +44,7 @@ import PauseMenu from "./Pages/Employee/main/pauseMenu";
 import NavbarCustomerLayout from "./NavbarCustomerLayout";
 import NavbarEmployeeLayout from "./NavbarEmployeeLayout";
 import CreateAccount from "./Pages/Owner/SetupShop/createAccount";
+import Branch from "./Pages/Owner/SetupShop/branch";
 import WebSocket from "ws";
 import { WebSocketProvider } from "./webSocketContext";
 
@@ -58,6 +59,7 @@ function App() {
           <Route path="/enter-otp" element={<EnterOTP />} />
           <Route path="/enter-new-password" element={<EnterNewPassword />} />
           <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/branch" element={<Branch />} />
 
           {/* Sale summary */}
           <Route path="/overview" element={<Home />} />
