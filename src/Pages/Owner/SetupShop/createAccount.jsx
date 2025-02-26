@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import ThaiVirtualKeyboard from "../../../Components/thaiVirtualKeyboard";
+import ThaiVirtualKeyboard from "../../../Components/General/thaiVirtualKeyboard";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import bcrypt from "bcryptjs";

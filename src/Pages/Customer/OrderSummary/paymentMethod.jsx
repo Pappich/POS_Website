@@ -1,18 +1,25 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import qrExample from "../../../Assets/Images/qrExample.jpg";
+import { useNavigate, useLocation } from "react-router-dom";
 import { BsCashCoin } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
 import { useSelector } from "react-redux";
+import { QRCodeCanvas } from "qrcode.react";
+import { promptPay } from "promptpay-qr";
+import fetchApi from "../../../Config/fetchApi";
+import configureAPI from "../../../Config/configureAPI";
 
 const PaymentMethod = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
   const navigate = useNavigate();
   const location = useLocation();
 
   const { selectedPayment, total } = location.state || {};
   console.log("selectedPayment: ", selectedPayment);
   console.log("TOTAL:", total);
+
+  const accountNumber = "0869201512";
+  const qrData = promptPay(accountNumber, total);
 
   const bankIcons = [
     "BAAC.png",
@@ -29,6 +36,39 @@ const PaymentMethod = () => {
 
   const handleBack = () => navigate("/summary");
 
+  const handleConfirmPayment = async () => {
+    const createOrderDto = {
+      order_date: new Date().toISOString(),
+      total_price: total,
+      queue_number: 3,
+      status: "รอทำ",
+      payment_method: selectedPayment,
+    };
+
+    const payload = {
+      createOrderDto,
+      items: [],
+    };
+
+    try {
+      const response = await fetchApi(
+        `${URL}/employee/orders`,
+        "POST",
+        payload
+      );
+
+      if (!response.ok) {
+        throw new Error("Error submitting the order");
+      }
+
+      const responseData = await response.json();
+      console.log("Order submission response:", responseData);
+      navigate("/order-summary", { state: { orderData: responseData } });
+    } catch (error) {
+      console.error("Error during order submission:", error);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-start items-center mb-6">
@@ -43,7 +83,7 @@ const PaymentMethod = () => {
           <div className="grid grid-cols-2 gap-8">
             {/* QR code */}
             <div className="flex justify-center">
-              <img src={qrExample} alt="QR code" className="w-[360px]" />
+              <QRCodeCanvas value={qrData} size={360} />
             </div>
             {/* Detail */}
             <div className="flex flex-col items-center">
@@ -72,6 +112,12 @@ const PaymentMethod = () => {
                   </div>
                 ))}
               </div>
+              <button
+                onClick={handleConfirmPayment}
+                className="px-4 py-2 bg-[#DD9F52] text-white rounded"
+              >
+                ยืนยันการชำระเงิน
+              </button>
             </div>
           </div>
         </div>

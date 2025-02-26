@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import configureAPI from "../Config/configureAPI";
-import fetchApi from "../Config/fetchApi";
+import configureAPI from "../../Config/configureAPI";
+import fetchApi from "../../Config/fetchApi";
 
 const AddCategoryButton = () => {
   const environment = process.env.NODE_ENV || "development";

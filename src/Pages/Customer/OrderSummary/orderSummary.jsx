@@ -18,6 +18,7 @@ const Summary = () => {
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("qr");
   const [menuData, setMenuData] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   const items = useSelector((state) => state.cart.items);
 
@@ -52,7 +53,6 @@ const Summary = () => {
   }, []);
 
   const subtotal = items.reduce((acc, item) => acc + item.price, 0);
-  // const tax = (subtotal * 0.07).toFixed(2);
   const tax = 0;
   const total = subtotal + parseFloat(tax);
 
@@ -64,51 +64,15 @@ const Summary = () => {
 
   const handleSelectPayment = (method) => setSelectedPayment(method);
 
-  const handleConfirmPayment = async () => {
-    const createOrderDto = {
-      order_date: new Date().toISOString(),
-      total_price: total,
-      queue_number: 3,
-      status: "รอทำ",
+  const handleConfirmPayment = () => {
+    // Prepare order details to pass to the payment method
+    const orderDetails = {
+      total,
+      items, // Pass the items array if needed
     };
 
-    // Format items array
-    const formattedItems = items.map((item) => {
-      return {
-        menu_id: item.menuId,
-        sweetness_id: item.selectedSweetness,
-        size_id: item.selectedSize,
-        add_on_id: item.selectedAddOn,
-        menu_type_id: item.selectedType,
-        quantity: item.quantity,
-        price: parseInt(item.price),
-      };
-    });
-
-    const payload = {
-      createOrderDto,
-      items: formattedItems,
-    };
-
-    console.log("Payload to send:", payload);
-
-    try {
-      const response = await fetchApi(
-        `${URL}/employee/orders`,
-        "POST",
-        payload
-      );
-
-      if (!response.ok) {
-        throw new Error("Error submitting the order");
-      }
-
-      const responseData = await response.json();
-      console.log("Order submission response:", responseData);
-      navigate("/payment-method", { state: { orderData: responseData } });
-    } catch (error) {
-      console.error("Error during order submission:", error);
-    }
+    // Navigate to the payment method page with order details
+    navigate("/payment-method", { state: { orderDetails } });
   };
 
   const handleRemove = (item) => {
@@ -165,37 +129,30 @@ const Summary = () => {
                 <tr key={index} className="border-b border-gray-200">
                   <td className="flex items-center py-2">
                     <img
-                      src={
-                        selectedMenu?.image_url ||
-                        "https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
-                      }
-                      alt={selectedMenu?.menu_name}
+                      src={`${URL}/${item.menu_img.replace(/\\/g, "/")}`}
+                      alt={item.menuName}
                       className="mr-2 rounded flex items-center h-[72px] w-[72px] mb-2"
                     />
                     <div>
-                      <p className="font-semibold">{selectedMenu?.menu_name}</p>
+                      <p className="font-semibold text-xl">{item.menuName}</p>
                       <div className="text-xl text-gray-500">
                         {item.selectedSize && (
-                          <span>ขนาด: {item.selectedSize} </span>
+                          <span>ขนาด: {item.selectedSize.name} </span>
                         )}
-                        {item.selectedSweetness && item.selectedSize && (
-                          <span>| หวาน: {item.selectedSweetness} </span>
+                        {item.selectedSweetness && (
+                          <span>| หวาน: {item.selectedSweetness.name} </span>
                         )}
-                        {item.selectedType &&
-                          (item.selectedSize || item.selectedSweetness) && (
-                            <span>| ชนิด: {item.selectedType} </span>
-                          )}
-                        {item.selectedAddOn.length > 0 &&
-                          (item.selectedSize ||
-                            item.selectedSweetness ||
-                            item.selectedType) && (
-                            <span>
-                              | ท็อปปิ้ง:{" "}
-                              {item.selectedAddOn
-                                .map((addon) => addon)
-                                .join(", ")}
-                            </span>
-                          )}
+                        {item.selectedType && (
+                          <span>| ชนิด: {item.selectedType.name} </span>
+                        )}
+                        {item.selectedAddOn.length > 0 && (
+                          <span>
+                            | ท็อปปิ้ง:{" "}
+                            {item.selectedAddOn
+                              .map((addOn) => addOn.name)
+                              .join(", ")}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </td>

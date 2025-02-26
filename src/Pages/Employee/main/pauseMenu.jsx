@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-import HomeEmButton from "../../../Components/homeEmButton";
+import HomeEmButton from "../../../Components/Employee/homeEmButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import { useEffect } from "react";
@@ -22,6 +22,7 @@ const PauseMenu = () => {
         const response = await fetchApi(`${URL}/employee/pause/menus`, "GET");
         const data = await response.json();
         setMenuItems(data);
+        setSelectedMenuItems(data.filter((item) => item.paused));
       } catch (error) {
         console.error("Error fetching menu:", error);
       }
@@ -70,7 +71,9 @@ const PauseMenu = () => {
 
     const payload = menuItems.map((menu) => ({
       menu_id: menu.menu_id,
-      paused: selectedMenuItems.includes(menu),
+      paused: selectedMenuItems.some(
+        (selected) => selected.menu_id === menu.menu_id
+      ),
     }));
 
     try {

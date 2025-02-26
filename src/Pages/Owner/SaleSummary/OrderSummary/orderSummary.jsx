@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
-import SideBar from "../../../../Components/sideBar";
-import CalendarSelect from "../../../../Components/calendarSelect";
-import OrderAndCancelCard from "../../../../Components/orderAndCancelCard";
-import PaymentMethodFilter from "../../../../Components/paymentMethodFilter";
+import SideBar from "../../../../Components/Owner/sideBar";
+import CalendarSelect from "../../../../Components/Owner/calendarSelect";
+import OrderAndCancelCard from "../../../../Components/Owner/orderAndCancelCard";
+import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
 import { useEffect } from "react";
 
 const OrderSummary = () => {

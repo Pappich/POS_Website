@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PiShoppingCart } from "react-icons/pi";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 
@@ -16,11 +15,10 @@ const Menu = () => {
 
   const navigate = useNavigate();
   const [menuData, setMenuData] = useState({
-    available_category: [],
-    available_menus: [],
+    categories: [],
   });
-  const { available_category, available_menus } = menuData;
-  const [activeCategory, setActiveCategory] = useState("");
+  const { categories } = menuData;
+  const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
 
   const getCartItemCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -30,65 +28,37 @@ const Menu = () => {
     fetchApi(`${URL}/customer/menus`, "GET")
       .then((response) => response.json())
       .then((data) => {
-        setMenuData(data);
+        // Set categories from the fetched data
+        setMenuData({
+          categories: data.categories || [],
+        });
       })
       .catch((error) => {
         console.error("Error fetching menu data:", error);
       });
-  }, []);
+  }, [URL, owner_id]);
 
-  console.log("MENU DATA:", menuData);
+  console.log("Menu Data:", menuData);
 
-  const groupedMenus = available_menus.reduce((acc, menu) => {
-    menu.category.forEach((category) => {
-      let group = acc.find((g) => g.category_name === category.category_name);
-      if (!group) {
-        acc.push({
-          category_name: category.category_name,
-          category_id: category.category_id,
-          menus: [menu],
-        });
-      } else {
-        group.menus.push(menu);
-      }
+  // Group menus by category, filtering out null or empty categories
+  const groupedMenus = (categories || [])
+    .filter((category) => category.category_name) // Filter out null or empty category names
+    .map((category) => {
+      return {
+        category_name: category.category_name,
+        menus: category.menus || [], // Ensure menus is an array
+      };
     });
-    return acc;
-  }, []);
 
-  menuData.available_menus.forEach((menu) => {
-    menu.category.forEach((category) => {
-      let group = groupedMenus.find(
-        (g) => g.category_name === category.category_name
-      );
+  // Add a group for "ทั้งหมด" with unique menus
+  const allMenus = categories.flatMap((category) => category.menus || []);
+  const uniqueMenus = Array.from(new Set(allMenus.map(menu => menu.menu_id)))
+    .map(id => allMenus.find(menu => menu.menu_id === id));
 
-      if (!group) {
-        // If the group doesn't exist, create a new one
-        groupedMenus.push({
-          category_name: category.category_name,
-          category_id: category.category_id,
-          menus: [
-            {
-              menu_id: menu.menu_id,
-              menu_name: menu.menu_name,
-            },
-          ],
-        });
-      } else {
-        // If the group exists, check if the menu is already added to the category
-        const existingMenu = group.menus.find(
-          (m) => m.menu_id === menu.menu_id
-        );
-        if (!existingMenu) {
-          group.menus.push({
-            menu_id: menu.menu_id,
-            menu_name: menu.menu_name,
-          });
-        }
-      }
-    });
+  groupedMenus.unshift({
+    category_name: "ทั้งหมด",
+    menus: uniqueMenus,
   });
-
-  console.log("GROUP MENU:", groupedMenus);
 
   const handleCategoryClick = (category) => {
     if (activeCategory === category) {
@@ -100,18 +70,10 @@ const Menu = () => {
 
   const filteredMenus =
     activeCategory === ""
-      ? available_menus.filter(
-          (menu, index, self) =>
-            index === self.findIndex((m) => m.menu_id === menu.menu_id)
-        ) // Show all menus without if no category is selected
+      ? uniqueMenus // Show all unique menus if no category is selected
       : groupedMenus
           .filter((group) => group.category_name === activeCategory)
-          .flatMap((group) =>
-            group.menus.filter(
-              (menu, index, self) =>
-                index === self.findIndex((m) => m.menu_id === menu.menu_id)
-            )
-          );
+          .flatMap((group) => group.menus);
 
   const handleMenuClick = (menuId) => {
     console.log("menu id click:", menuId);
@@ -126,7 +88,7 @@ const Menu = () => {
 
   return (
     <div className="font-noto flex flex-col min-h-screen bg-white">
-      {/* cart */}
+      {/* Cart */}
       <div className="flex justify-end items-center mb-6 relative">
         <button onClick={handleAddToCart} className="relative">
           <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
@@ -136,39 +98,43 @@ const Menu = () => {
         </button>
       </div>
 
+      {/* Category Buttons */}
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 ml-2 space-x-4 mb-4">
-        {available_category.map((category) => (
+        {groupedMenus.map((group) => (
           <button
-            key={category}
-            onClick={() => handleCategoryClick(category)}
+            key={group.category_name}
+            onClick={() => handleCategoryClick(group.category_name)}
             className={`px-4 py-2 rounded-full border border-[#D4B28C] ${
-              activeCategory === category
+              activeCategory === group.category_name
                 ? "bg-[#D4B28C] text-white"
                 : "border-[#D4B28C] text-[#D4B28C]"
             }`}
           >
-            {category}
+            {group.category_name}
           </button>
         ))}
       </div>
 
       {/* Product Grid */}
       <div className="grid grid-cols-4 gap-6">
-        {filteredMenus.map((menu, index) => (
-          <button
-            className="px-6 py-3 rounded-md border border-[#D4B28C] shadow-md ml-2"
-            key={index}
-            onClick={() => handleMenuClick(menu.menu_id)}
-          >
-            <img
-              className="w-full aspect-[4/3] object-cover rounded-md mb-2 border border-gray-200 shadow-sm"
-              src={menu.image_url}
-              alt={menu.menu_name}
-            />
-            <div className="font-bold text-lg">{menu.menu_name}</div>
-            <div className="text-gray-600">{menu.description}</div>
-          </button>
-        ))}
+        {filteredMenus.map((menu, index) => {
+          const imageUrl = `${URL}/${menu.image_url.replace(/\\/g, "/")}`;
+          return (
+            <button
+              className="px-6 py-3 rounded-md border border-[#D4B28C] shadow-md ml-2"
+              key={index}
+              onClick={() => handleMenuClick(menu.menu_id)}
+            >
+              <img
+                className="w-full aspect-[4/3] object-cover rounded-md mb-2 border border-gray-200 shadow-sm"
+                src={imageUrl}
+                alt={menu.menu_name}
+              />
+              <div className="font-bold text-lg">{menu.menu_name}</div>
+              <div className="text-gray-600">{menu.description}</div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

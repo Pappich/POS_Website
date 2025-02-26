@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegClock } from "react-icons/fa6";
 import { MdOutlineTableBar } from "react-icons/md";
@@ -8,10 +8,9 @@ import { CiCalendar } from "react-icons/ci";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { IoMdStopwatch } from "react-icons/io";
 import { MdDone } from "react-icons/md";
-import DoneOrderButton from "../../../Components/doneOrderButton";
-import CancelOrderButtonEm from "../../../Components/cancelOrderButtonEm";
-import LogoutButton from "../../../Components/logoutButton";
-import { useState, useEffect } from "react";
+import DoneOrderButton from "../../../Components/Employee/doneOrderButton";
+import CancelOrderButtonEm from "../../../Components/Employee/cancelOrderButtonEm";
+import LogoutButton from "../../../Components/General/logoutButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 
@@ -24,39 +23,38 @@ const Order = () => {
     navigate("/pause-section");
   };
   const [orders, setOrders] = useState([]);
-  // const [order, setOrder] = useState({});
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [orderStats, setOrderStats] = useState({
+    total_orders: 0,
+    pending_orders: 0,
+    completed_orders: 0,
+  });
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("http://localhost:3000/employee/orders");
+        const response = await fetchApi(`${URL}/employee/orders`, "GET");
         if (!response.ok) {
           throw new Error("Failed to fetch orders");
         }
         const data = await response.json();
-        const formattedOrders = data
-          .filter((order) => order.status === "processing") // Filter only 'processing' orders
-          .map((order) => {
-            const formattedDate = new Date(order.order_date).toLocaleString(
-              "th-TH",
-              {
-                timeZone: "Asia/Bangkok",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
-              }
-            );
-
-            return {
-              ...order,
-              order_date: formattedDate,
-              order_items: order.order_items || [],
-            };
-          });
+        setOrderStats({
+          total_orders: data.total_orders,
+          pending_orders: data.pending_orders,
+          completed_orders: data.completed_orders,
+        });
+        const formattedOrders = data.orders.map((order) => ({
+          ...order,
+          order_items: order.order_item || [],
+          order_date: new Date(order.order_date).toLocaleString("th-TH", {
+            timeZone: "Asia/Bangkok",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }),
+        }));
         setOrders(formattedOrders);
       } catch (err) {
         setError(err.message);
@@ -66,7 +64,7 @@ const Order = () => {
     };
 
     fetchOrders();
-  }, [orders]);
+  }, []);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -91,17 +89,9 @@ const Order = () => {
               <span className="pl-1">{orders[0].order_date} น.</span>
             </div>
 
-            {/* <div className="flex justify-between items-center">
-            <span>
-              <MdOutlineTableBar className="text-[#DD9F52]" size={19} />
-            </span>
-            <span className="pl-1 font-bold text-[#FF5555]">ทานที่ร้าน</span>
-          </div> */}
-
             <div className="flex justify-between mt-2">
               <span className="pr-1">ช่องทางการชำระเงิน</span>
               <span className="border border-[#70AB8E] text-[#70AB8E] rounded-full px-5 ">
-                {/* add payment method */}
                 QR CODE
               </span>
             </div>
@@ -118,17 +108,18 @@ const Order = () => {
             <div>รายการสินค้า</div>
             <div>จำนวน</div>
           </div>
-          {orders[0]?.order_item && orders[0].order_item.length > 0 ? (
+          {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
             <div className="h-[400px] overflow-y-auto mt-4">
-              {orders[0].order_item.map((item, idx) => (
+              {orders[0].order_items.map((item, idx) => (
                 <div key={idx} className="mb-4">
                   <div className="flex justify-between text-2xl">
-                    <div>{item.menu.menu_name}</div>
-                    <div>{item.quantity}</div>
+                    <div>{item.menu_name.menu_name}</div>
+                    <div>{item.menu_name.quantity}</div>
                   </div>
                   <span className="text-[#5B5B5B] text-xl">
-                    ชนิด: {item.menu_type.type_name} | หวาน:{" "}
-                    {item.sweetness.level_name} | ขนาด: {item.size.size_name}
+                    ชนิด: {item.details[0]?.type_name} | หวาน:{" "}
+                    {item.details[0]?.level_name} | ขนาด:{" "}
+                    {item.details[0]?.size_name}
                   </span>
                 </div>
               ))}
@@ -137,8 +128,8 @@ const Order = () => {
             <p>ไม่มีสินค้าในคำสั่งซื้อ</p>
           )}
           <div className="space-y-2 w-full pb-2 mb-auto pt-[200px]">
-            <CancelOrderButtonEm order={orders[0].order_id} />
-            <DoneOrderButton order={orders[0].order_id} />
+            <CancelOrderButtonEm order={orders[0]} />
+            <DoneOrderButton order={orders[0]} />
           </div>
         </div>
       </div>
@@ -173,7 +164,9 @@ const Order = () => {
             </div>
             <div className="ml-4 flex flex-col justify-center">
               <p className="text-gray-600 text-2xl">ออเดอร์วันนี้</p>
-              <p className="font-bold text-2xl">15 ออเดอร์</p>
+              <p className="font-bold text-2xl">
+                {orderStats.total_orders} ออเดอร์
+              </p>
             </div>
           </div>
 
@@ -183,7 +176,9 @@ const Order = () => {
             </div>
             <div className="ml-4 flex flex-col justify-center">
               <p className="text-gray-600 text-2xl">ออเดอร์ที่รอ</p>
-              <p className="font-bold text-2xl">17 ออเดอร์</p>
+              <p className="font-bold text-2xl">
+                {orderStats.pending_orders} ออเดอร์
+              </p>
             </div>
           </div>
 
@@ -193,7 +188,9 @@ const Order = () => {
             </div>
             <div className="ml-4 flex flex-col justify-center">
               <p className="text-gray-600 text-2xl">ออเดอร์ที่เสร็จ</p>
-              <p className="font-bold text-2xl">10 ออเดอร์</p>
+              <p className="font-bold text-2xl">
+                {orderStats.completed_orders} ออเดอร์
+              </p>
             </div>
           </div>
         </div>
@@ -233,17 +230,17 @@ const Order = () => {
                       </div>
 
                       <div className="h-[620px] overflow-y-auto">
-                        {order.order_item && order.order_item.length > 0 ? (
-                          order.order_item.map((item, idx) => (
+                        {order.order_items && order.order_items.length > 0 ? (
+                          order.order_items.map((item, idx) => (
                             <div key={idx} className="mb-2">
                               <div className="flex justify-between text-2xl">
-                                <div>{item.menu.menu_name}</div>
-                                <div>{item.quantity}</div>
+                                <div>{item.menu_name.menu_name}</div>
+                                <div>{item.menu_name.quantity}</div>
                               </div>
                               <span className="text-[#5B5B5B] text-xl">
-                                ชนิด: {item.menu_type.type_name} | หวาน:{" "}
-                                {item.sweetness.level_name} | ขนาด:{" "}
-                                {item.size.size_name}
+                                ชนิด: {item.details[0]?.type_name} | หวาน:{" "}
+                                {item.details[0]?.level_name} | ขนาด:{" "}
+                                {item.details[0]?.size_name}
                               </span>
                             </div>
                           ))
@@ -252,7 +249,7 @@ const Order = () => {
                         )}
                       </div>
                       <div className="space-y-2 w-full pt-2 pb-2">
-                        <CancelOrderButtonEm order={order?.order_id} />
+                        <CancelOrderButtonEm order={order} />
                       </div>
                     </div>
                   </div>

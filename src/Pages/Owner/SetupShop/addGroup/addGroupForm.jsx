@@ -6,7 +6,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import configureAPI from "../../../../Config/configureAPI";
-import LoadingPopup from "../../../../Components/loadingPopup";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const AddGroupForm = () => {
   const environment = process.env.NODE_ENV || "development";

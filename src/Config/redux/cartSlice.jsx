@@ -11,6 +11,8 @@ const cartSlice = createSlice({
     addToCart: (state, action) => {
       const {
         menuId,
+        menuName,
+        menu_img,
         selectedType,
         selectedSweetness,
         selectedSize,
@@ -20,6 +22,8 @@ const cartSlice = createSlice({
       } = action.payload;
       const newItem = {
         menuId,
+        menuName,
+        menu_img,
         selectedType,
         selectedSweetness,
         selectedSize,
@@ -31,6 +35,8 @@ const cartSlice = createSlice({
       const existingItemIndex = state.items.findIndex(
         (item) =>
           item.menuId === menuId &&
+          item.menuName === menuName &&
+          item.menu_img === menu_img &&
           item.selectedType.id === selectedType.id &&
           item.selectedSweetness.id === selectedSweetness.id &&
           item.selectedSize.id === selectedSize.id &&
@@ -50,6 +56,8 @@ const cartSlice = createSlice({
       state.items = state.items.filter(
         (item) =>
           item.menuId !== action.payload.menuId ||
+          item.menuName !== action.payload.menuName ||
+          item.menu_img !== action.payload.menu_img ||
           item.selectedSize !== action.payload.selectedSize ||
           item.selectedSweetness !== action.payload.selectedSweetness ||
           item.selectedType !== action.payload.selectedType ||

@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import fetchApi from "../../../../Config/fetchApi";
 import { useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
-import IngredientDropdown from "../../../../Components/ingredientDropdown";
+import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
 
 const AddStockForm = () => {
   const location = useLocation();
@@ -590,11 +590,9 @@ const AddStockForm = () => {
                   {typeItems.map((type) =>
                     sizeItems.map((size) => {
                       const value =
-                        typeData[type.menu_type_id]?.[row.id]?.[size.size_id] ||
                         typeData[type.menu_type_id]?.[rowIndex]?.[
                           size.size_id
-                        ] ||
-                        "-";
+                        ] || "-";
                       return (
                         <td
                           key={`${type.menu_type_id}-${size.size_id}`}

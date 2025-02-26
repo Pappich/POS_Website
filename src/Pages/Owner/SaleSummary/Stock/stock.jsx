@@ -3,8 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import the CSS
 import { registerLocale, setLocale } from "react-datepicker";
 import th from "date-fns/locale/th"; // Import Thai locale from date-fns
-import SideBar from "../../../../Components/sideBar";
-import AddCategoryButton from "../../../../Components/addCategoryButton";
+import AddCategoryButton from "../../../../Components/Owner/addCategoryButton";
 import { LuInfo } from "react-icons/lu";
 import { IoMdTime } from "react-icons/io";
 import { IoWarningOutline } from "react-icons/io5";
@@ -13,6 +12,7 @@ import { FaPlus, FaRegCalendar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { FaMinus } from "react-icons/fa";
 import { useEffect } from "react";
+import SideBar from "../../../../Components/Owner/sideBar";
 
 const thLocaleWithMondayStart = {
   ...th,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import fetchApi from "../Config/fetchApi";
-import configureAPI from "../Config/configureAPI";
+import fetchApi from "../../Config/fetchApi";
+import configureAPI from "../../Config/configureAPI";
 
 const IngredientDropdown = ({ value, onChange }) => {
   const environment = process.env.NODE_ENV || "development";

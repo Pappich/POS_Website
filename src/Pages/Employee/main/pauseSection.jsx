@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import HomeEmButton from "../../../Components/homeEmButton";
+import HomeEmButton from "../../../Components/Employee/homeEmButton";
 const PauseSection = () => {
   const navigate = useNavigate();
 

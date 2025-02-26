@@ -18,7 +18,7 @@ const MenuDetail = () => {
   const { owner_id } = userData || {};
 
   const location = useLocation();
-  const { menuId } = location.state;
+  const { menuId } = location.state || {};
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -47,36 +47,38 @@ const MenuDetail = () => {
         setMenu(data);
 
         console.log("DATA:", data);
-        setSelectedType(data.type_name[0]?.menu_type_name || "");
-        setSelectedSweetness(data.level_name[0]?.sweetness_level_name || "");
-        setSelectedSize(data.size_name[0]?.size_name || "");
+        setSelectedType(data.menu_type_group[0]?.type_name || "");
+        setSelectedSweetness(data.sweetness_group[0]?.level_name || "");
+        setSelectedSize(data.size_group[0]?.size_name || "");
         setSelectedAddOn([]);
       } catch (error) {
         console.error("Error fetching menu data:", error);
       }
     };
 
-    fetchMenuData();
+    if (menuId) {
+      fetchMenuData();
+    }
   }, [menuId]);
 
   const handleBack = () => navigate("/menu");
 
   const handleAddToCart = () => {
     const newErrors = {};
-    if (menu.type_name[0]?.menu_type_is_required && !selectedType) {
+    if (menu?.menu_type_group[0]?.is_required && !selectedType) {
       newErrors.type = "โปรดเลือกชนิดเครื่องดื่มที่ต้องการ";
     }
 
-    if (menu.level_name[0]?.sweetness_level_is_required && !selectedSweetness) {
+    if (menu?.sweetness_group.length > 0 && !selectedSweetness) {
       newErrors.sweetness = "โปรดเลือกระดับความหวานที่ต้องการ";
     }
 
-    if (menu.size_name[0]?.size_is_required && !selectedSize) {
+    if (menu?.size_group.length > 0 && !selectedSize) {
       newErrors.size = "โปรดเลือกขนาดที่ต้องการ";
     }
 
     if (
-      menu.add_on_name[0]?.add_on_is_required &&
+      menu?.add_on.length > 0 &&
       (selectedAddOn.length === 0 ||
         selectedAddOn.some((id) => id === null || id === undefined))
     ) {
@@ -90,30 +92,43 @@ const MenuDetail = () => {
 
     const selectedMenuDetails = {
       menuId: menuId,
-      menuName: menu,
-      selectedType,
-      selectedSweetness,
-      selectedSize,
-      selectedAddOn,
+      menuName: menu.menu_name,
+      menu_img: menu.image_url,
+      selectedType: {
+        id: menu.menu_type_group.find((type) => type.type_name === selectedType)?.menu_type_id,
+        name: selectedType,
+      },
+      selectedSweetness: {
+        id: menu.sweetness_group.find((sweetness) => sweetness.level_name === selectedSweetness)?.sweetness_id,
+        name: selectedSweetness,
+      },
+      selectedSize: {
+        id: menu.size_group.find((size) => size.size_name === selectedSize)?.size_id,
+        name: selectedSize,
+      },
       price: calculatePrice(),
       quantity,
+      selectedAddOn: selectedAddOn.map((addOnId) => ({
+        id: addOnId,
+        name: menu.add_on.find((addOn) => addOn.add_on_id === addOnId)?.ingredient_name,
+      })),
     };
+    console.log("selectedMenuDetails:", selectedMenuDetails);
 
     dispatch(addToCart(selectedMenuDetails));
-
     navigate("/summary");
   };
 
-  const handleSelection = (setter, value, current, isMultiple = false) => {
-    if (isMultiple) {
-      setter((prev) =>
-        prev.includes(value)
-          ? prev.filter((item) => item !== value)
-          : [...prev, value]
-      );
-    } else {
-      setter(current === value ? null : value);
-    }
+  const handleSelection = (setter, value) => {
+    setter(value);
+  };
+
+  const handleAddOnSelection = (addOnId) => {
+    setSelectedAddOn((prev) =>
+      prev.includes(addOnId)
+        ? prev.filter((id) => id !== addOnId)
+        : [...prev, addOnId]
+    );
   };
 
   const handleAdd = () => {
@@ -124,82 +139,30 @@ const MenuDetail = () => {
     if (quantity > 1) setQuantity((prev) => prev - 1);
   };
 
-  const OptionGroup = ({
-    title,
-    options,
-    selected,
-    onSelect,
-    isMultiple,
-    isRequired,
-    errorMessage,
-  }) => (
-    <div>
-      <div className="font-bold mb-2">{title}</div>
-      <div className="flex flex-wrap gap-4 mb-4">
-        {options.map((option) => (
-          <button
-            key={option.id}
-            onClick={() => onSelect(option.id)}
-            aria-selected={selected.includes(option.id)}
-            className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
-              selected.includes(option.id)
-                ? "bg-[#D4B28C] text-white"
-                : "bg-white text-[#D4B28C]"
-            }`}
-            disabled={
-              isRequired &&
-              !selected.length &&
-              !isMultiple &&
-              !selected.includes(option.id)
-            }
-          >
-            {option.name}
-          </button>
-        ))}
-      </div>
-      {errorMessage && (
-        <div className="text-red-600 text-sm mb-2">{errorMessage}</div>
-      )}
-    </div>
-  );
-
-  console.log("ERROR:", errors);
-
   const calculatePrice = () => {
     let price = parseFloat(menu.price) || 0;
 
-    if (selectedSize) {
-      const selectedSizeOption = menu.size_name.find(
-        (size) => size.size_id === selectedSize
-      );
-      price += parseFloat(selectedSizeOption?.size_price_addition || "0");
-    }
-
     if (selectedAddOn.length > 0) {
       selectedAddOn.forEach((addon) => {
-        const selectedAddOnOption = menu.add_on_name.find(
+        const selectedAddOnOption = menu.add_on.find(
           (addonOption) => addonOption.add_on_id === addon
         );
-        price += parseFloat(
-          selectedAddOnOption?.add_on_name_price_addition || "0"
-        );
+        price += parseFloat(selectedAddOnOption?.add_on_price || "0");
       });
     }
 
-    if (selectedSweetness) {
-      const selectedSweetnessOption = menu.level_name.find(
-        (level) => level.sweetness_level_id === selectedSweetness
+    if (selectedType) {
+      const selectedTypeOption = menu.menu_type_group.find(
+        (type) => type.type_name === selectedType
       );
-      price += parseFloat(
-        selectedSweetnessOption?.sweetness_level_price_addition || "0"
-      );
+      price += parseFloat(selectedTypeOption?.price_difference || "0");
     }
 
-    if (selectedType) {
-      const selectedTypeOption = menu.type_name.find(
-        (type) => type.menu_type_id === selectedType
+    if (selectedSize) {
+      const selectedSizeOption = menu.size_group.find(
+        (size) => size.size_name === selectedSize
       );
-      price += parseFloat(selectedTypeOption?.menu_type_price_addition || "0");
+      price += parseFloat(selectedSizeOption?.size_price || "0");
     }
 
     return price * quantity;
@@ -223,9 +186,9 @@ const MenuDetail = () => {
 
       <div className="flex justify-center mb-6">
         <img
-          src={menu.image_url}
+          src={`${URL}/${menu.image_url.replace(/\\/g, "/")}`}
           alt={menu.menu_name}
-          className="rounded-md border border-[#AD8B73] h-[250px] w-[350px]"
+          className="h-[250px] w-[350px] aspect-[4/3] object-cover rounded-md mb-2 border border-gray-200 shadow-sm"
         />
       </div>
 
@@ -235,67 +198,95 @@ const MenuDetail = () => {
       </div>
 
       <div className="mt-4">
-        <OptionGroup
-          title="ชนิดเครื่องดื่ม"
-          options={menu.type_name.map((item) => ({
-            id: item.menu_type_id,
-            name: item.menu_type_name,
-          }))}
-          selected={selectedType ? [selectedType] : []}
-          onSelect={(option) =>
-            handleSelection(setSelectedType, option, selectedType, false)
-          }
-          isRequired={menu.type_name[0]?.menu_type_is_required}
-          errorMessage={errors.type}
-        />
+        {menu.menu_type_group && menu.menu_type_group.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-4">ชนิดเครื่องดื่ม</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.menu_type_group.map((type) => (
+                <button
+                  key={type.menu_type_id}
+                  onClick={() =>
+                    handleSelection(setSelectedType, type.type_name)
+                  }
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedType === type.type_name
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {type.type_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-        <OptionGroup
-          title="ระดับความหวาน"
-          options={menu.level_name.map((item) => ({
-            id: item.sweetness_level_id,
-            name: item.sweetness_level_name,
-          }))}
-          selected={selectedSweetness ? [selectedSweetness] : []}
-          onSelect={(option) =>
-            handleSelection(
-              setSelectedSweetness,
-              option,
-              selectedSweetness,
-              false
-            )
-          }
-          isRequired={menu.level_name[0]?.sweetness_level_is_required}
-          errorMessage={errors.sweetness}
-        />
+        {menu.sweetness_group && menu.sweetness_group.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-8">ระดับความหวาน</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.sweetness_group.map((sweetness) => (
+                <button
+                  key={sweetness.sweetness_id}
+                  onClick={() =>
+                    handleSelection(setSelectedSweetness, sweetness.level_name)
+                  }
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedSweetness === sweetness.level_name
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {sweetness.level_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-        <OptionGroup
-          title="ขนาด"
-          options={menu.size_name.map((item) => ({
-            id: item.size_id,
-            name: item.size_name,
-          }))}
-          selected={selectedSize ? [selectedSize] : []}
-          onSelect={(option) =>
-            handleSelection(setSelectedSize, option, selectedSize, false)
-          }
-          isRequired={menu.size_name[0]?.size_is_required}
-          errorMessage={errors.size}
-        />
+        {menu.size_group && menu.size_group.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-8">ขนาดแก้ว</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.size_group.map((size) => (
+                <button
+                  key={size.size_id}
+                  onClick={() =>
+                    handleSelection(setSelectedSize, size.size_name)
+                  }
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedSize === size.size_name
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {size.size_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-        <OptionGroup
-          title="ตัวเลือก"
-          options={menu.add_on_name.map((item) => ({
-            id: item.add_on_id,
-            name: `${item.add_on_name} + ${item.add_on_name_price_addition} ฿`,
-          }))}
-          selected={selectedAddOn}
-          onSelect={(option) =>
-            handleSelection(setSelectedAddOn, option, selectedAddOn, true)
-          }
-          isMultiple={menu.add_on_name[0]?.add_on_is_multiple}
-          isRequired={menu.add_on_name[0]?.add_on_is_required}
-          errorMessage={errors.addOn}
-        />
+        {menu.add_on && menu.add_on.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-8">ท็อปปิ้ง</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.add_on.map((addOn) => (
+                <button
+                  key={addOn.add_on_id}
+                  onClick={() => handleAddOnSelection(addOn.add_on_id)}
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedAddOn.includes(addOn.add_on_id)
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {addOn.ingredient_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-4 flex flex-col items-center space-y-4">

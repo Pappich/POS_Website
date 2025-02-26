@@ -7,7 +7,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
-import IngredientDropdown from "../../../../Components/ingredientDropdown";
+import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
 
 const ToppingChoice = () => {
   const environment = process.env.NODE_ENV || "development";

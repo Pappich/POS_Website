@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-import HomeEmButton from "../../../Components/homeEmButton";
+import HomeEmButton from "../../../Components/Employee/homeEmButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
-import { useEffect } from "react";
 
 const PauseIngredient = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -25,6 +24,7 @@ const PauseIngredient = () => {
         );
         const data = await response.json();
         setIngredientItems(data);
+        setSelectedIngredientItems(data.filter((item) => item.paused));
       } catch (error) {
         console.error("Error fetching ingredients:", error);
       }
@@ -34,11 +34,6 @@ const PauseIngredient = () => {
   }, []);
 
   console.log("ingredientItems", ingredientItems);
-
-  const unpausedIngredients = ingredientItems.filter(
-    (ingredient) =>
-      !selectedIngredientItems.includes(ingredient) && !ingredient.paused
-  );
 
   const getFilteredIngredientItems = () => {
     if (filter === "ทั้งหมด") return ingredientItems;
@@ -79,8 +74,13 @@ const PauseIngredient = () => {
 
     const payload = ingredientItems.map((ingredient) => ({
       ingredient_id: ingredient.ingredient_id,
-      paused: selectedIngredientItems.includes(ingredient),
+      paused: selectedIngredientItems.some(
+        (selected) => selected.ingredient_id === ingredient.ingredient_id
+      ),
     }));
+
+    console.log("selectedIngredientItems", selectedIngredientItems);
+    console.log("payload", payload);
 
     try {
       const response = await fetchApi(
