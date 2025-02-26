@@ -10,26 +10,26 @@ const MainMenu = () => {
   const icons = [
     {
       id: "product",
-      label: "เพิ่มรายการสินค้า",
-      icon: <FaUtensils size={50} />,
+      label: "เพิ่ม / จัดการรายการสินค้า",
+      icon: <FaUtensils size={72} />,
       // disabled: !enabledSteps.includes("product"),
     },
     {
       id: "group",
-      label: "เพิ่มกลุ่มรายการสินค้า",
-      icon: <FaList size={50} />,
+      label: "เพิ่ม / จัดการกลุ่มรายการสินค้า",
+      icon: <FaList size={72} />,
       // disabled: !enabledSteps.includes("group"),
     },
     {
       id: "choice",
-      label: "เพิ่มตัวเลือก",
-      icon: <FaThLarge size={50} />,
+      label: "เพิ่ม / จัดการตัวเลือก",
+      icon: <FaThLarge size={72} />,
       // disabled: !enabledSteps.includes("options"),
     },
     {
       id: "stock",
-      label: "เพิ่มการตัดคลังสินค้า",
-      icon: <FaBox size={50} />,
+      label: "เพิ่ม / จัดการการตัดคลังสินค้า",
+      icon: <FaBox size={72} />,
       // disabled: !enabledSteps.includes("stock"),
     },
   ];
@@ -75,13 +75,13 @@ const MainMenu = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center min-h-screen bg-white mt-[120px]">
       <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">ตัวเลือกรายการสินค้า</h1>
+        <h1 className="text-3xl font-bold mb-2">ตัวเลือกรายการสินค้า</h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
-      <div className="w-full ml-16 mt-8">
+      <div className="w-full ml-16 mt-[120px]">
         <div className="grid grid-cols-4 gap-8">
           {icons.map(({ id, label, icon, disabled }) => (
             <div
@@ -102,15 +102,15 @@ const MainMenu = () => {
               >
                 {icon}
               </div>
-              <p className={`mt-2 text-lg text-black`}>{label}</p>
+              <p className={`mt-2 text-2xl text-black`}>{label}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex mt-24 w-full space-x-8 justify-between">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

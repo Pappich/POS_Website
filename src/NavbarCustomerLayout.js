@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "./Components/General/navBar";
+import NavbarCustomer from "./Components/Customer/navBarCustomer";
 
-function NavbarLayout() {
+function NavbarCustomerLayout() {
   return (
     <div className="border-gray-100 w-full">
-      <Navbar />
+      <NavbarCustomer />
       <div className="px-10 border-gray-100">
         <Outlet />
       </div>
@@ -12,4 +12,4 @@ function NavbarLayout() {
   );
 }
 
-export default NavbarLayout;
+export default NavbarCustomerLayout;

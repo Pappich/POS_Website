@@ -1,117 +1,206 @@
-import React, { useState } from "react";
-import { IoChevronBack } from "react-icons/io5";
+import React, { useState, useEffect } from "react";
+import { IoChevronBack, IoTrashOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import PaymentMethod from "./paymentMethod";
-import { IoTrashOutline } from "react-icons/io5";
+import { useSelector } from "react-redux";
+import fetchApi from "../../../Config/fetchApi";
+import configureAPI from "../../../Config/configureAPI";
+import { useDispatch } from "react-redux";
+import { removeFromCart } from "../../../Config/redux/cartSlice";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const Summary = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("qr");
-  const totalAmount = 321;
+  const [menuData, setMenuData] = useState([]);
+  const [orders, setOrders] = useState([]);
+
+  const items = useSelector((state) => state.cart.items);
+
+  console.log("cart item:", items);
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetchApi(`${URL}/customer/menus`, "GET");
+        const data = await response.json();
+
+        const selectedMenus = items.map((item) => {
+          return data.available_menus.find(
+            (menuItem) => menuItem.menu_id === item.menuId
+          );
+        });
+
+        console.log("selectedMenus:", selectedMenus);
+
+        if (selectedMenus) {
+          setMenuData(selectedMenus);
+          console.log(menuData);
+        } else {
+          console.error("Menu item not found");
+        }
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
+
+    fetchMenuData();
+  }, []);
+
+  const subtotal = items.reduce((acc, item) => acc + item.price, 0);
+  const tax = 0;
+  const total = subtotal + parseFloat(tax);
 
   const handleBack = () => navigate("/menu");
 
-  const items = [
-    { name: "ชาเขียว", quantity: 1, price: 69, total: 69 },
-    { name: "ชาเขียว", quantity: 2, price: 50, total: 100 },
-    { name: "ชาเขียว", quantity: 2, price: 50, total: 100 },
-  ];
-
-  const subtotal = items.reduce((acc, item) => acc + item.total, 0);
-  const tax = (subtotal * 0.07).toFixed(2);
-  const total = (subtotal + parseFloat(tax)).toFixed(2);
-
   const handlePaymentClick = () => setShowPaymentPopup(true);
+
   const closePaymentPopup = () => setShowPaymentPopup(false);
+
   const handleSelectPayment = (method) => setSelectedPayment(method);
 
   const handleConfirmPayment = () => {
-    console.log("Selected payment method :", selectedPayment);
-    navigate("/payment-method", { state: { selectedPayment, totalAmount } });
-    setShowPaymentPopup(false);
+    // Prepare order details to pass to the payment method
+    const orderDetails = {
+      total,
+      items, // Pass the items array if needed
+    };
+
+    // Navigate to the payment method page with order details
+    navigate("/payment-method", { state: { orderDetails } });
+  };
+
+  const handleRemove = (item) => {
+    console.log("ITEM TO DELETE:", item);
+    dispatch(
+      removeFromCart({
+        menuId: item.menuId,
+        selectedSize: item.selectedSize,
+        selectedSweetness: item.selectedSweetness,
+        selectedType: item.selectedType,
+        selectedAddOn: item.selectedAddOn,
+      })
+    );
   };
 
   return (
-    <div className="w-full font-noto flex flex-col items-center min-h-screen bg-white">
+    <div className="w-full font-noto flex flex-col items-center bg-white">
       <div className="w-full flex justify-start items-center mb-6">
         <button onClick={handleBack} className="text-[#DD9F52] text-4xl">
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
       </div>
 
-      <div className="flex flex-col mb-2">
-        <h1 className="text-2xl font-bold">สรุปรายการสินค้า</h1>
+      <div className="flex flex-col mb-2 mt-[40px]">
+        <h1 className="text-3xl font-bold">สรุปรายการสินค้า</h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-gray-300 text-lg">
+          <tr className="border-b border-gray-300 text-2xl">
             <th className="text-left py-2">เมนู</th>
             <th className="text-center py-2">จำนวน</th>
-            <th className="text-center py-2">ราคา</th>
             <th className="text-center py-2">ราคาทั้งหมด</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => (
-            <tr key={index} className="border-b border-gray-200">
-              <td className="flex items-center py-2">
-                <img
-                  src="https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
-                  alt={item.name}
-                  className="mr-2 rounded flex items-center h-[50px] w-[50px] mb-2"
-                />
-                <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm text-gray-500">
-                    ชนิด: เย็น | หวาน: 50% | ขนาด: M | ท็อปปิ้ง: ไข่มุก
-                  </p>
-                </div>
-              </td>
-              <td className="text-center">{item.quantity}</td>
-              <td className="text-center">{item.price} ฿</td>
-              <td className="text-center">{item.total} ฿</td>
-              <td className="text-[#DD9F52]">
-                <IoTrashOutline
-                  className="w-6 h-6 transition-transform duration-200 ease-in-out transform hover:scale-125 hover:text-[#cda777]"
-                  onClick={null}
-                />
+          {items.length === 0 ? (
+            <tr>
+              <td
+                colSpan="4"
+                className="text-center py-4 text-gray-500 text-2xl"
+              >
+                ยังไม่มีสินค้าในตระกร้าขณะนี้
               </td>
             </tr>
-          ))}
+          ) : (
+            items.map((item, index) => {
+              const selectedMenu = menuData.find(
+                (menu) => menu.menu_id === item.menuId
+              );
+
+              return (
+                <tr key={index} className="border-b border-gray-200">
+                  <td className="flex items-center py-2">
+                    <img
+                      src={`${URL}/${item.menu_img.replace(/\\/g, "/")}`}
+                      alt={item.menuName}
+                      className="mr-2 rounded flex items-center h-[72px] w-[72px] mb-2"
+                    />
+                    <div>
+                      <p className="font-semibold text-xl">{item.menuName}</p>
+                      <div className="text-xl text-gray-500">
+                        {item.selectedSize && (
+                          <span>ขนาด: {item.selectedSize.name} </span>
+                        )}
+                        {item.selectedSweetness && (
+                          <span>| หวาน: {item.selectedSweetness.name} </span>
+                        )}
+                        {item.selectedType && (
+                          <span>| ชนิด: {item.selectedType.name} </span>
+                        )}
+                        {item.selectedAddOn.length > 0 && (
+                          <span>
+                            | ท็อปปิ้ง:{" "}
+                            {item.selectedAddOn
+                              .map((addOn) => addOn.name)
+                              .join(", ")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-center">{item.quantity}</td>
+                  <td className="text-center">{item.price} บาท</td>
+                  <td>
+                    <button
+                      onClick={() => handleRemove(item)}
+                      className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                    >
+                      <AiOutlineDelete size={36} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
 
-      {/* order summary */}
-      <div className="w-full mt-4 border-t border-gray-300 pt-4 text-lg">
+      {/* Order summary */}
+      <div className="w-full fixed bottom-32 border-t border-gray-300 pt-4 text-2xl px-12">
         <div className="flex justify-between mb-2 font-bold">
           <span>รวมเป็นเงิน</span>
-          <span>{subtotal} ฿</span>
+          <span>{subtotal} บาท</span>
         </div>
         <div className="flex font-bold justify-between mb-2">
           <span>ภาษีมูลค่าเพิ่ม 7%</span>
-          <span>{tax} ฿</span>
+          <span>{tax} บาท</span>
         </div>
-        <div className="flex justify-between text-xl font-bold">
+        <div className="flex justify-between text-3xl font-bold">
           <span>รวมทั้งหมด</span>
-          <span className="text-[#DD9F52]">{total} ฿</span>
+          <span className="text-[#DD9F52]">{total} บาท</span>
         </div>
       </div>
 
       <button
         onClick={handlePaymentClick}
-        className="w-full mt-6 py-3 bg-[#D4B28C] text-white rounded-full font-bold"
+        className="fixed bottom-4 py-3 w-full px-8 bg-[#D4B28C] text-white rounded-full font-bold"
       >
         จ่ายเงิน
       </button>
 
-      {/* payment popup */}
+      {/* Payment popup */}
       {showPaymentPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 w-[500px] relative">
-            <h2 className="text-xl font-bold mb-4 flex justify-center">
+          <div className="bg-white rounded-lg p-10 w-[800px] relative">
+            <h2 className="text-3xl font-bold mb-4 flex justify-center">
               วิธีการชำระเงิน
             </h2>
             <div className="flex items-center mb-4">
@@ -123,7 +212,7 @@ const Summary = () => {
                 checked={selectedPayment === "qr"}
                 onChange={() => handleSelectPayment("qr")}
               />
-              <label htmlFor="qr-code" className="text-lg">
+              <label htmlFor="qr-code" className="text-2xl">
                 QR Code
               </label>
             </div>
@@ -136,7 +225,7 @@ const Summary = () => {
                 checked={selectedPayment === "cash"}
                 onChange={() => handleSelectPayment("cash")}
               />
-              <label htmlFor="cash" className="text-lg">
+              <label htmlFor="cash" className="text-2xl">
                 เงินสด
               </label>
             </div>

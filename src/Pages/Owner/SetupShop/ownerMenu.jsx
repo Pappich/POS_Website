@@ -11,13 +11,13 @@ const OwnerMenu = () => {
       id: "createMenu",
       label: "ระบบสร้างรายการสินค้า",
       details: "เพิ่มรายการ กลุ่ม ตัวเลือกของสินค้า และการตัดคลังสินค้า",
-      icon: <RiMenuAddLine size={50} />,
+      icon: <RiMenuAddLine size={100} />,
     },
     {
       id: "stock",
       label: "เว็บไซต์ตรวจสอบคลังสินค้า",
       details: "ดูภาพรวมยอดขาย ประวัติออเดอร์ และอัปเดตคลังสินค้า",
-      icon: <BsBox2 size={50} />,
+      icon: <BsBox2 size={100} />,
     },
   ];
 
@@ -34,14 +34,14 @@ const OwnerMenu = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center mt-[120px]">
       <div className="text-start mb-10">
-        <h1 className="text-2xl font-bold mb-2">เจ้าของร้าน</h1>
-        <h1 className="text-xl mb-2">โปรดเลือกเว็บไซต์ที่ต้องการเข้าใช้งาน</h1>
+        <h1 className="text-3xl font-bold mb-2">เจ้าของร้าน</h1>
+        <h1 className="text-2xl mb-2">โปรดเลือกเว็บไซต์ที่ต้องการเข้าใช้งาน</h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
       </div>
 
-      <div className="w-full ml-16 mt-8">
+      <div className="w-full ml-16 mt-[120px]">
         <div className="grid grid-cols-2 gap-8">
           {icons.map(({ id, label, details, icon }) => (
             <div
@@ -58,16 +58,16 @@ const OwnerMenu = () => {
               >
                 {icon}
               </div>
-              <p className={"mt-2 text-xl font-bold text-black"}>{label}</p>
-              <p className={"mt-2 text-lg text-black"}>{details}</p>
+              <p className={"mt-2 text-3xl font-bold text-black"}>{label}</p>
+              <p className={"mt-2 text-2xl text-black"}>{details}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex mt-8 w-full space-x-8 justify-between">
+      <div className="flex w-full fixed bottom-4 left-0 px-4 py-4">
         <button
-          className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

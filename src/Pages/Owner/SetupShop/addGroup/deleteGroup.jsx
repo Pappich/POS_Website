@@ -29,7 +29,7 @@ const DeleteGroup = ({ isOpen, onClose, onConfirm, deleteCategory }) => {
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-1">
       <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
-        <h2 className="text-xl mb-4">
+        <h2 className="text-3xl mb-4">
           ลบกลุ่ม{" "}
           <span className="font-bold">{deleteCategory.category_name}</span>{" "}
           หรือไม่ ?

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-import HomeEmButton from "../../../Components/homeEmButton";
+import HomeEmButton from "../../../Components/Employee/homeEmButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
-import { useEffect } from "react";
 
 const PauseIngredient = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -25,6 +24,7 @@ const PauseIngredient = () => {
         );
         const data = await response.json();
         setIngredientItems(data);
+        setSelectedIngredientItems(data.filter((item) => item.paused));
       } catch (error) {
         console.error("Error fetching ingredients:", error);
       }
@@ -34,11 +34,6 @@ const PauseIngredient = () => {
   }, []);
 
   console.log("ingredientItems", ingredientItems);
-
-  const unpausedIngredients = ingredientItems.filter(
-    (ingredient) =>
-      !selectedIngredientItems.includes(ingredient) && !ingredient.paused
-  );
 
   const getFilteredIngredientItems = () => {
     if (filter === "ทั้งหมด") return ingredientItems;
@@ -79,8 +74,13 @@ const PauseIngredient = () => {
 
     const payload = ingredientItems.map((ingredient) => ({
       ingredient_id: ingredient.ingredient_id,
-      paused: selectedIngredientItems.includes(ingredient),
+      paused: selectedIngredientItems.some(
+        (selected) => selected.ingredient_id === ingredient.ingredient_id
+      ),
     }));
+
+    console.log("selectedIngredientItems", selectedIngredientItems);
+    console.log("payload", payload);
 
     try {
       const response = await fetchApi(
@@ -129,13 +129,10 @@ const PauseIngredient = () => {
   };
 
   return (
-    <>
-      {/* <div className="flex justify-end">
-        <HomeEmButton />
-      </div> */}
-      <div className="w-full flex justify-center text-lg font-bold">
-        <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>
+    <div className="w-full">
+      <div className="flex justify-center text-lg font-bold">
+        <div className="text-center mb-10 mt-[40px]">
+          <h1 className="text-3xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>
           <div className="w-20 h-1 bg-[#D4B28C]"></div>
         </div>
       </div>
@@ -160,7 +157,7 @@ const PauseIngredient = () => {
         <div className="flex items-center space-x-4">
           <label
             htmlFor="productDetails"
-            className="text-lg font-bold text-start"
+            className="text-2xl font-bold text-start"
           >
             เมนูทั้งหมด
           </label>
@@ -197,8 +194,8 @@ const PauseIngredient = () => {
         </div>
       </div>
 
-      <div className="w-full ml-16">
-        <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
+      <div className="w-full ml-2">
+        <div className="grid grid-cols-3 gap-4 mt-4">
           {filteredIngredientItems.map((ingredient, index) => (
             <label key={index} className="flex items-center space-x-2">
               <input
@@ -223,22 +220,22 @@ const PauseIngredient = () => {
           : null}
       </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
           onClick={handleBackButton}
-          className="px-6 py-3 w-[250px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
         >
           ย้อนกลับ
         </button>
 
         <button
           onClick={handleSaveButton}
-          className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
         >
           บันทึก
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -6,7 +6,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const PieChart = () => {
   const data = {
-    labels: ["ข้าวผัดไก่", "ข้าวไข่เจียว", "ราดหน้า"],
+    labels: ["ชานมไต้หวัน", "แอปเปิลโซดา", "กาแฟโบราณ"],
     datasets: [
       {
         data: [50, 48, 42], // Sales data for the menu

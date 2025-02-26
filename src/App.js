@@ -41,6 +41,9 @@ import Summary from "./Pages/Customer/OrderSummary/orderSummary";
 import PauseIngredient from "./Pages/Employee/main/pauseIngredient";
 import NavbarLayout from "./NavbarLayout";
 import PauseMenu from "./Pages/Employee/main/pauseMenu";
+import NavbarCustomerLayout from "./NavbarCustomerLayout";
+import NavbarEmployeeLayout from "./NavbarEmployeeLayout";
+import CreateAccount from "./Pages/Owner/SetupShop/createAccount";
 
 function App() {
   return (
@@ -51,6 +54,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/enter-otp" element={<EnterOTP />} />
         <Route path="/enter-new-password" element={<EnterNewPassword />} />
+        <Route path="/create-account" element={<CreateAccount />} />
 
         {/* Sale summary */}
         <Route path="/overview" element={<Home />} />
@@ -61,6 +65,23 @@ function App() {
         <Route path="/add-owner-product" element={<AddOwnerProduct />} />
         <Route path="/product-detail" element={<ProductDetail />} />
         <Route path="/cancel-order-summary" element={<CancelOrderSummary />} />
+
+        {/* Customer flow */}
+        <Route element={<NavbarCustomerLayout />}>
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/menu-detail" element={<MenuDetail />} />
+          <Route path="/summary" element={<Summary />} />
+          <Route path="/payment-method" element={<PaymentMethod />} />
+          <Route path="/queue-summary" element={<QueueSummary />} />
+        </Route>
+
+        {/* Employee flow */}
+        <Route element={<NavbarEmployeeLayout />}>
+          <Route path="/order-list" element={<Order />} />
+          <Route path="/pause-section" element={<PauseSection />} />
+          <Route path="/pause-ingredient" element={<PauseIngredient />} />
+          <Route path="/pause-menu" element={<PauseMenu />} />
+        </Route>
 
         {/* Routes with Navbar : other flow*/}
         <Route element={<NavbarLayout />}>
@@ -90,19 +111,6 @@ function App() {
           {/* Add stock flow */}
           <Route path="/stock-list" element={<StockList />} />
           <Route path="/add-stock" element={<AddStockForm />} />
-
-          {/* Customer flow */}
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/menu-detail" element={<MenuDetail />} />
-          <Route path="/summary" element={<Summary />} />
-          <Route path="/payment-method" element={<PaymentMethod />} />
-          <Route path="/queue-summary" element={<QueueSummary />} />
-
-          {/* Employee flow */}
-          <Route path="/order-list" element={<Order />} />
-          <Route path="/pause-section" element={<PauseSection />} />
-          <Route path="/pause-ingredient" element={<PauseIngredient />} />
-          <Route path="/pause-menu" element={<PauseMenu />} />
         </Route>
       </Routes>
       {/* </div> */}

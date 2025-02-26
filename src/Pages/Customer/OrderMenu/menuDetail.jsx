@@ -1,21 +1,134 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PiShoppingCart } from "react-icons/pi";
 import { IoChevronBack } from "react-icons/io5";
+import fetchApi from "../../../Config/fetchApi";
+import configureAPI from "../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../../Config/redux/cartSlice";
 
 const MenuDetail = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const userData = useSelector((state) => state.user.userData);
+  const cartItems = useSelector((state) => state.cart.items);
+  const { owner_id } = userData || {};
+
+  const location = useLocation();
+  const { menuId } = location.state || {};
+
   const navigate = useNavigate();
-  const [selectedType, setSelectedType] = useState("ร้อน");
-  const [selectedSweetness, setSelectedSweetness] = useState("0%");
-  const [selectedSize, setSelectedSize] = useState("S");
-  const [selectedAddOn, setSelectedAddOn] = useState("ไข่มุก");
+  const dispatch = useDispatch();
+
+  const [menu, setMenu] = useState(null);
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedSweetness, setSelectedSweetness] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedAddOn, setSelectedAddOn] = useState([]);
   const [quantity, setQuantity] = useState(1);
+  const [errors, setErrors] = useState({});
+
+  const getCartItemCount = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  useEffect(() => {
+    const fetchMenuData = async () => {
+      try {
+        const response = await fetchApi(
+          `${URL}/customer/menus/${menuId}`,
+          "GET"
+        );
+        const data = await response.json();
+
+        setMenu(data);
+
+        console.log("DATA:", data);
+        setSelectedType(data.menu_type_group[0]?.type_name || "");
+        setSelectedSweetness(data.sweetness_group[0]?.level_name || "");
+        setSelectedSize(data.size_group[0]?.size_name || "");
+        setSelectedAddOn([]);
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+    };
+
+    if (menuId) {
+      fetchMenuData();
+    }
+  }, [menuId]);
 
   const handleBack = () => navigate("/menu");
-  const handleAddToCart = () => navigate("/summary");
 
-  const handleSelection = (setter, value, current) => {
-    setter(current === value ? null : value);
+  const handleAddToCart = () => {
+    const newErrors = {};
+    if (menu?.menu_type_group[0]?.is_required && !selectedType) {
+      newErrors.type = "โปรดเลือกชนิดเครื่องดื่มที่ต้องการ";
+    }
+
+    if (menu?.sweetness_group.length > 0 && !selectedSweetness) {
+      newErrors.sweetness = "โปรดเลือกระดับความหวานที่ต้องการ";
+    }
+
+    if (menu?.size_group.length > 0 && !selectedSize) {
+      newErrors.size = "โปรดเลือกขนาดที่ต้องการ";
+    }
+
+    if (
+      menu?.add_on.length > 0 &&
+      (selectedAddOn.length === 0 ||
+        selectedAddOn.some((id) => id === null || id === undefined))
+    ) {
+      newErrors.addOn = "โปรดเลือกตัวเลือกที่ต้องการอย่างน้อย 1 ตัวเลือก";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    const selectedMenuDetails = {
+      menuId: menuId,
+      menuName: menu.menu_name,
+      menu_img: menu.image_url,
+      selectedType: {
+        id: menu.menu_type_group.find((type) => type.type_name === selectedType)?.menu_type_id,
+        name: selectedType,
+      },
+      selectedSweetness: {
+        id: menu.sweetness_group.find((sweetness) => sweetness.level_name === selectedSweetness)?.sweetness_id,
+        name: selectedSweetness,
+      },
+      selectedSize: {
+        id: menu.size_group.find((size) => size.size_name === selectedSize)?.size_id,
+        name: selectedSize,
+      },
+      price: calculatePrice(),
+      quantity,
+      selectedAddOn: selectedAddOn.map((addOnId) => ({
+        id: addOnId,
+        name: menu.add_on.find((addOn) => addOn.add_on_id === addOnId)?.ingredient_name,
+      })),
+    };
+    console.log("selectedMenuDetails:", selectedMenuDetails);
+
+    dispatch(addToCart(selectedMenuDetails));
+    navigate("/summary");
+  };
+
+  const handleSelection = (setter, value) => {
+    setter(value);
+  };
+
+  const handleAddOnSelection = (addOnId) => {
+    setSelectedAddOn((prev) =>
+      prev.includes(addOnId)
+        ? prev.filter((id) => id !== addOnId)
+        : [...prev, addOnId]
+    );
   };
 
   const handleAdd = () => {
@@ -26,95 +139,154 @@ const MenuDetail = () => {
     if (quantity > 1) setQuantity((prev) => prev - 1);
   };
 
-  const OptionGroup = ({ title, options, selected, onSelect }) => (
-    <div>
-      <div className="font-bold mb-2">{title}</div>
-      <div className="flex flex-wrap gap-4 mb-4">
-        {options.map((option) => (
-          <button
-            key={option}
-            onClick={() => onSelect(option)}
-            aria-selected={selected === option}
-            className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
-              selected === option
-                ? "bg-[#D4B28C] text-white"
-                : "bg-white text-[#D4B28C]"
-            }`}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  const calculatePrice = () => {
+    let price = parseFloat(menu.price) || 0;
+
+    if (selectedAddOn.length > 0) {
+      selectedAddOn.forEach((addon) => {
+        const selectedAddOnOption = menu.add_on.find(
+          (addonOption) => addonOption.add_on_id === addon
+        );
+        price += parseFloat(selectedAddOnOption?.add_on_price || "0");
+      });
+    }
+
+    if (selectedType) {
+      const selectedTypeOption = menu.menu_type_group.find(
+        (type) => type.type_name === selectedType
+      );
+      price += parseFloat(selectedTypeOption?.price_difference || "0");
+    }
+
+    if (selectedSize) {
+      const selectedSizeOption = menu.size_group.find(
+        (size) => size.size_name === selectedSize
+      );
+      price += parseFloat(selectedSizeOption?.size_price || "0");
+    }
+
+    return price * quantity;
+  };
+
+  if (!menu) return <div>Loading...</div>;
 
   return (
     <div className="font-noto flex flex-col min-h-screen bg-white">
-      {/* Back button and cart */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 relative">
         <button onClick={handleBack}>
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
-        <button onClick={handleAddToCart}>
+        <button onClick={handleAddToCart} className="relative">
           <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            {getCartItemCount()}
+          </span>
         </button>
       </div>
 
-      {/* Product  Detail */}
       <div className="flex justify-center mb-6">
         <img
-          src="https://s359.kapook.com/r/600/auto/pagebuilder/7f2adf98-9b23-46db-814c-ff23d31554e5.jpg"
-          alt="ชาเขียว"
-          className="rounded-md border border-[#AD8B73] h-[250px] w-[350px]"
+          src={`${URL}/${menu.image_url.replace(/\\/g, "/")}`}
+          alt={menu.menu_name}
+          className="h-[250px] w-[350px] aspect-[4/3] object-cover rounded-md mb-2 border border-gray-200 shadow-sm"
         />
       </div>
 
       <div className="text-center mb-6">
-        <h1 className="text-xl font-bold text-yellow-600">ชาเขียว</h1>
-        <p className="text-gray-500">ชาเขียวแท้จากญี่ปุ่น</p>
+        <h1 className="text-3xl font-bold text-yellow-600">{menu.menu_name}</h1>
+        <p className="text-gray-500">{menu.description}</p>
       </div>
 
-      {/* Options */}
       <div className="mt-4">
-        {/* Type */}
-        <OptionGroup
-          title="ชนิดเครื่องดื่ม"
-          options={["ร้อน", "เย็น", "ปั่น"]}
-          selected={selectedType}
-          onSelect={(option) =>
-            handleSelection(setSelectedType, option, selectedType)
-          }
-        />
+        {menu.menu_type_group && menu.menu_type_group.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-4">ชนิดเครื่องดื่ม</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.menu_type_group.map((type) => (
+                <button
+                  key={type.menu_type_id}
+                  onClick={() =>
+                    handleSelection(setSelectedType, type.type_name)
+                  }
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedType === type.type_name
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {type.type_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-        {/* Sweetness */}
-        <OptionGroup
-          title="ระดับความหวาน"
-          options={["0%", "25%", "50%", "75%"]}
-          selected={selectedSweetness}
-          onSelect={(option) =>
-            handleSelection(setSelectedSweetness, option, selectedSweetness)
-          }
-        />
+        {menu.sweetness_group && menu.sweetness_group.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-8">ระดับความหวาน</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.sweetness_group.map((sweetness) => (
+                <button
+                  key={sweetness.sweetness_id}
+                  onClick={() =>
+                    handleSelection(setSelectedSweetness, sweetness.level_name)
+                  }
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedSweetness === sweetness.level_name
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {sweetness.level_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-        {/* Size */}
-        <OptionGroup
-          title="ขนาด"
-          options={["S", "M", "L"]}
-          selected={selectedSize}
-          onSelect={(option) =>
-            handleSelection(setSelectedSize, option, selectedSize)
-          }
-        />
+        {menu.size_group && menu.size_group.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-8">ขนาดแก้ว</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.size_group.map((size) => (
+                <button
+                  key={size.size_id}
+                  onClick={() =>
+                    handleSelection(setSelectedSize, size.size_name)
+                  }
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedSize === size.size_name
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {size.size_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-        {/* Add-ons */}
-        <OptionGroup
-          title="ตัวเลือก"
-          options={["ไข่มุก + 10 ", "วุ้นมะพร้าว + 15", "บุก + 10"]}
-          selected={selectedAddOn}
-          onSelect={(option) =>
-            handleSelection(setSelectedAddOn, option, selectedAddOn)
-          }
-        />
+        {menu.add_on && menu.add_on.length > 0 && (
+          <>
+            <h2 className="text-2xl font-bold mb-2 mt-8">ท็อปปิ้ง</h2>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {menu.add_on.map((addOn) => (
+                <button
+                  key={addOn.add_on_id}
+                  onClick={() => handleAddOnSelection(addOn.add_on_id)}
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                    selectedAddOn.includes(addOn.add_on_id)
+                      ? "bg-[#D4B28C] text-white"
+                      : ""
+                  }`}
+                >
+                  {addOn.ingredient_name}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-4 flex flex-col items-center space-y-4">
@@ -123,16 +295,16 @@ const MenuDetail = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={handleDelete}
-              className="w-10 h-10 font-bold text-white bg-[#DC9494] rounded-full flex items-center justify-center"
+              className="w-14 h-14 font-bold text-white bg-[#DC9494] rounded-full flex items-center justify-center"
             >
               -
             </button>
-            <div className="w-20 h-10 font-bold text-center border border-[#AD8B73] rounded-full flex items-center justify-center">
+            <div className="w-24 h-14 font-bold text-center border border-[#AD8B73] rounded-full flex items-center justify-center">
               {quantity}
             </div>
             <button
               onClick={handleAdd}
-              className="w-10 h-10 text-white bg-[#A2DC94] rounded-full flex items-center justify-center"
+              className="w-14 h-14 text-white bg-[#A2DC94] rounded-full flex items-center justify-center"
             >
               +
             </button>
@@ -141,8 +313,8 @@ const MenuDetail = () => {
 
         <div className="w-full flex flex-row items-center justify-between">
           <span className="font-bold">ราคา</span>
-          <div className="w-40 text-center border border-[#AD8B73] text-black font-bold text-xl px-6 py-2 rounded-full">
-            {69} ฿
+          <div className="w-60 h-14 text-center flex items-center justify-center border border-[#AD8B73] text-black font-bold text-2xl rounded-full">
+            {calculatePrice().toFixed(2)} บาท
           </div>
         </div>
 

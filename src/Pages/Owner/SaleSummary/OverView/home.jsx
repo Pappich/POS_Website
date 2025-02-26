@@ -1,14 +1,15 @@
 import React from "react";
-import SideBar from "../../../../Components/sideBar";
-import CalendarSelect from "../../../../Components/calendarSelect";
-import IncomeOrderCancel from "../../../../Components/incomeOrderCancel";
-import BarChart from "../../../../Components/barChart";
-import PieChart from "../../../../Components/pieChart";
+import CalendarSelect from "../../../../Components/Owner/calendarSelect";
+import IncomeOrderCancel from "../../../../Components/Owner/incomeOrderCancel";
+import BarChart from "../../../../Components/Owner/barChart";
+import PieChart from "../../../../Components/Owner/pieChart";
+import SideBar from "../../../../Components/Owner/sideBar";
+
 const Home = () => {
   const myName = [
-    { name: "Tot", age: 5 },
-    { name: "T", age: 51 },
-    { name: "O", age: 52 },
+    { name: "Total Order                  ", age: 5 },
+    { name: "Total Revenue", age: 51 },
+    { name: "Total Cancel", age: 52 },
   ];
 
   return (

@@ -2,13 +2,21 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineHome } from "react-icons/hi";
 import { TbLogout } from "react-icons/tb";
+import { PiUserCircleBold } from "react-icons/pi";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const role = sessionStorage.getItem("role");
+  console.log("ROLE FROM TOKEN:", role);
+
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate("/");
+  };
 
   return (
-    <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-3">
+    <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md w-full">
+      <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8">
         {/* Shop logo */}
         <a className="flex items-center space-y-2">
           <svg
@@ -33,7 +41,7 @@ const Navbar = () => {
             />
             <rect x="6" y="27" width="47" height="3" rx="1.5" fill="#2F2105" />
           </svg>
-          <span class="self-center text-2xl font-semibold whitespace-nowrap text-black">
+          <span class="self-center text-3xl font-semibold whitespace-nowrap text-black">
             สุขเสมอคาเฟ่
           </span>
         </a>
@@ -45,15 +53,24 @@ const Navbar = () => {
             className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
           >
             <HiOutlineHome size={24} />
-            <span className="text-lg font-bold">หน้าหลัก</span>
+            <span className="text-xl font-bold">หน้าหลัก</span>
           </button>
           <button
-            onClick={() => navigate("/")}
+            onClick={handleLogout}
             className="flex p-2 text-black hover:text-red-600 transition-all duration-300"
           >
             <TbLogout size={24} />
-            <span className="text-lg font-bold">ออกจากระบบ</span>
+            <span className="text-xl font-bold">ออกจากระบบ</span>
           </button>
+          {role && (
+            <div className="flex items-center justify-center w-[150px] p-1 space-x-1 bg-[#D4B28C] rounded-full">
+              <PiUserCircleBold size={24} />
+              <span className="text-xl font-bold text-black">
+                {/* {role == "owner" ? "เจ้าของร้าน" : "พนักงาน"} */}
+                เจ้าของร้าน
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </nav>

@@ -1,15 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Components/General/navBar";
 
-function NavbarLayout() {
+function NavbarEmployeeLayout() {
   return (
-    <div className="border-gray-100 w-full">
+    <div className="w-full bg-gray-200">
       <Navbar />
-      <div className="px-10 border-gray-100">
+      <div className="px-4 bg-gray-200">
         <Outlet />
       </div>
     </div>
   );
 }
 
-export default NavbarLayout;
+export default NavbarEmployeeLayout;

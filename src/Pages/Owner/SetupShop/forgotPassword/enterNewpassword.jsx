@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaLock } from "react-icons/fa";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
 
 const EnterNewPassword = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -11,11 +16,16 @@ const EnterNewPassword = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
+  const owner_id = sessionStorage.getItem("owner_id");
+  console.log("OWNER_ID FROM TOKEN:", owner_id);
+  const email = sessionStorage.getItem("email");
+  console.log("email FROM TOKEN:", email);
+
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{10,}$/;
     let isValid = true;
 
@@ -36,16 +46,31 @@ const EnterNewPassword = () => {
     }
 
     if (isValid) {
-      navigate("/");
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/reset-password`,
+          "PATCH",
+          { email: email, newPassword: password }
+        );
+
+        if (response.ok) {
+          sessionStorage.setItem("password_reset", "true");
+          navigate("/create-account");
+        } else {
+          console.error("Failed to reset password");
+        }
+      } catch (error) {
+        console.error("Error resetting password:", error);
+      }
     }
   };
 
   const handleSignIn = () => {
-    navigate("/");
+    navigate("/login");
   };
 
   return (
-    <div className="font-noto flex flex-col items-center min-h-screen bg-white">
+    <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl text-black mb-2 text-left">ตั้งรหัสผ่านใหม่</h2>
         <p className="text-primaryRegular text-gray-500 mb-6 text-left">
@@ -120,7 +145,7 @@ const EnterNewPassword = () => {
           )}
         </div>
 
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <button
             onClick={handleSignIn}
             style={{ color: "#D4B28C" }}
@@ -128,7 +153,7 @@ const EnterNewPassword = () => {
           >
             กลับไปเข้าสู่ระบบ
           </button>
-        </div>
+        </div> */}
 
         <button
           onClick={handleConfirm}

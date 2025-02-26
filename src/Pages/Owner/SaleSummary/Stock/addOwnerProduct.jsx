@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SideBar from "../../../../Components/sideBar";
+import SideBar from "../../../../Components/Owner/sideBar";
 import { IoIosArrowDown } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineCheckCircle } from "react-icons/ai"; // Import success icon
@@ -275,13 +275,13 @@ const AddOwnerProduct = () => {
         {/* Save and Back buttons */}
         <div className="flex mt-8 w-full justify-between">
           <button
-            className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
             onClick={handleSave}
           >
             บันทึก

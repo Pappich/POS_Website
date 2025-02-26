@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "react-simple-keyboard/build/css/index.css";
-import fetchApi from "../Config/fetchApi";
-import configureAPI from "../Config/configureAPI";
+import fetchApi from "../../Config/fetchApi";
+import configureAPI from "../../Config/configureAPI";
 
 const DoneOrderButton = ({ order }) => {
   const environment = process.env.NODE_ENV || "development";
@@ -21,13 +21,21 @@ const DoneOrderButton = ({ order }) => {
 
   const completeOrder = async () => {
     const orderData = {
-      order_id: order,
-      status: "success",
+      order_id: order.order_id,
+      status: "เสร็จสิ้น",
+      order_date: Date.now(),
+      queue_number: order.queue_number,
+      customer_name: null,
+      customer_contact: null,
+      cancel_status: null,
+      is_paid: false,
     };
+
+    console.log("orderData", orderData);
 
     try {
       const response = await fetchApi(
-        `${URL}/employee/orders/${order}/complete`,
+        `${URL}/employee/orders/${order.order_id}/complete`,
         "PATCH",
         orderData
       );

@@ -2,12 +2,13 @@ import React from "react";
 import { FaBahtSign } from "react-icons/fa6";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { MdOutlineRemoveShoppingCart } from "react-icons/md";
+
 const IncomeOrderCancel = () => {
   return (
-    <div>
-      <div className="flex justify-between">
+    <div className="w-full">
+      <div className="flex w-full justify-between gap-4">
         {/* รายรับทั้งหมด */}
-        <div className="flex block max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
+        <div className="flex flex-1 py-2 px-4 bg-white border rounded-lg">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
             <FaBahtSign color="white" size={16} />
           </div>
@@ -18,7 +19,7 @@ const IncomeOrderCancel = () => {
         </div>
 
         {/* ยอดออเดอร์ทั้งหมด */}
-        <div className="flex block max-w-sm py-2 px-4 w-full mr-2 bg-white border rounded-lg ">
+        <div className="flex flex-1 py-2 px-4 bg-white border rounded-lg">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
             <MdOutlineShoppingCart color="white" size={16} />
           </div>
@@ -29,7 +30,7 @@ const IncomeOrderCancel = () => {
         </div>
 
         {/* จำนวนออเดอร์ที่ถูกยกเลิก */}
-        <div className="flex block max-w-sm py-2 px-4 w-full bg-white border rounded-lg ">
+        <div className="flex flex-1 py-2 px-4 bg-white border rounded-lg">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
             <MdOutlineRemoveShoppingCart color="white" size={16} />
           </div>

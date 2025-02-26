@@ -6,7 +6,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import configureAPI from "../../../../Config/configureAPI";
-import LoadingPopup from "../../../../Components/loadingPopup";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const AddGroupForm = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -27,6 +27,8 @@ const AddGroupForm = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const { owner_id } = userData || {};
+  const [errors, setErrors] = useState("");
+  const [selectedMenuErrors, setSelectedMenuErrors] = useState("");
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
@@ -49,53 +51,87 @@ const AddGroupForm = () => {
   console.log("mode:", mode);
   console.log("owner id:", owner_id);
 
+  // fetch group data
   useEffect(() => {
     const fetchGroupData = async () => {
       try {
-        const categoryId = groupData.category_id;
-        const response = await fetchApi(
-          `${URL}/owner/categories/${categoryId}/menus`,
-          "GET"
-        );
-        const group = await response.json();
-        console.log("Group data:", group);
-
         if (mode === "edit" && groupData) {
-          const menuNames = group.map((menu) => menu.menu_id);
+          const categoryId = groupData.category_id;
+          const response = await fetchApi(
+            `${URL}/owner/categories/${categoryId}/menus`,
+            "GET"
+          );
+          const groupMenus = await response.json();
+          console.log("Group menus:", groupMenus);
 
-          setGroupName(groupData.category_name || null);
-          setSelectedMenus(menuNames || []);
+          setGroupName(groupData.category_name || "");
+
+          // Find menu IDs based on menu names from the response
+          if (Array.isArray(groupMenus)) {
+            const menuIds = menuItems
+              .filter((menuItem) => groupMenus.includes(menuItem.menu_name))
+              .map((menu) => menu.menu_id);
+
+            console.log("Matched menu IDs:", menuIds);
+            setSelectedMenus(menuIds);
+          }
         }
       } catch (error) {
         console.error("Error fetching group data:", error);
       }
     };
 
-    fetchGroupData();
-  }, []);
+    // Only fetch group data if menuItems is populated
+    if (menuItems.length > 0) {
+      fetchGroupData();
+    }
+  }, [mode, groupData, URL, menuItems]); // Add menuItems to dependencies
 
-  const handleNext = async () => {
+  // Add a debug useEffect to monitor selectedMenus changes
+  useEffect(() => {
+    console.log("Selected Menus Updated:", selectedMenus);
+  }, [selectedMenus]);
+
+  console.log("groupData", groupData);
+  console.log("selectedMenus", selectedMenus);
+
+  const handleAddGroup = async () => {
     setLoading(true);
     try {
       if (step === 3) {
-        if (owner_id) {
-          const endpoint = mode === "add" ? `${URL}/owner/categories` : null;
-          const method = mode === "add" ? "POST" : "PATCH";
+        const endpoint =
+          mode === "add"
+            ? `${URL}/owner/categories`
+            : `${URL}/owner/categories/${groupData.category_id}`;
+        const method = mode === "add" ? "POST" : "PATCH";
 
-          const response = await fetchApi(endpoint, method, {
-            category_name: groupName,
-            menu_id: selectedMenus,
-          });
+        const response = await fetchApi(endpoint, method, {
+          category_name: groupName,
+          menu_id: selectedMenus,
+        });
 
-          if (response.ok) {
-            navigate("/group-list");
-          }
+        if (response.ok) {
+          navigate("/group-list");
         }
       }
     } catch (error) {
       console.error("Error create category:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (!validateForm()) return;
+    }
+    if (step === 2) {
+      if (!validateMenuSelect()) return;
+    }
+    if (step === 3) {
+      //ADD HANDLE SEND TO BACKEND
+      console.log("save button click");
+      handleAddGroup();
     }
     if (step < 3) {
       setStep(step + 1);
@@ -112,11 +148,35 @@ const AddGroupForm = () => {
   };
 
   const handleSelectMenu = (menuId) => {
-    setSelectedMenus((prev) =>
-      prev.includes(menuId)
+    console.log("Toggling menu ID:", menuId);
+    setSelectedMenus((prev) => {
+      const newSelection = prev.includes(menuId)
         ? prev.filter((id) => id !== menuId)
-        : [...prev, menuId]
-    );
+        : [...prev, menuId];
+      console.log("New selection:", newSelection);
+      return newSelection;
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!groupName.trim()) {
+      newErrors.groupName = "กรุณากรอกชื่อกลุ่มสินค้า";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateMenuSelect = () => {
+    const newErrors = {};
+
+    if (selectedMenus.length === 0) {
+      newErrors.selectedMenus = "กรุณาเลือกอย่างน้อย 1 เมนู";
+    }
+
+    setSelectedMenuErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const filteredMenus = menuItems.filter((menu) =>
@@ -128,12 +188,12 @@ const AddGroupForm = () => {
       case 1:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               1. กรอกชื่อกลุ่มรายการสินค้าที่ต้องการ
             </div>
             <label
               htmlFor="groupName"
-              className="text-lg mb-2 w-full text-center"
+              className="text-2xl mb-2 w-full text-center"
             >
               ชื่อกลุ่ม
             </label>
@@ -145,17 +205,20 @@ const AddGroupForm = () => {
               placeholder="กรอกชื่อกลุ่ม..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
+            {errors.groupName && (
+              <p className="text-red-500 text-sm mt-2">{errors.groupName}</p>
+            )}
           </>
         );
       case 2:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               2. เลือกเมนูที่ต้องการเพิ่มในกลุ่มรายการสินค้า
               <span className="text-[#DD9F52] ml-2"> {groupName}</span>
             </div>
 
-            <div className="w-full flex justify-start text-lg mb-8">
+            <div className="w-full flex justify-start text-xl mb-8">
               <div className="relative flex items-center w-full">
                 <FaSearch
                   style={{ color: "#D4B28C" }}
@@ -163,7 +226,7 @@ const AddGroupForm = () => {
                 />
                 <input
                   type="text"
-                  placeholder="ค้นหาด้วยชื่อกลุ่ม..."
+                  placeholder="ค้นหาด้วยชื่อเมนู..."
                   value={searchTerm}
                   onChange={handleSearch}
                   className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
@@ -173,40 +236,52 @@ const AddGroupForm = () => {
             <div className="w-full ml-16">
               <label
                 htmlFor="productDetails"
-                className="text-lg w-full text-start font-bold"
+                className="text-2xl w-full text-start font-bold"
               >
                 เมนูทั้งหมด
               </label>
               <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-                {filteredMenus.map((menu) => (
-                  <label
-                    key={menu.menu_id}
-                    className="flex items-center space-x-2"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedMenus.includes(menu.menu_id)}
-                      onChange={() => handleSelectMenu(menu.menu_id)}
-                      className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                    />
-                    <span>{menu.menu_name}</span>
-                  </label>
-                ))}
+                {filteredMenus.map((menu) => {
+                  const isChecked = selectedMenus.includes(menu.menu_id);
+                  console.log(
+                    `Menu ${menu.menu_name} (${menu.menu_id}) checked:`,
+                    isChecked
+                  );
+                  return (
+                    <label
+                      key={menu.menu_id}
+                      className="flex items-center space-x-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleSelectMenu(menu.menu_id)}
+                        className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                      />
+                      <span>{menu.menu_name}</span>
+                    </label>
+                  );
+                })}
               </div>
             </div>
+            {selectedMenuErrors.selectedMenus && (
+              <p className="text-red-500 text-sm mt-2">
+                {selectedMenuErrors.selectedMenus}
+              </p>
+            )}
           </>
         );
       case 3:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               3. สรุปกลุ่มรายการสินค้า
               <span className="text-[#DD9F52] ml-2"> {groupName}</span>
             </div>
             <div className="w-full ml-16">
               <label
                 htmlFor="selectedMenus"
-                className="text-lg w-full text-start font-bold"
+                className="text-2xl w-full text-start font-bold"
               >
                 เมนูทั้งหมดในหมวดหมู่
               </label>
@@ -236,9 +311,9 @@ const AddGroupForm = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen bg-white">
+      <div className="flex flex-col items-center bg-white">
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
+          <h1 className="text-3xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
           <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
         </div>
 
@@ -247,15 +322,15 @@ const AddGroupForm = () => {
             {renderStepContent()}
           </div>
 
-          <div className="flex mt-8 w-full space-x-8 justify-between">
+          <div className="flex fixed bottom-4 left-0 px-4 py-4 mt-8 w-full space-x-8 justify-between">
             <button
-              className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+              className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
               onClick={handleBack}
             >
               ย้อนกลับ
             </button>
             <button
-              className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+              className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
               onClick={handleNext}
             >
               {step < 3 ? "ถัดไป" : "บันทึก"}

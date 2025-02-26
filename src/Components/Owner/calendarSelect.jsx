@@ -49,14 +49,14 @@ const CalendarSelect = () => {
     <div>
       <button
         type="button"
-        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-1 py-0.2 mb-2"
+        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-2xl px-1 py-0.2 mb-2"
         onClick={toggleModal}
       >
-        <div className="flex">
-          <CiCalendar size={17} />
+        <div className="flex justify-center items-center">
+          <CiCalendar size={36} />
           <span className="pl-1 pr-1">{`${selectedMonth} พ.ศ. ${selectedYear}`}</span>
           <span className="pt-0.5">
-            <IoIosArrowDown size={17} />
+            <IoIosArrowDown size={36} />
           </span>
         </div>
       </button>
@@ -76,7 +76,7 @@ const CalendarSelect = () => {
               // Year Selector Mode
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-bold text-lg">เลือกปี</span>
+                  <span className="font-bold text-2xl">เลือกปี</span>
                   <button
                     onClick={() => setIsYearSelector(false)}
                     className="text-[#C6B399] hover:text-gray-700 font-medium"
@@ -117,7 +117,7 @@ const CalendarSelect = () => {
                         {selectedYear}
                       </span>
                       <span className="pt-0.5 text-[#CCCCCC] hover:text-gray-700">
-                        <IoIosArrowDown size={17} />
+                        <IoIosArrowDown size={24} />
                       </span>
                     </div>
                   </button>
@@ -158,11 +158,11 @@ const CalendarSelect = () => {
 
             <button
               type="button"
-              className="text-[#C6B399] mt-6 bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-1 py-0.2 mb-2"
+              className="text-[#C6B399] mt-6 bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full px-8 py-2 mb-2"
               onClick={toggleModal}
             >
-              <div className="flex ">
-                <span className="px-16 font-bold text-2xl">ย้อนกลับ</span>
+              <div className="flex items-center justify-center">
+                <span className="px-4 font-bold text-2xl">ย้อนกลับ</span>
               </div>
             </button>
           </div>

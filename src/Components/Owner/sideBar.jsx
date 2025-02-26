@@ -29,7 +29,7 @@ const SideBar = ({ menuTab }) => {
   return (
     <div>
       <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md">
-        <div className="max-w-screen-xl flex items-center justify-between mx-auto p-3">
+        <div className="w-screen-xl flex items-center justify-between mx-auto p-3">
           {/* Shop logo */}
           <a className="flex items-center space-y-2">
             <svg

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "react-simple-keyboard/build/css/index.css";
-import fetchApi from "../Config/fetchApi";
-import configureAPI from "../Config/configureAPI";
+import fetchApi from "../../Config/fetchApi";
+import configureAPI from "../../Config/configureAPI";
 
 const CancelOrderButtonEm = ({ order }) => {
   const environment = process.env.NODE_ENV || "development";
@@ -23,14 +23,20 @@ const CancelOrderButtonEm = ({ order }) => {
 
   const cancelOrder = async () => {
     const customerData = {
-      order_id: order,
+      order_id: order.order_id,
+      // order_date: Date.now(),
+      // queue_number: order.queue_number,
+      // status: "canceled",
       customer_name: customerName,
-      contact: contact,
+      customer_contact: contact,
+      // cancel_status: "ยังไม่คืนเงิน",
     };
+
+    console.log("customerData", customerData);
 
     try {
       const response = await fetchApi(
-        `${URL}/employee/orders/${order}/cancel`,
+        `${URL}/employee/orders/${order.order_id}/cancel`,
         "PATCH",
         customerData
       );
@@ -68,7 +74,7 @@ const CancelOrderButtonEm = ({ order }) => {
               <label>หมายเลขออเดอร์</label>
               <input
                 type="text"
-                value={order}
+                value={order.order_id}
                 disabled
                 className="w-full border border-[#D4B28C] rounded-full px-3 py-1.5 text-gray-600 bg-gray-100"
               />

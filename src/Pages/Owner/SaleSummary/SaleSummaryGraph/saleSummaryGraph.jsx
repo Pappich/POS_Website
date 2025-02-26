@@ -1,8 +1,8 @@
 import React from "react";
-import SideBar from "../../../../Components/sideBar";
-import CalendarSelect from "../../../../Components/calendarSelect";
-import IncomeOrderCancel from "../../../../Components/incomeOrderCancel";
-import LineChart from "../../../../Components/lineChart";
+import SideBar from "../../../../Components/Owner/sideBar";
+import CalendarSelect from "../../../../Components/Owner/calendarSelect";
+import IncomeOrderCancel from "../../../../Components/Owner/incomeOrderCancel";
+import LineChart from "../../../../Components/Owner/lineChart";
 const SaleSummaryGraph = () => {
   return (
     <div className="h-screen flex flex-col">

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
-import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -11,7 +10,6 @@ const AddProductForm = () => {
   const URL = configureAPI[environment].URL;
 
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.userData);
   const location = useLocation();
   const { mode, productData } = location.state || {
     mode: "add",
@@ -22,26 +20,66 @@ const AddProductForm = () => {
   const [menuName, setMenuName] = useState("");
   const [productDetails, setProductDetails] = useState("");
   const [productImage, setProductImage] = useState(null);
+  const [productFile, setProductFile] = useState(null);
   const [productPrice, setProductPrice] = useState("");
+  const [priceError, setPriceError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { owner_id } = userData || {};
-
-  console.log("user data: ", owner_id);
+  const [fileError, setFileError] = useState("");
+  const [errors, setErrors] = useState({
+    menuName: "",
+    productPrice: "",
+  });
 
   useEffect(() => {
     if (mode === "edit" && productData) {
+      const imageUrl = `${URL}/${productData.image_url.replace(/\\/g, "/")}`;
+
+      console.log("image url:", imageUrl);
       setMenuName(productData.menu_name || null);
       setProductDetails(productData.description || null);
-      setProductImage(productData.image_url || null);
+      setProductImage(imageUrl || null);
       setProductPrice(productData.price || null);
     }
   }, [mode, productData]);
 
+  console.log("IMAGE:", productFile);
+
+  const handleUploadImage = async (productFile) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", productFile);
+
+      console.log("Uploading file:", productFile);
+
+      const response = await fetch(`${URL}/owner/menus/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("FILE DATA", formData);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("File uploaded successfully", data);
+        return data.filePath;
+      } else {
+        console.error("Image upload failed");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
+    }
+  };
+
   const handleAddProduct = async () => {
     console.log("add product");
     setLoading(true);
+
     try {
-      if (owner_id) {
+      const imagePath = await handleUploadImage(productFile);
+
+      if (imagePath) {
         const endpoint =
           mode === "add"
             ? `${URL}/owner/menus`
@@ -51,15 +89,17 @@ const AddProductForm = () => {
         const response = await fetchApi(endpoint, method, {
           menu_name: menuName,
           description: productDetails,
-          price: productPrice,
-          image_url:
-            "https://images.app.goo.gl/ufVikgddcd26KVwPA" ||
-            "https://images.app.goo.gl/ufVikgddcd26KVwPA",
-          store_id: 1,
-          owner_id,
-          branch_id: 1,
-          category_id: 1,
+          price: parseInt(productPrice),
+          image_url: imagePath,
         });
+
+        console.log(
+          "DATA TO SEND:",
+          menuName,
+          productDetails,
+          parseFloat(productPrice),
+          imagePath
+        );
 
         if (response.ok) {
           navigate("/product-list");
@@ -73,10 +113,13 @@ const AddProductForm = () => {
   };
 
   const handleNext = () => {
+    if (step === 1 || step === 4) {
+      if (!validateForm()) return;
+    }
     if (step === 5) {
       //ADD HANDLE SEND TO BACKEND
       console.log("save button click");
-      handleAddProduct(menuName, productDetails, productPrice, productImage);
+      handleAddProduct(menuName, productDetails, productPrice, productFile);
     }
     if (step < 5) {
       setStep(step + 1);
@@ -95,25 +138,63 @@ const AddProductForm = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProductImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const allowedTypes = [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/webp",
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        setFileError("Only PNG, JPG, JPEG, and WEBP files are allowed.");
+        setProductImage(null);
+        return;
+      }
+
+      setFileError("");
+      setProductImage(window.URL.createObjectURL(file));
+      setProductFile(file);
     }
   };
+
+  const handlePriceChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*\.?\d*$/.test(value)) {
+      setProductPrice(value);
+      setPriceError("");
+    } else {
+      setPriceError("กรุณากรอกเฉพาะตัวเลขเท่านั้น");
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!menuName.trim()) {
+      newErrors.menuName = "กรุณากรอกชื่อสินค้า";
+    }
+
+    if (step == 2 && !productPrice.trim()) {
+      newErrors.productPrice = "กรุณากรอกราคาสินค้า";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  console.log("ERROR:", errors);
 
   const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-6 font-bold">
               1. กรอกชื่อสินค้าที่ต้องการ
             </div>
             <label
               htmlFor="menuName"
-              className="text-lg mb-2 w-full text-center"
+              className="text-2xl mb-4 w-full text-center"
             >
               ชื่อสินค้า
             </label>
@@ -125,17 +206,20 @@ const AddProductForm = () => {
               placeholder="กรอกชื่อสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
+            {errors.menuName && (
+              <p className="text-red-500 text-sm mt-2">{errors.menuName}</p>
+            )}
           </>
         );
       case 2:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-2xl mb-6 font-bold">
               2. กรอกรายละเอียดของสินค้า
             </div>
             <label
               htmlFor="productDetails"
-              className="text-lg mb-2 w-full text-center"
+              className="text-2xl mb-4 w-full text-center"
             >
               รายละเอียดสินค้า
             </label>
@@ -195,6 +279,11 @@ const AddProductForm = () => {
                 />
               </label>
             </div>
+            {fileError && (
+              <p className="text-red-500 text-sm mt-2 text-center">
+                {fileError}
+              </p>
+            )}
           </>
         );
       case 4:
@@ -213,10 +302,17 @@ const AddProductForm = () => {
               type="text"
               id="productPrice"
               value={productPrice}
-              onChange={(e) => setProductPrice(e.target.value)}
+              onChange={handlePriceChange}
+              isInvalid={!!priceError}
               placeholder="กรอกราคาสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
+            {priceError && (
+              <p className=" text-red-500 text-sm mt-2">{priceError}</p>
+            )}
+            {errors.productPrice && (
+              <p className="text-red-500 text-sm mt-2">{errors.productPrice}</p>
+            )}
           </>
         );
       case 5:
@@ -253,9 +349,9 @@ const AddProductForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center bg-white mt-[40px]">
       <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">
+        <h1 className="text-3xl font-bold mb-2">
           {mode === "add" ? "เพิ่มรายการสินค้า" : "แก้ไขรายการสินค้า"}
         </h1>
         <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
@@ -266,15 +362,15 @@ const AddProductForm = () => {
           {renderStepContent()}
         </div>
 
-        <div className="flex mt-8 w-full space-x-8 justify-between">
+        <div className="fixed bottom-4 left-0 px-4 py-4 w-full flex justify-between p-4">
           <button
-            className="px-6 py-3 w-[250px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-6 py-3 w-[250px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
             onClick={handleNext}
           >
             {step < 5 ? "ถัดไป" : "บันทึก"}

@@ -2,18 +2,28 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
 
 const StockList = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  const userData = useSelector((state) => state.user.userData);
+  const { owner_id } = userData || {};
+
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("ทั้งหมด");
   const [menuData, setMenuData] = useState({
     available_category: [],
-    available_menus: [],
+    categories: [],
+    menus: []
   });
 
+  // Fetch menu data
   useEffect(() => {
-    fetchApi("http://localhost:3000/customer/menus", "GET")
+    fetchApi(`${URL}/owner/categories/all/menus`, "GET")
       .then((response) => response.json())
       .then((data) => {
         setMenuData(data);
@@ -21,69 +31,74 @@ const StockList = () => {
       .catch((error) => {
         console.error("Error fetching menu data:", error);
       });
-  }, []);
+  }, [URL]);
 
-  console.log("MENU DATA", menuData);
-
-  const { available_category, available_menus } = menuData;
-  console.log("available_menus", available_menus);
-
-  // loop map menu items by category
-  const menuItems = available_menus.reduce((acc, menu) => {
-    menu.category.forEach((category) => {
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(menu.menu_name);
+  // Get all menus including those in categories and standalone menus
+  const getAllMenus = () => {
+    const allMenus = new Set();
+    
+    // Add standalone menus
+    menuData.menus?.forEach(menu => {
+      allMenus.add(JSON.stringify(menu));
     });
-    return acc;
-  }, {});
 
-  const categoryItems = available_category;
-  const allMenuItems = available_menus.map((menu) => ({
-    menu_id: menu.menu_id,
-    menu_name: menu.menu_name,
-  }));
+    // Add menus from categories
+    menuData.categories?.forEach(category => {
+      category.menus?.forEach(menu => {
+        allMenus.add(JSON.stringify(menu));
+      });
+    });
 
-  console.log("MENU:", allMenuItems);
-  console.log("categoryItems:", categoryItems);
+    return Array.from(allMenus).map(menu => JSON.parse(menu));
+  };
 
-  // filter by search
-  const filteredItems =
-    selectedCategory && menuItems[selectedCategory]
-      ? menuItems[selectedCategory].filter((item) =>
-          item.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      : allMenuItems;
+  // Get filtered menus based on selected category and search term
+  const getFilteredMenus = () => {
+    let menus = [];
+
+    if (selectedCategory === "ทั้งหมด") {
+      menus = getAllMenus();
+    } else {
+      const category = menuData.categories?.find(cat => cat.name === selectedCategory);
+      menus = category?.menus || [];
+    }
+
+    return menus.filter(menu =>
+      menu.menu_name
+        .toLowerCase()
+        .normalize("NFC")
+        .includes(searchTerm.toLowerCase().normalize("NFC"))
+    );
+  };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
 
   const handleCategoryClick = (category) => {
-    setSelectedCategory(category === selectedCategory ? null : category);
+    setSelectedCategory(category);
   };
 
   const handleBack = () => {
     navigate("/main-menu");
   };
 
-  const handleEditClick = (item) => {
-    console.log("item click", item);
+  const handleEditClick = (menu) => {
     navigate("/add-stock", {
       state: {
-        menu: item.menu_name,
-        menu_id: item.menu_id,
-        // available_menus: available_menus,
+        menu: menu.menu_name,
+        menu_id: menu.menu_id,
       },
     });
   };
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-white">
-      <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold mb-2">รายการสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] mx-auto mt-6"></div>
+      <div className="text-center mb-10 mt-[40px]">
+        <h1 className="text-3xl font-bold mb-2">รายการสินค้า</h1>
+        <div className="w-20 h-1 bg-[#D4B28C] mt-6"></div>
       </div>
 
       <div className="w-full flex justify-between items-center mb-6">
-        <h1 className="text-lg font-bold">เมนูทั้งหมด</h1>
+        <h1 className="text-2xl font-bold">เมนูทั้งหมด</h1>
       </div>
 
       <div className="w-full mb-8">
@@ -100,48 +115,61 @@ const StockList = () => {
       </div>
 
       <div className="w-full flex items-start overflow-x-auto whitespace-nowrap pb-2 mb-6">
-        {categoryItems.map((categoryItem, index) => (
+        {/* Add "ทั้งหมด" category button */}
+        <button
+          onClick={() => handleCategoryClick("ทั้งหมด")}
+          className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold mr-2 ${
+            selectedCategory === "ทั้งหมด"
+              ? "bg-[#D4B28C] text-white"
+              : "bg-white text-[#DD9F52]"
+          }`}
+        >
+          ทั้งหมด
+        </button>
+
+        {/* Category buttons */}
+        {menuData.available_category?.map((category, index) => (
           <button
             key={index}
-            onClick={() => handleCategoryClick(categoryItem)}
-            className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold ml-2 ${
-              selectedCategory === categoryItem
+            onClick={() => handleCategoryClick(category)}
+            className={`px-6 py-3 rounded-full border border-[#D4B28C] font-bold mr-2 ${
+              selectedCategory === category
                 ? "bg-[#D4B28C] text-white"
                 : "bg-white text-[#DD9F52]"
             }`}
           >
-            {categoryItem}
+            {category}
           </button>
         ))}
       </div>
 
       <div className="w-full">
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item, index) => (
-            <div key={index} className="w-full mb-4">
-              <div className="flex justify-between items-center">
-                <p className="text-lg">{item.menu_name}</p>
-                <button
-                  onClick={() => handleEditClick(item)}
-                  className="text-[#D4B28C] font-bold"
-                >
-                  แก้ไข
-                </button>
-              </div>
-              <div className="w-full h-px bg-gray-300 mt-2"></div>
+        {getFilteredMenus().map((menu, index) => (
+          <div key={index} className="w-full mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-2xl">{menu.menu_name}</p>
+              <button
+                onClick={() => handleEditClick(menu)}
+                className="text-[#D4B28C] font-bold"
+              >
+                แก้ไข
+              </button>
             </div>
-          ))
-        ) : (
+            <div className="w-full h-px bg-gray-300 mt-2"></div>
+          </div>
+        ))}
+        
+        {getFilteredMenus().length === 0 && (
           <p className="text-gray-400 text-center">ไม่พบสินค้า</p>
         )}
       </div>
 
-      <div className="flex mt-10 w-full justify-start">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full justify-start">
         <button
           onClick={handleBack}
-          className="px-6 py-3 w-64 rounded-full border border-[#D4B28C] text-[#D4B28C] bg-transparent font-bold transition duration-300 hover:bg-[#D4B28C] hover:text-white"
+          className="px-14 py-4 w-[300px] rounded-full border border-[#D4B28C] text-[#D4B28C] bg-transparent font-bold transition duration-300 hover:bg-[#D4B28C] hover:text-white"
         >
-          เสร็จสิ้น
+          ย้อนกลับ
         </button>
       </div>
     </div>
