@@ -23,6 +23,7 @@ const CreateAccount = () => {
 
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
+  const branchId = sessionStorage.getItem("branch_id");
 
   console.log("URL: ", URL);
 
@@ -32,9 +33,12 @@ const CreateAccount = () => {
 
   const handleLogin = async (email, password) => {
     try {
+
+      
       const response = await fetchApi(`${URL}/owner/create-employee`, "POST", {
         email: email,
         password: password,
+        branch_id: 3, //mock branch id for now
       });
 
       if (response.ok) {
@@ -48,10 +52,6 @@ const CreateAccount = () => {
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
-
-  //   const handleForgotPassword = () => {
-  //     navigate("/forgot-password");
-  //   };
 
   const handleFocus = (field) => {
     setFocusedField(field);
@@ -67,6 +67,10 @@ const CreateAccount = () => {
     ) {
       setShowKeyboard(false);
     }
+  };
+
+  const handleCloseKeyboard = () => {
+    setShowKeyboard(false);
   };
 
   useEffect(() => {
@@ -149,10 +153,7 @@ const CreateAccount = () => {
 
       {/* Virtual Keyboard */}
       {showKeyboard && (
-        <div
-          className="keyboard-container fixed bottom-0 left-0 w-full z-50"
-          ref={keyboardContainerRef}
-        >
+        <div ref={keyboardContainerRef}>
           <ThaiVirtualKeyboard
             input={focusedField === "username" ? usernameInput : passwordInput}
             setInput={
@@ -160,6 +161,8 @@ const CreateAccount = () => {
             }
             layout={keyboardLayout}
             setLayout={setKeyboardLayout}
+            inputRef={inputContainerRef}
+            onClose={handleCloseKeyboard}
           />
         </div>
       )}

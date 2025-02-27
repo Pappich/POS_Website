@@ -10,7 +10,6 @@ const AddCategoryButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categoryName, setCategoryName] = useState("");
-  const owner_id = 16;
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const handleOutsideClick = (e) => {
@@ -22,14 +21,12 @@ const AddCategoryButton = () => {
   const handleAddIngredientCategory = async () => {
     setLoading(true);
     try {
-      if (owner_id) {
-        const response = await fetchApi(`${URL}/owner/stock-group`, "POST", {
-          category_name: categoryName,
-        });
+      const response = await fetchApi(`${URL}/owner/stock-group`, "POST", {
+        category_name: categoryName,
+      });
 
-        if (response.ok) {
-          toggleModal();
-        }
+      if (response.ok) {
+        toggleModal();
       }
     } catch (error) {
       console.error("Error create ingredient category:", error);

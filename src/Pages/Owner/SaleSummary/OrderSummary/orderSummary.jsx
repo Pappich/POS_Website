@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import SideBar from "../../../../Components/Owner/sideBar";
 import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import OrderAndCancelCard from "../../../../Components/Owner/orderAndCancelCard";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
-import { useEffect } from "react";
 
 const OrderSummary = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -13,55 +12,69 @@ const OrderSummary = () => {
 
   const timeRangeFilter = ["ทั้งหมด", "รายปี", "รายเดือน", "รายวัน"];
   const [selectedTimeRange, setSelectedTimeRange] = useState("ทั้งหมด");
+  const [orderData, setOrderData] = useState([]);
+
+  // Set default date to today's date in the format YYYY-MM-DD
+  const today = new Date();
+  const options = {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  const formattedDate = today.toLocaleDateString("en-CA", options); // Format as YYYY-MM-DD
+
+  const [selectedDate, setSelectedDate] = useState(formattedDate);
+
   const handleTimeRangeClick = (timeRange) => {
     setSelectedTimeRange(timeRange);
   };
-  const [orderData, setOrderData] = useState([]);
-  const date = "2023-09-18";
 
+  // Function to fetch order data based on the selected date
+  const fetchOrderData = async () => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/stock-orders/${selectedDate}`
+      );
+      const data = await response.json();
+      console.log("API Response Data:", data);
+
+      const { total_orders, canceled_orders, order_topic } = data;
+
+      const orders = Array.isArray(order_topic) ? order_topic : [order_topic];
+
+      const formattedData = orders.map((order) => {
+        const orderDate = new Date(order.order_date);
+        const thaiTime = orderDate.toLocaleString("th-TH", {
+          timeZone: "Asia/Bangkok",
+          hour12: false,
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return {
+          ...order,
+          order_date: thaiTime,
+        };
+      });
+
+      setOrderData({
+        total_orders,
+        canceled_orders,
+        order_topic: formattedData,
+      });
+    } catch (error) {
+      console.error("Error fetching order data:", error);
+    }
+  };
+
+  // Fetch data when the component mounts or when the selected date changes
   useEffect(() => {
-    const fetchOrderData = async () => {
-      try {
-        const response = await fetchApi(`${URL}/owner/stock-orders/${date}`);
-        const data = await response.json();
-        console.log("API Response Data:", data);
-
-        const { total_orders, canceled_orders, order_topic } = data;
-
-        const orders = Array.isArray(order_topic) ? order_topic : [order_topic];
-
-        const formattedData = orders.map((order) => {
-          const orderDate = new Date(order.order_date);
-          const thaiTime = orderDate.toLocaleString("th-TH", {
-            timeZone: "Asia/Bangkok",
-            hour12: false,
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          return {
-            ...order,
-            order_date: thaiTime,
-          };
-        });
-
-        setOrderData({
-          total_orders,
-          canceled_orders,
-          order_topic: formattedData,
-        });
-      } catch (error) {
-        console.error("Error fetching order data:", error);
-      }
-    };
-
     fetchOrderData();
-  }, [date]);
-
-  console.log("ORDER DATA:", orderData);
+  }, [selectedDate]);
 
   return (
     <div>
@@ -69,7 +82,7 @@ const OrderSummary = () => {
       <div className="px-10">
         <h1 className="font-bold text-3xl mt-[40px]">ออเดอร์ทั้งหมด</h1>
         <span className="flex justify-end">
-          <CalendarSelect />
+          <CalendarSelect setSelectedDate={setSelectedDate} />
         </span>
         <OrderAndCancelCard
           total_orders={orderData.total_orders}
@@ -89,7 +102,7 @@ const OrderSummary = () => {
                     <button
                       key={index}
                       onClick={() => handleTimeRangeClick(timeRange)}
-                      className={`px-4 py-1  ${
+                      className={`px-4 py-1 ${
                         selectedTimeRange === timeRange
                           ? "bg-[#C6B399] text-white rounded-full border"
                           : "bg-white border-[#C6B399]"
@@ -115,7 +128,7 @@ const OrderSummary = () => {
                 <th className="pl-10 py-2 border-b border-[#000000]">
                   ราคาสุทธิ
                 </th>
-                <th className=" pr-5 py-2 text-center border-b border-[#000000]">
+                <th className="pr-5 py-2 text-center border-b border-[#000000]">
                   ช่องทางการชำระเงิน
                 </th>
               </tr>

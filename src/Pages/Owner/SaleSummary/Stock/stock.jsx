@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import the CSS
 import { registerLocale, setLocale } from "react-datepicker";
@@ -11,9 +11,9 @@ import { FiSearch } from "react-icons/fi"; // Import magnifier icon
 import { FaPlus, FaRegCalendar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { FaMinus } from "react-icons/fa";
-import { useEffect } from "react";
 import SideBar from "../../../../Components/Owner/sideBar";
-
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
 const thLocaleWithMondayStart = {
   ...th,
   options: {
@@ -23,6 +23,9 @@ const thLocaleWithMondayStart = {
 };
 
 const Stock = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -33,38 +36,38 @@ const Stock = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    // Fetch data from the backend
     const fetchIngredients = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/owner/stock-ingredients"
+        const response = await fetchApi(
+          `${URL}/owner/stock-ingredients`,
+          "GET"
         );
         const data = await response.json();
-        setIngredients(data); // Store the data in state
+
+        // Process the data to handle null categories
+        const processedData = data.map((category) => {
+          if (category.category_id === null) {
+            return {
+              ...category,
+              ingredients: category.ingredients.filter(
+                (ingredient, index, self) =>
+                  index ===
+                  self.findIndex(
+                    (i) => i.ingredient_id === ingredient.ingredient_id
+                  )
+              ), // Remove duplicates
+            };
+          }
+          return category;
+        });
+
+        setIngredients(processedData);
       } catch (error) {
         console.error("Error fetching ingredients:", error);
       }
     };
-
     fetchIngredients();
   }, []);
-
-  useEffect(() => {
-    // Fetch categories
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:3000/owner/stock-ingredients/categories"
-        );
-        const data = await response.json();
-        setCategories(data.categories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, [selectedCategory]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -88,9 +91,15 @@ const Stock = () => {
     setSelectedCategory(categoryId);
   };
 
-  const filteredIngredients = ingredients.filter((item) =>
-    selectedCategory ? item.category_id === selectedCategory : true
-  );
+  const filteredIngredients = ingredients.flatMap((category) => {
+    if (
+      selectedCategory === null ||
+      category.category_id === selectedCategory
+    ) {
+      return category.ingredients;
+    }
+    return [];
+  });
 
   return (
     <div>
@@ -256,6 +265,7 @@ const Stock = () => {
             </table>
           </div>
         </div>
+        
         {/* Modal */}
         {modalVisible && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">

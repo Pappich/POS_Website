@@ -13,6 +13,7 @@ import CancelOrderButtonEm from "../../../Components/Employee/cancelOrderButtonE
 import LogoutButton from "../../../Components/General/logoutButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
+import CheckSlip from "../../../Components/Employee/checkSlip";
 
 const Order = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -30,6 +31,7 @@ const Order = () => {
     pending_orders: 0,
     completed_orders: 0,
   });
+  const [checkSlipData, setCheckSlipData] = useState(null);
 
   //connect web socket
   useEffect(() => {
@@ -41,12 +43,12 @@ const Order = () => {
 
     socket.onmessage = async (event) => {
       try {
-        const text = await event.data.text(); 
-        const message = JSON.parse(text); 
+        const text = await event.data.text();
+        const message = JSON.parse(text);
 
         if (message.type === "NEW_SLIP") {
           console.log("New slip received:", message.data);
-          // display popup
+          setCheckSlipData(message.data);
         }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
@@ -288,6 +290,7 @@ const Order = () => {
           </div>
         </div>
       </div>
+      {checkSlipData && <CheckSlip imageUrl={checkSlipData} />}
     </div>
   );
 };

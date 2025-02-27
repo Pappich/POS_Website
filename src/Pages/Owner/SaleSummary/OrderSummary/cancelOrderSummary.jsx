@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import SideBar from "../../../../Components/Owner/sideBar";
 import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
+import fetchApi from "../../../../Config/fetchApi";
 
 const CancelOrderSummary = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -14,8 +15,9 @@ const CancelOrderSummary = () => {
   useEffect(() => {
     const fetchOrderData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/owner/stock-cancel-orders"
+        const response = await fetchApi(
+          `${URL}/owner/stock-cancel-orders`,
+          "GET"
         );
         const data = await response.json();
 
@@ -50,8 +52,9 @@ const CancelOrderSummary = () => {
   useEffect(() => {
     const fetchOrderDetail = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/owner/orders/${selectedOrder}`
+        const response = await fetchApi(
+          `${URL}/owner/orders/${selectedOrder}`,
+          "GET"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch order details");
@@ -93,19 +96,13 @@ const CancelOrderSummary = () => {
   };
 
   const handleStatusChange = async () => {
-    const url = `http://localhost:3000/owner/orders/${selectedOrder}`;
+    const url = `${URL}/owner/orders/${selectedOrder}`;
     const data = {
       cancel_status: selectedStatus,
     };
 
     try {
-      const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetchApi(url, "PATCH", data);
 
       console.log("SEND DATA:", data);
 

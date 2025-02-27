@@ -4,24 +4,30 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const PieChart = () => {
+const PieChart = ({ topThree }) => {
+  // Check if topThree is defined and has data
+
+  console.log("TOP THREE", topThree);
+
   const data = {
-    labels: ["ชานมไต้หวัน", "แอปเปิลโซดา", "กาแฟโบราณ"],
+    labels: topThree ? topThree.map((item) => item.menu_name) : [],
     datasets: [
       {
-        data: [50, 48, 42], // Sales data for the menu
-        backgroundColor: ["#D49148", "#A3C4DC", "#E4D5A6"], // Custom colors
+        data: topThree ? topThree.map((item) => item.quantity) : [],
+        backgroundColor: ["#D49148", "#A3C4DC", "#E4D5A6"],
         hoverOffset: 4,
       },
     ],
   };
 
+  console.log("DATA", data);
+
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // Allow custom height
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false, // Hide the default legend
+        display: false,
       },
       tooltip: {
         callbacks: {
@@ -74,7 +80,7 @@ const CustomLegend = ({ data }) => {
           />
           <span style={{ marginRight: "auto" }}>{label}</span>
           <span style={{ fontWeight: "bold", textAlign: "right" }}>
-            {data.datasets[0].data[i]} จาน
+            {data.datasets[0].data[i]} แก้ว
           </span>
         </div>
       ))}

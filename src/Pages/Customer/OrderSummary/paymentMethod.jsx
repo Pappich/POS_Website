@@ -55,15 +55,16 @@ const PaymentMethod = () => {
   };
 
   const handleConfirmPayment = async () => {
-    // send to web socket
     if (slipImage) {
-      const base64Image = await getBase64Image(slipImage);
-      const message = {
-        type: "NEW_SLIP",
-        data: "SLIPJA",
-      };
-      if (socket) {
-        socket.send(JSON.stringify(message));
+      const imagePath = await handleUploadImage(slipImage);
+      if (imagePath) {
+        const message = {
+          type: "NEW_SLIP",
+          data: imagePath,
+        };
+        if (socket) {
+          socket.send(JSON.stringify(message));
+        }
       }
     }
 
@@ -96,6 +97,33 @@ const PaymentMethod = () => {
       navigate("/queue-summary", { state: { orderData: responseData } });
     } catch (error) {
       console.error("Error during order submission:", error);
+    }
+  };
+
+  const handleUploadImage = async (productFile) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", productFile);
+
+      console.log("Uploading file:", productFile);
+
+      const response = await fetchApi(
+        `${URL}/owner/menus/upload`,
+        "POST",
+        formData
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("File uploaded successfully", data);
+        return data.filePath;
+      } else {
+        console.error("Image upload failed");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      return null;
     }
   };
 

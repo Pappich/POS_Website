@@ -36,7 +36,7 @@ const Login = () => {
         return;
       }
 
-      const response = await fetchApi(`${URL}/owner/login`, "POST", {
+      const response = await fetchApi(`${URL}/auth/login`, "POST", {
         email: email,
         password: password,
       });

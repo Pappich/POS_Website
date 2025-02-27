@@ -1,4 +1,4 @@
-function fetchApi(url, method, body) {
+const fetchApi = async (url, method, body) => {
   // Retrieve the values from sessionStorage
   const token = sessionStorage.getItem("token");
   const ownerId = sessionStorage.getItem("owner_id");
@@ -31,11 +31,20 @@ function fetchApi(url, method, body) {
 
   console.log("HEADERS :", headers);
 
-  return fetch(url, {
-    method,
+  const options = {
+    method: method,
     headers: headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
-}
+    body: JSON.stringify(body),
+  };
+
+  // If the method is a file upload, you might want to handle it differently
+  if (method === "POST" && body instanceof FormData) {
+    delete options.headers["Content-Type"]; // Let the browser set the content type for FormData
+    options.body = body; // Use the FormData directly
+  }
+
+  const response = await fetch(url, options);
+  return response;
+};
 
 export default fetchApi;
