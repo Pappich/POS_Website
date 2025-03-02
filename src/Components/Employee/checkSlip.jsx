@@ -1,16 +1,14 @@
 import React from "react";
 import configureAPI from "../../Config/configureAPI";
 import { useWebSocket } from "../../webSocketContext";
+import fetchApi from "../../Config/fetchApi";
 
 const CheckSlip = ({ imageUrl }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
 
-  const image_url = `${URL}/${imageUrl.replace(/\\/g, "/")}`;
-
   const handleRetake = () => {
-    // send message to payment tab to open phone detect again
     if (socket) {
       const message = {
         type: "RETAKE_SLIP",
@@ -19,14 +17,37 @@ const CheckSlip = ({ imageUrl }) => {
     }
   };
 
-  const handleConfirm = () => {
-    // send message to payment tab to confirm the slip
-    if (socket) {
-      const message = {
-        type: "CONFIRM_SLIP",
-        data: imageUrl,
-      };
-      socket.send(JSON.stringify(message));
+  const handleConfirm = async () => {
+    try {
+      // แปลง base64 เป็น blob และอัพโหลดไป backend
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("file", blob, "slip.png");
+
+      const uploadResponse = await fetchApi(
+        `${URL}/owner/menus/upload`,
+        "POST",
+        formData
+      );
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload slip");
+      }
+
+      const uploadData = await uploadResponse.json();
+
+      // ส่ง path ที่ได้จาก backend กลับไป
+      if (socket) {
+        const message = {
+          type: "CONFIRM_SLIP",
+          data: uploadData.filePath,
+        };
+        socket.send(JSON.stringify(message));
+      }
+    } catch (error) {
+      console.error("Error handling slip confirmation:", error);
     }
   };
 
@@ -38,7 +59,19 @@ const CheckSlip = ({ imageUrl }) => {
         </h2>
         <hr className="h-0.5 bg-[#DD9F52] border-0 mb-4" />
 
-        <img src={image_url} alt="Slip" className="w-full rounded-lg mb-6" />
+        {/* แสดงรูป base64 โดยตรง */}
+        {imageUrl ? (
+          <img
+            src={imageUrl} // ใช้ base64 string โดยตรง
+            alt="Slip"
+            className="w-full rounded-lg mb-6"
+            onError={(e) => console.error("Image loading error:", e)}
+          />
+        ) : (
+          <div className="w-full h-48 flex items-center justify-center bg-gray-100 rounded-lg mb-6">
+            ไม่พบรูปภาพ
+          </div>
+        )}
 
         <div className="flex gap-2 mt-6">
           <button

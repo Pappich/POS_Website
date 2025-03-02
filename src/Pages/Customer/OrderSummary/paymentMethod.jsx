@@ -47,8 +47,9 @@ const PaymentMethod = () => {
   const [showPhoneDetect, setShowPhoneDetect] = useState(false);
 
   useEffect(() => {
+    console.log("Socket state:", socket);
     if (socket) {
-      socket.onmessage = async (event) => {
+      const messageHandler = async (event) => {
         try {
           let messageData;
           if (event.data instanceof Blob) {
@@ -58,69 +59,75 @@ const PaymentMethod = () => {
             messageData = JSON.parse(event.data);
           }
 
-          if (messageData.type === "RETAKE_SLIP") {
+          console.log("PaymentMethod received message:", messageData);
+
+          if (messageData.type === "CONFIRM_SLIP") {
+            console.log("Got slip path:", messageData.data);
+
+            const createOrderDto = {
+              order_date: new Date().toISOString(),
+              total_price: total,
+              queue_number: null,
+              status: "รอทำ",
+              payment_method: selectedPayment,
+              path_img: messageData.data,
+            };
+
+            const payload = {
+              createOrderDto,
+              items: items || [],
+            };
+
+            console.log("Sending order payload:", payload);
+            console.log("Sending to URL:", `${URL}/employee/orders`);
+
+            try {
+              const response = await fetchApi(
+                `${URL}/employee/orders`,
+                "POST",
+                payload
+              );
+
+              console.log("Got response:", response);
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Error data:", errorData);
+                throw new Error("Error submitting the order");
+              }
+
+              const responseData = await response.json();
+              console.log("Order submitted successfully:", responseData);
+
+              navigate("/queue-summary", {
+                state: { orderData: responseData },
+              });
+            } catch (error) {
+              console.error("Error during order submission:", error);
+            }
+          } else if (messageData.type === "RETAKE_SLIP") {
             setShowPhoneDetect(true);
           }
         } catch (error) {
-          console.error("Error parsing WebSocket message:", error);
+          console.error("Error in WebSocket message handler:", error);
+          console.error("Event data:", event.data);
         }
       };
+
+      // เพิ่ม handler ให้กับ socket
+      socket.addEventListener("message", messageHandler);
+
+      // Cleanup
+      return () => {
+        socket.removeEventListener("message", messageHandler);
+      };
     }
-  }, [socket]);
+  }, [socket, total, selectedPayment, items, navigate, URL]);
 
   const handleBack = () => navigate("/summary");
 
   const handleConfirmPayment = () => {
     setShowPhoneDetect(true);
-  };
-
-  const handlePhoneDetectCapture = async (imageData) => {
-    setShowPhoneDetect(false);
-
-    const base64Response = await fetch(imageData);
-    const blob = await base64Response.blob();
-    const file = new File([blob], "slip.png", { type: "image/png" });
-
-    const imagePath = await handleUploadImage(file);
-    if (imagePath) {
-      const message = {
-        type: "NEW_SLIP",
-        data: imagePath,
-      };
-      if (socket) {
-        socket.send(JSON.stringify(message));
-      }
-
-      const createOrderDto = {
-        order_date: new Date().toISOString(),
-        total_price: total,
-        queue_number: null,
-        status: "รอทำ",
-        payment_method: selectedPayment,
-      };
-
-      const payload = {
-        createOrderDto,
-        items: items || [],
-      };
-
-      try {
-        const response = await fetchApi(
-          `${URL}/employee/orders`,
-          "POST",
-          payload
-        );
-
-        if (!response.ok) {
-          throw new Error("Error submitting the order");
-        }
-
-        const responseData = await response.json();
-        navigate("/queue-summary", { state: { orderData: responseData } });
-      } catch (error) {
-        console.error("Error during order submission:", error);
-      }
-    }
   };
 
   const handleUploadImage = async (productFile) => {
@@ -238,7 +245,7 @@ const PaymentMethod = () => {
               ตรวจจับใบเสร็จโอนเงิน
             </h2>
             <hr className="h-0.5 bg-[#DD9F52] border-0" />
-            <PhoneDetect onCapture={handlePhoneDetectCapture} />
+            <PhoneDetect socket={socket} />
           </div>
         </div>
       )}

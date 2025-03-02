@@ -6,7 +6,7 @@ import Webcam from "react-webcam";
 import { drawRect } from "./utilities";
 import "./phoneDetect.css";
 
-function PhoneDetect({ onCapture }) {
+function PhoneDetect({ onCapture, socket }) {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const countdownRef = useRef(null);
@@ -16,7 +16,8 @@ function PhoneDetect({ onCapture }) {
   const [waitingForDecision, setWaitingForDecision] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true);
-  // Modify handleCancel to reset the waiting state
+  const [phoneDetected, setPhoneDetected] = useState(false);
+
   const handleCancel = () => {
     setIsCapturing(false);
     setCapturedImage(null);
@@ -34,7 +35,14 @@ function PhoneDetect({ onCapture }) {
         stream.getTracks().forEach((track) => track.stop());
       }
     }
-    onCapture(capturedImage);
+    // ส่งรูปผ่าน WebSocket ไปแสดงที่ CheckSlip
+    if (socket) {
+      const message = {
+        type: "NEW_SLIP",
+        data: capturedImage, // base64 image
+      };
+      socket.send(JSON.stringify(message));
+    }
     setCapturedImage(null);
     setShowWebcam(true);
   };

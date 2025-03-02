@@ -12,21 +12,6 @@ export const WebSocketProvider = ({ children }) => {
       console.log("WebSocket connection established");
     };
 
-    ws.onmessage = async (event) => {
-      try {
-        let messageData;
-        if (event.data instanceof Blob) {
-          const text = await event.data.text();
-          messageData = JSON.parse(text);
-        } else {
-          messageData = JSON.parse(event.data);
-        }
-        console.log("Message from server:", messageData);
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    };
-
     ws.onclose = () => {
       console.log("WebSocket connection closed");
     };

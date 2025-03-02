@@ -55,11 +55,13 @@ const Order = () => {
         switch (messageData.type) {
           case "NEW_SLIP":
             console.log("New slip received:", messageData.data);
-            setCheckSlipData(messageData.data);
+            if (messageData.data.startsWith("data:image")) {
+              setCheckSlipData(messageData.data);
+            }
             break;
 
           case "CONFIRM_SLIP":
-            handleSubmitOrder(messageData.data);
+            setCheckSlipData(null);
             break;
 
           default:
@@ -131,18 +133,18 @@ const Order = () => {
     });
   };
 
-  const handleSubmitOrder = async (slipPath) => {
-    // Logic to submit order with confirmed slip
-    try {
-      const response = await fetchApi(`${URL}/employee/orders`, "POST", {
-        // ... order data
-        slip_image: slipPath,
-      });
-      // ... handle response
-    } catch (error) {
-      console.error("Error submitting order:", error);
-    }
-  };
+  // const handleSubmitOrder = async (slipPath) => {
+  //   // Logic to submit order with confirmed slip
+  //   try {
+  //     const response = await fetchApi(`${URL}/employee/orders`, "POST", {
+  //       // ... order data
+  //       slip_image: slipPath,
+  //     });
+  //     // ... handle response
+  //   } catch (error) {
+  //     console.error("Error submitting order:", error);
+  //   }
+  // };
 
   if (isLoading) {
     return (
