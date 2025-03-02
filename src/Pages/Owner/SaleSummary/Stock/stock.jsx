@@ -34,6 +34,8 @@ const Stock = () => {
   const [ingredients, setIngredients] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [ingredientHistory, setIngredientHistory] = useState(null);
 
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -69,6 +71,28 @@ const Stock = () => {
     fetchIngredients();
   }, []);
 
+  // Fetch categories when component mounts
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetchApi(
+          `${URL}/owner/stock-ingredients/categories`,
+          "GET"
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.categories);
+        } else {
+          console.error("Failed to fetch categories");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, [URL]);
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -100,6 +124,20 @@ const Stock = () => {
     }
     return [];
   });
+
+  const handleShowHistory = async (ingredientId) => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/stock-ingredients/sub-ingredient/${ingredientId}`,
+        "GET"
+      );
+      const data = await response.json();
+      setIngredientHistory(data);
+      setHistoryModalVisible(true);
+    } catch (error) {
+      console.error("Error fetching ingredient history:", error);
+    }
+  };
 
   return (
     <div>
@@ -241,7 +279,9 @@ const Stock = () => {
                       {item.ingredient_name}
                     </td>
                     <td className="py-2 text-center border-b border-[#F1F4F7]">
-                      {item.quantity_in_stock}
+                      {item.total_volume && item.net_volume
+                        ? `${item.total_volume / item.net_volume} ชิ้น`
+                        : "-"}
                     </td>
                     <td className="py-2 pl-10 text-center border-b border-[#F1F4F7]">
                       {categories.find(
@@ -252,7 +292,7 @@ const Stock = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent the row click handler from firing
-                          handleUpdateClick(item);
+                          handleShowHistory(item.ingredient_id);
                         }}
                         className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
                       >
@@ -265,8 +305,10 @@ const Stock = () => {
             </table>
           </div>
         </div>
-        
-        {/* Modal */}
+
+        {/* update product list modal */}
+
+        {/* update product modal */}
         {modalVisible && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white rounded-lg p-8 flex just flex-col h-[500px] w-[700px] relative">
@@ -289,7 +331,7 @@ const Stock = () => {
                   <p className="mb-4">
                     <span className="font-bold pr-2">หมวดหมู่</span>
                     <span className="px-3 border border-[#613080] rounded-full text-[#613080]">
-                      น้ำชา
+                      อุปกรณ์
                     </span>
                   </p>
 
@@ -342,7 +384,8 @@ const Stock = () => {
                       </button>
                       <div className="px-8 relative inline-block">
                         <span className="font-bold">
-                          {selectedProduct.quantity}
+                          {/* {selectedProduct.quantity} */}
+                          50
                         </span>
                         <span className="absolute left-[10%] right-[10%] bottom-0 h-[1px] bg-[#848484]"></span>
                       </div>
@@ -370,6 +413,101 @@ const Stock = () => {
                   onClick={closeModal}
                 >
                   บันทึก
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Ingredient History Modal */}
+        {historyModalVisible && ingredientHistory && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
+              {/* Modal Header */}
+              <h2 className="text-lg font-bold text-center mb-4">
+                ประวัติการอัปเดต {ingredientHistory.ingredient_name}
+              </h2>
+
+              {/* Table Section */}
+              <div className="overflow-x-auto border rounded-lg p-5 flex-grow">
+                <table className="border-collapse table-auto w-full">
+                  <thead>
+                    <tr>
+                      <th className="py-2 pr-5 text-center border-b border-[#000000]">
+                        ลำดับที่
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        จำนวนคงเหลือ
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        ปริมาณรวม
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        ปริมาณสุทธิ
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        วันหมดอายุ
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        การดำเนินการ
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ingredientHistory.updates.map((update, index) => (
+                      <tr key={update.update_id}>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {index + 1}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {update.quantity_in_stock} ชิ้น
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {update.total_volume}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {update.net_volume}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {new Date(update.expiration_date).toLocaleDateString(
+                            "th-TH"
+                          )}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          <button
+                            onClick={() => {
+                              setHistoryModalVisible(false);
+                              setSelectedProduct(ingredientHistory);
+                              setModalVisible(true);
+                            }}
+                            className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                          >
+                            อัปเดต
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Add Button */}
+              <div className="mt-4 flex justify-between">
+                <button
+                  onClick={() => setHistoryModalVisible(false)}
+                  className="px-6 py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                >
+                  ปิด
+                </button>
+                <button
+                  onClick={() => {
+                    setHistoryModalVisible(false);
+                    setSelectedProduct(ingredientHistory);
+                    setModalVisible(true);
+                  }}
+                  className="px-6 py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                >
+                  เพิ่มการอัปเดต
                 </button>
               </div>
             </div>

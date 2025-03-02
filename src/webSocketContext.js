@@ -13,21 +13,17 @@ export const WebSocketProvider = ({ children }) => {
     };
 
     ws.onmessage = async (event) => {
-      if (event.data instanceof Blob) {
-        const text = await event.data.text(); 
-        try {
-          const message = JSON.parse(text);
-          console.log("Message from server:", message);
-        } catch (error) {
-          console.error("Error parsing message:", error);
+      try {
+        let messageData;
+        if (event.data instanceof Blob) {
+          const text = await event.data.text();
+          messageData = JSON.parse(text);
+        } else {
+          messageData = JSON.parse(event.data);
         }
-      } else {
-        try {
-          const message = JSON.parse(event.data);
-          console.log("Message from server:", message);
-        } catch (error) {
-          console.error("Error parsing message:", error);
-        }
+        console.log("Message from server:", messageData);
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
       }
     };
 

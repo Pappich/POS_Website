@@ -4,8 +4,12 @@ import SideBar from "../../../../Components/Owner/sideBar";
 import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
 import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
 
 const CancelOrderSummary = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedOrderData, setSelectedOrderData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

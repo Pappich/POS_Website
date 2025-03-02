@@ -8,6 +8,7 @@ import generatePayload from "promptpay-qr";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import { useWebSocket } from "../../../webSocketContext";
+import PhoneDetect from "../../../Components/PhoneDetect/phoneDetect";
 
 const PaymentMethod = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -43,60 +44,82 @@ const PaymentMethod = () => {
   ];
 
   const socket = useWebSocket();
-  const [slipImage, setSlipImage] = useState(null);
+  const [showPhoneDetect, setShowPhoneDetect] = useState(false);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+
+          if (messageData.type === "RETAKE_SLIP") {
+            setShowPhoneDetect(true);
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+        }
+      };
+    }
+  }, [socket]);
 
   const handleBack = () => navigate("/summary");
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSlipImage(file);
-    }
+  const handleConfirmPayment = () => {
+    setShowPhoneDetect(true);
   };
 
-  const handleConfirmPayment = async () => {
-    if (slipImage) {
-      const imagePath = await handleUploadImage(slipImage);
-      if (imagePath) {
-        const message = {
-          type: "NEW_SLIP",
-          data: imagePath,
-        };
-        if (socket) {
-          socket.send(JSON.stringify(message));
+  const handlePhoneDetectCapture = async (imageData) => {
+    setShowPhoneDetect(false);
+
+    const base64Response = await fetch(imageData);
+    const blob = await base64Response.blob();
+    const file = new File([blob], "slip.png", { type: "image/png" });
+
+    const imagePath = await handleUploadImage(file);
+    if (imagePath) {
+      const message = {
+        type: "NEW_SLIP",
+        data: imagePath,
+      };
+      if (socket) {
+        socket.send(JSON.stringify(message));
+      }
+
+      const createOrderDto = {
+        order_date: new Date().toISOString(),
+        total_price: total,
+        queue_number: null,
+        status: "รอทำ",
+        payment_method: selectedPayment,
+      };
+
+      const payload = {
+        createOrderDto,
+        items: items || [],
+      };
+
+      try {
+        const response = await fetchApi(
+          `${URL}/employee/orders`,
+          "POST",
+          payload
+        );
+
+        if (!response.ok) {
+          throw new Error("Error submitting the order");
         }
+
+        const responseData = await response.json();
+        navigate("/queue-summary", { state: { orderData: responseData } });
+      } catch (error) {
+        console.error("Error during order submission:", error);
       }
-    }
-
-    const createOrderDto = {
-      order_date: new Date().toISOString(),
-      total_price: total,
-      queue_number: 3,
-      status: "รอทำ",
-      payment_method: selectedPayment,
-    };
-
-    const payload = {
-      createOrderDto,
-      items: [],
-    };
-
-    try {
-      const response = await fetchApi(
-        `${URL}/employee/orders`,
-        "POST",
-        payload
-      );
-
-      if (!response.ok) {
-        throw new Error("Error submitting the order");
-      }
-
-      const responseData = await response.json();
-      console.log("Order submission response:", responseData);
-      navigate("/queue-summary", { state: { orderData: responseData } });
-    } catch (error) {
-      console.error("Error during order submission:", error);
     }
   };
 
@@ -143,8 +166,6 @@ const PaymentMethod = () => {
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
       </div>
-
-      <input type="file" accept="image/*" onChange={handleFileChange} />
 
       {/* QR code */}
       {selectedPayment === "qr" && (
@@ -206,6 +227,19 @@ const PaymentMethod = () => {
             กรุณาชำระเงินที่เคาน์เตอร์พนักงาน
           </p>
           <p className="text-2xl">อย่าลืมรับสลิปที่ช่องทางด้านขวามือ</p>
+        </div>
+      )}
+
+      {/* Phone Detect Modal */}
+      {showPhoneDetect && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-4/5 max-w-3xl text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              ตรวจจับใบเสร็จโอนเงิน
+            </h2>
+            <hr className="h-0.5 bg-[#DD9F52] border-0" />
+            <PhoneDetect onCapture={handlePhoneDetectCapture} />
+          </div>
         </div>
       )}
     </div>

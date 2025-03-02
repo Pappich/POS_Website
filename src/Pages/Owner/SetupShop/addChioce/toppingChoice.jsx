@@ -124,51 +124,51 @@ const ToppingChoice = () => {
 
   const handleNext = async () => {
     let valid = true;
-    const newErrors = {
-      price: "",
-      choiceName: "",
-      choiceQuantity: "",
-      menuSelection: "",
-    };
+    // const newErrors = {
+    //   price: "",
+    //   choiceName: "",
+    //   choiceQuantity: "",
+    //   menuSelection: "",
+    // };
 
-    // case price
-    choices.forEach((choice, index) => {
-      if (!choice.price || isNaN(choice.price)) {
-        valid = false;
-        newErrors.price = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
-      } else {
-        newErrors.price = "";
-      }
+    // // case price
+    // choices.forEach((choice, index) => {
+    //   if (!choice.price || isNaN(choice.price)) {
+    //     valid = false;
+    //     newErrors.price = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
+    //   } else {
+    //     newErrors.price = "";
+    //   }
 
-      if (!choice.name) {
-        valid = false;
-        newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
-      } else if (index === choices.length - 1 && !choice.name) {
-        valid = false;
-        newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
-      } else {
-        newErrors.choiceName = "";
-      }
+    //   if (!choice.name) {
+    //     valid = false;
+    //     newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
+    //   } else if (index === choices.length - 1 && !choice.name) {
+    //     valid = false;
+    //     newErrors.choiceName = "กรุณากรอกชื่อช้อยส์";
+    //   } else {
+    //     newErrors.choiceName = "";
+    //   }
 
-      if (step === 2 && (!choice.quantity || isNaN(choice.quantity))) {
-        valid = false;
-        newErrors.choiceQuantity = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
-      } else {
-        newErrors.choiceQuantity = "";
-      }
-    });
+    //   if (step === 2 && (!choice.quantity || isNaN(choice.quantity))) {
+    //     valid = false;
+    //     newErrors.choiceQuantity = "กรุณากรอกเฉพาะตัวเลขเท่านั้น";
+    //   } else {
+    //     newErrors.choiceQuantity = "";
+    //   }
+    // });
 
-    console.log("ERROR:", errors);
+    // console.log("ERROR:", errors);
 
-    // case select menu
-    if (step === 3 && selectedMenus.length === 0) {
-      valid = false;
-      newErrors.menuSelection = "กรุณาเลือกอย่างน้อย 1 เมนู";
-    } else {
-      newErrors.menuSelection = "";
-    }
+    // // case select menu
+    // if (step === 3 && selectedMenus.length === 0) {
+    //   valid = false;
+    //   newErrors.menuSelection = "กรุณาเลือกอย่างน้อย 1 เมนู";
+    // } else {
+    //   newErrors.menuSelection = "";
+    // }
 
-    setErrors(newErrors);
+    // setErrors(newErrors);
     if (valid) {
       if (step === 4) {
         try {

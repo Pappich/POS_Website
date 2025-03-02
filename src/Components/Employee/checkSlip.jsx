@@ -1,49 +1,66 @@
 import React from "react";
 import configureAPI from "../../Config/configureAPI";
+import { useWebSocket } from "../../webSocketContext";
 
 const CheckSlip = ({ imageUrl }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
+  const socket = useWebSocket();
 
   const image_url = `${URL}/${imageUrl.replace(/\\/g, "/")}`;
 
+  const handleRetake = () => {
+    // send message to payment tab to open phone detect again
+    if (socket) {
+      const message = {
+        type: "RETAKE_SLIP",
+      };
+      socket.send(JSON.stringify(message));
+    }
+  };
+
+  const handleConfirm = () => {
+    // send message to payment tab to confirm the slip
+    if (socket) {
+      const message = {
+        type: "CONFIRM_SLIP",
+        data: imageUrl,
+      };
+      socket.send(JSON.stringify(message));
+    }
+  };
+
   return (
-    <div className="relative">
-      <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-        <div className="bg-white w-[500px] h-auto rounded-lg p-6 shadow-lg">
-          <h2 className="text-lg font-bold text-center mb-1">
-            ตรวจสอบสลิปโอนเงิน
-          </h2>
-          <hr className="h-0.5 bg-[#DD9F52] border-0" />
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+      <div className="bg-white w-[500px] rounded-lg p-6 shadow-lg">
+        <h2 className="text-lg font-bold text-center mb-2">
+          ตรวจสอบสลิปโอนเงิน
+        </h2>
+        <hr className="h-0.5 bg-[#DD9F52] border-0 mb-4" />
 
-          <img src={image_url} alt="Slip" className="w-full h-auto mb-4 mt-2" />
+        <img src={image_url} alt="Slip" className="w-full rounded-lg mb-6" />
 
-          <div className="flex justify-between space-x-4 mt-10">
-            <button
-              className="w-full text-[#C6B399] border border-[#C6B399] hover:bg-[#afafaf] hover:text-white font-bold py-2 px-4 rounded-full"
-              onClick={() => {
-                //cancel
-              }}
-            >
-              ยกเลิก
-            </button>
-            <button
-              className="w-full text-[#C6B399] border border-[#C6B399] hover:bg-[#afafaf] hover:text-white font-bold py-2 px-4 rounded-full"
-              onClick={() => {
-                //call retake slip
-              }}
-            >
-              ถ่ายใหม่
-            </button>
-            <button
-              className="w-full bg-[#C6B399] hover:bg-[#a69781] text-white font-bold py-2 px-4 rounded-full"
-              onClick={() => {
-                //send all order detail to backend
-              }}
-            >
-              ตกลง
-            </button>
-          </div>
+        <div className="flex gap-2 mt-6">
+          <button
+            className="w-full border border-gray-300 text-gray-600 hover:bg-gray-100 transition-all duration-300 py-2 rounded-full"
+            onClick={() => {
+              /* Cancel the payment */
+            }}
+          >
+            ยกเลิก
+          </button>
+          <button
+            className="w-full border border-[#C6B399] text-[#C6B399] bg-transparent hover:bg-[#C6B399] hover:text-white font-bold py-2 rounded-full transition-all"
+            onClick={handleRetake}
+          >
+            ถ่ายใหม่
+          </button>
+          <button
+            className="w-full bg-[#C6B399] text-white font-bold py-2 rounded-full hover:bg-[#a69781] transition-all"
+            onClick={handleConfirm}
+          >
+            ตกลง
+          </button>
         </div>
       </div>
     </div>

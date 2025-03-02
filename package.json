@@ -5,6 +5,8 @@
   "dependencies": {
     "@fontsource/inter": "^5.0.20",
     "@reduxjs/toolkit": "^2.5.0",
+    "@tensorflow-models/coco-ssd": "^2.1.0",
+    "@tensorflow/tfjs": "^2.4.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -25,6 +27,7 @@
     "react-scripts": "5.0.1",
     "react-select": "^5.10.0",
     "react-simple-keyboard": "^3.7.150",
+    "react-webcam": "^7.2.0",
     "redux": "^5.0.1",
     "simple-keyboard": "^3.7.106",
     "simple-keyboard-layouts": "^3.4.21",
@@ -33,7 +36,7 @@
     "ws": "^8.18.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -57,6 +60,7 @@
     ]
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "tailwindcss": "^3.4.7"
   }
 }
