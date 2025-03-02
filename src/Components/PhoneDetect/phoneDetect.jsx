@@ -38,12 +38,14 @@ function PhoneDetect({ onCapture, socket }) {
     if (socket) {
       const message = {
         type: "NEW_SLIP",
-        data: capturedImage, // base64 image
+        data: capturedImage,
       };
       socket.send(JSON.stringify(message));
     }
     setCapturedImage(null);
     setShowWebcam(true);
+    // ปิด modal ทันทีหลังส่งรูป
+    onCapture(null);
   };
 
   const [isDetecting, setIsDetecting] = useState(true);
