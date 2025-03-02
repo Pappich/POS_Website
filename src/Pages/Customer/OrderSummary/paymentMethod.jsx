@@ -64,6 +64,7 @@ const PaymentMethod = () => {
           if (messageData.type === "CONFIRM_SLIP") {
             console.log("Got slip path:", messageData.data);
 
+            // สร้าง createOrderDto ตามโครงสร้างที่ backend ต้องการ
             const createOrderDto = {
               order_date: new Date().toISOString(),
               total_price: total,
@@ -71,15 +72,26 @@ const PaymentMethod = () => {
               status: "รอทำ",
               payment_method: selectedPayment,
               path_img: messageData.data,
+              cancel_status: null,
             };
+
+            // แปลงโครงสร้าง items ให้ตรงกับ backend
+            const formattedItems = items.map((item) => ({
+              menu_id: item.menuId,
+              sweetness_id: item.selectedSweetness.id,
+              size_id: item.selectedSize.id,
+              add_on_id: item.selectedAddOn.map((addon) => addon.id), // แปลงเป็น array ของ id
+              menu_type_id: item.selectedType.id,
+              quantity: item.quantity,
+              price: item.price,
+            }));
 
             const payload = {
               createOrderDto,
-              items: items || [],
+              items: formattedItems,
             };
 
             console.log("Sending order payload:", payload);
-            console.log("Sending to URL:", `${URL}/employee/orders`);
 
             try {
               const response = await fetchApi(
@@ -128,6 +140,18 @@ const PaymentMethod = () => {
 
   const handleConfirmPayment = () => {
     setShowPhoneDetect(true);
+  };
+
+  const handlePhoneDetectCapture = async (imageData) => {
+    setShowPhoneDetect(false);
+
+    if (socket) {
+      const message = {
+        type: "NEW_SLIP",
+        data: imageData,
+      };
+      socket.send(JSON.stringify(message));
+    }
   };
 
   const handleUploadImage = async (productFile) => {
@@ -245,7 +269,7 @@ const PaymentMethod = () => {
               ตรวจจับใบเสร็จโอนเงิน
             </h2>
             <hr className="h-0.5 bg-[#DD9F52] border-0" />
-            <PhoneDetect socket={socket} />
+            <PhoneDetect onCapture={handlePhoneDetectCapture} socket={socket} />
           </div>
         </div>
       )}

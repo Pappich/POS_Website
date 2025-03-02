@@ -16,8 +16,7 @@ function PhoneDetect({ onCapture, socket }) {
   const [waitingForDecision, setWaitingForDecision] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [showWebcam, setShowWebcam] = useState(true);
-  const [phoneDetected, setPhoneDetected] = useState(false);
-
+  // Modify handleCancel to reset the waiting state
   const handleCancel = () => {
     setIsCapturing(false);
     setCapturedImage(null);
