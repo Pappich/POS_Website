@@ -14,6 +14,7 @@ import { FaMinus } from "react-icons/fa";
 import SideBar from "../../../../Components/Owner/sideBar";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 const thLocaleWithMondayStart = {
   ...th,
   options: {
@@ -100,8 +101,8 @@ const Stock = () => {
     fetchCategories();
   }, [URL]);
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
   };
 
   const handleAddOwnerProduct = () => {
@@ -205,7 +206,7 @@ const Stock = () => {
           unit: selectedProduct.unit,
           quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
           category_name: selectedProduct.category_name,
-          expiration_date: expDate,
+          expiration_date: updateFormData.expiration_date,
         };
 
         console.log("payload POST", payload);
@@ -341,8 +342,7 @@ const Stock = () => {
           <div className="my-4 relative flex">
             <div className="mr-5 flex items-center bg-white border-[#C6B399] border rounded-full px-4 py-1 w-full">
               <FiSearch className="text-[#C6B399] mr-2" size={36} />
-              <input
-                type="text"
+              <ThaiVirtualKeyboardInput
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="ค้นหาสินค้า..."
@@ -429,25 +429,15 @@ const Stock = () => {
 
         {/* Update/Create Product Modal */}
         {modalVisible && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn">
-            {/* Modal Container */}
-            <div className="bg-white rounded-2xl p-8 flex flex-col h-auto max-h-[90vh] w-[90%] max-w-[700px] relative shadow-xl border border-gray-300">
-              {/* Close Button */}
-              <button
-                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl"
-                onClick={closeModal}
-              >
-                &times;
-              </button>
-
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
               {/* Product Name */}
-              <h2 className="text-xl font-bold text-center mb-6">
+              <h2 className="text-lg font-bold text-center mb-4 absolute top-4 w-full">
                 {selectedProduct?.ingredient_name}
               </h2>
 
               {/* Modal Content */}
-              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-                {/* Product Image */}
+              <div className="flex mt-10">
                 <div className="flex-shrink-0">
                   {selectedProduct?.image_url && (
                     <img
@@ -504,24 +494,16 @@ const Stock = () => {
                       ปริมาตรสุทธิต่อหน่วย
                     </div>
                     <div className="flex items-center">
-                      <input
-                        value={
-                          isEditingNetVolume
-                            ? updateFormData.net_volume || ""
-                            : `${updateFormData.net_volume || ""} ${
-                                selectedProduct?.unit
-                              }`
+                      <ThaiVirtualKeyboardInput
+                        value={updateFormData.net_volume}
+                        onChange={(value) => 
+                          setUpdateFormData(prev => ({
+                            ...prev,
+                            net_volume: value
+                          }))
                         }
-                        type={isEditingNetVolume ? "number" : "text"}
+                        type="number"
                         readOnly={!isEditingNetVolume}
-                        onChange={(e) => {
-                          if (isEditingNetVolume) {
-                            setUpdateFormData((prev) => ({
-                              ...prev,
-                              net_volume: e.target.value,
-                            }));
-                          }
-                        }}
                         className="border border-gray-300 rounded-full p-2 text-gray-600 focus:outline-none w-full mr-3"
                       />
                       <button

@@ -4,6 +4,7 @@ import { FaLock } from "react-icons/fa";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const EnterNewPassword = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -120,12 +121,12 @@ const EnterNewPassword = () => {
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
             <FaLock style={{ color: "#D4B28C" }} className="mr-2" />
-            <input
+            <ThaiVirtualKeyboardInput
               type={showPassword ? "text" : "password"}
               id="confirmPassword"
               placeholder="ยืนยันรหัสผ่าน..."
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={setConfirmPassword}
               className="w-full py-2 px-3 bg-transparent outline-none text-gray-700"
             />
             <button

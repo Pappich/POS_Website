@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AiOutlineCheckCircle } from "react-icons/ai";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const ProductDetail = () => {
   const navigate = useNavigate();
@@ -98,7 +99,13 @@ const ProductDetail = () => {
             <input
               type="text"
               value={ingredientData.ingredient_name}
-              readOnly
+              onChange={(value) => {
+                setIngredientData(prev => ({
+                  ...prev,
+                  ingredient_name: value
+                }))
+              }}
+              readOnly={true}
               className="w-full bg-[#ECECEC] border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             <div className="py-2">

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const StockList = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -71,7 +72,9 @@ const StockList = () => {
     );
   };
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
@@ -104,8 +107,7 @@ const StockList = () => {
       <div className="w-full mb-8">
         <div className="relative w-full">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#D4B28C]" />
-          <input
-            type="text"
+          <ThaiVirtualKeyboardInput
             placeholder="ค้นหาด้วยชื่อสินค้า..."
             value={searchTerm}
             onChange={handleSearch}

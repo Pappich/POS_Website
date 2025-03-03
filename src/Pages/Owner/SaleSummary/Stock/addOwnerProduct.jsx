@@ -7,6 +7,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const AddOwnerProduct = () => {
   const navigate = useNavigate();
@@ -208,11 +209,10 @@ const AddOwnerProduct = () => {
             <div className="py-2">
               <span className="font-bold">ชื่อสินค้า</span>
             </div>
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              placeholder="กรอกชื่อสินค้า"
+              onChange={setProductName}
+              placeholder="ชื่อสินค้า"
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
 
@@ -222,10 +222,9 @@ const AddOwnerProduct = () => {
                 <div className="py-2">
                   <span className="font-bold">จำนวน</span>
                 </div>
-                <input
-                  type="text"
+                <ThaiVirtualKeyboardInput
                   value={productAmount}
-                  onChange={(e) => setProductAmount(e.target.value)}
+                  onChange={setProductAmount}
                   placeholder="กรอกจำนวนของสินค้า"
                   className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
@@ -288,10 +287,9 @@ const AddOwnerProduct = () => {
                 <div className="py-2">
                   <span className="font-bold">ปริมาตรสุทธิต่อหน่วย</span>
                 </div>
-                <input
-                  type="text"
+                <ThaiVirtualKeyboardInput
                   value={netVolume}
-                  onChange={(e) => setNetVolume(e.target.value)}
+                  onChange={setNetVolume}
                   placeholder="กรอกปริมาตรสุทธิ"
                   className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />

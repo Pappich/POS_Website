@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
 import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const ToppingChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -245,13 +246,8 @@ const ToppingChoice = () => {
     }
   };
 
-  const handleChoiceChange = (index, field, value, label = "") => {
+  const handleChoiceChange = (index, field, value) => {
     const updatedChoices = [...choices];
-
-    if (field === "ingredientId") {
-      updatedChoices[index].name = label || value;
-    }
-
     updatedChoices[index][field] = value;
     setChoices(updatedChoices);
   };
@@ -263,7 +259,9 @@ const ToppingChoice = () => {
     ]);
   };
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleSelectMenu = (menuId) => {
     setSelectedMenus((prev) =>
@@ -351,26 +349,24 @@ const ToppingChoice = () => {
               {choices.map((choice, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-6 w-full items-center"
+                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-8 w-full items-center"
                 >
-                  <div className="w-full grid grid-cols-2">
-                    <IngredientDropdown
-                      value={choice.name || choice.ingredientId}
-                      onChange={(value, label) =>
-                        handleChoiceChange(index, "ingredientId", value, label)
+                  <div className="grid grid-cols-2 gap-4 w-full items-center">
+                    <ThaiVirtualKeyboardInput
+                      placeholder="กรอกชื่อท็อปปิ้ง..."
+                      value={choice.name}
+                      onChange={(value) =>
+                        handleChoiceChange(index, "name", value)
                       }
+                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     />
-                    {errors.choiceName && (
-                      <div className="absolute text-red-500 text-lg mt-1">
-                        {errors.choiceName}
-                      </div>
-                    )}
+                    {/* Unit Selection Dropdown */}
                     <select
                       value={choice.unit || ""}
                       onChange={(e) =>
                         handleChoiceChange(index, "unit", e.target.value)
                       }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 ml-2"
+                      className="border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     >
                       <option value="">เลือกหน่วย...</option>
                       {unitOptions.map((option) => (
@@ -380,12 +376,13 @@ const ToppingChoice = () => {
                       ))}
                     </select>
                   </div>
-                  <input
+
+                  <ThaiVirtualKeyboardInput
                     type="text"
                     placeholder="ราคา..."
                     value={choice.price || ""}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "price", e.target.value)
+                    onChange={(value) =>
+                      handleChoiceChange(index, "price", value)
                     }
                     className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
@@ -437,8 +434,7 @@ const ToppingChoice = () => {
 
                   {/* Right Column */}
                   <div>
-                    <input
-                      type="text"
+                    <ThaiVirtualKeyboardInput
                       placeholder="ยังไม่มีข้อมูล..."
                       value={choice.quantity}
                       onChange={(e) =>
@@ -472,7 +468,7 @@ const ToppingChoice = () => {
                   style={{ color: "#D4B28C" }}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
                 />
-                <input
+                <ThaiVirtualKeyboardInput
                   type="text"
                   placeholder="ค้นหาด้วยชื่อสินค้า..."
                   value={searchTerm}

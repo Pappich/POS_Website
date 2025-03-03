@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import configureAPI from "../../Config/configureAPI";
 import fetchApi from "../../Config/fetchApi";
+import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
 
 const AddCategoryButton = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -72,11 +73,10 @@ const AddCategoryButton = () => {
               >
                 ชื่อหมวดหมู่
               </label>
-              <input
-                type="text"
+              <ThaiVirtualKeyboardInput
                 id="categoryName"
                 placeholder="กรอกชื่อหมวดหมู่..."
-                onChange={(e) => setCategoryName(e.target.value)}
+                onChange={setCategoryName}
                 className="w-full border border-[#C6B399] rounded-full p-2 focus:outline-none focus:ring-1 focus:ring-[#C6B399]"
               />
             </div>

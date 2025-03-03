@@ -7,6 +7,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const GlassChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -171,7 +172,6 @@ const GlassChoice = () => {
             };
 
             console.log("PATCH requestData:", requestData);
-            
           } else {
             const formattedOptions = choices.map((choice) => {
               const option = {};
@@ -237,7 +237,9 @@ const GlassChoice = () => {
     setChoices((prev) => [...prev, { name: "", price: "" }]);
   };
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleSelectMenu = (menuId) => {
     setSelectedMenus((prev) =>
@@ -294,11 +296,10 @@ const GlassChoice = () => {
             >
               ชื่อกลุ่ม
             </label>
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               id="groupName"
               value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
+              onChange={setGroupName}
               placeholder="กรอกชื่อกลุ่ม..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -329,12 +330,11 @@ const GlassChoice = () => {
                 className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-8 w-full items-center"
               >
                 <div className="w-full">
-                  <input
-                    type="text"
+                  <ThaiVirtualKeyboardInput
                     placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
                     value={choice.name}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "name", e.target.value)
+                    onChange={(value) =>
+                      handleChoiceChange(index, "name", value)
                     }
                     className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
@@ -345,12 +345,12 @@ const GlassChoice = () => {
                   )}
                 </div>
                 <div className=" w-full">
-                  <input
-                    type="text"
-                    placeholder="ยังไม่มีข้อมูล..."
+                  <ThaiVirtualKeyboardInput
+                    type="number"
+                    placeholder="กรอกส่วนต่างของราคา..."
                     value={choice.price}
-                    onChange={(e) =>
-                      handleChoiceChange(index, "price", e.target.value)
+                    onChange={(value) =>
+                      handleChoiceChange(index, "price", value)
                     }
                     className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
@@ -391,8 +391,7 @@ const GlassChoice = () => {
                   style={{ color: "#D4B28C" }}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
                 />
-                <input
-                  type="text"
+                <ThaiVirtualKeyboardInput
                   placeholder="ค้นหาด้วยชื่อสินค้า..."
                   value={searchTerm}
                   onChange={handleSearch}

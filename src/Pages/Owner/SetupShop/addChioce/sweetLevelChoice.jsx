@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const SweetLevelChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -218,7 +219,9 @@ const SweetLevelChoice = () => {
     setChoices((prev) => [...prev, { sweetness_id: null, name: "" }]);
   };
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleSelectMenu = (menuId) => {
     setSelectedMenus((prev) =>
@@ -266,11 +269,11 @@ const SweetLevelChoice = () => {
             >
               ชื่อกลุ่ม
             </label>
-            <input
+            <ThaiVirtualKeyboardInput
               type="text"
               id="groupName"
               value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
+              onChange={(value) => setGroupName(value)}
               placeholder="กรอกชื่อกลุ่ม..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -294,15 +297,14 @@ const SweetLevelChoice = () => {
                 {choices.map((choice, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-[1fr_auto] gap-4 mb-6 w-full items-center"
+                    className="grid grid-cols-[1fr_auto] gap-4 mb-8 w-full items-center"
                   >
                     <div className="w-full">
-                      <input
-                        type="text"
-                        placeholder="กรอกชื่อช้อยส์ที่ต้องการ..."
+                      <ThaiVirtualKeyboardInput
+                        placeholder="กรอกระดับความหวาน..."
                         value={choice.name}
-                        onChange={(e) =>
-                          handleChoiceChange(index, "name", e.target.value)
+                        onChange={(value) =>
+                          handleChoiceChange(index, "name", value)
                         }
                         className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                       />
@@ -344,7 +346,7 @@ const SweetLevelChoice = () => {
                   style={{ color: "#D4B28C" }}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
                 />
-                <input
+                <ThaiVirtualKeyboardInput
                   type="text"
                   placeholder="ค้นหาด้วยชื่อสินค้า..."
                   value={searchTerm}

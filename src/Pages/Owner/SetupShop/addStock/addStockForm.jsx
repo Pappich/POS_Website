@@ -7,6 +7,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import { useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const AddStockForm = () => {
   const location = useLocation();
@@ -395,7 +396,7 @@ const AddStockForm = () => {
             >
               <div>
                 <IngredientDropdown
-                  value={ingredient.material}
+                  value={ingredient.ingredientId || ingredient.ingredient_name}
                   onChange={(value, label) =>
                     handleInputChange(index, "ingredientId", value, label)
                   }
@@ -404,7 +405,7 @@ const AddStockForm = () => {
 
               <div>
                 <select
-                  value={ingredient.unit || ""}
+                  value={ingredient.unit}
                   onChange={(e) => {
                     handleInputChange(index, "unit", e.target.value);
                   }}
@@ -513,17 +514,16 @@ const AddStockForm = () => {
                         key={size.size_id}
                         className="border border-gray-300 px-4 py-2 text-center"
                       >
-                        <input
-                          type="text"
+                        <ThaiVirtualKeyboardInput
                           value={
                             typeData[selectedType]?.[index]?.[size.size_id] ||
                             ""
                           }
-                          onChange={(e) =>
+                          onChange={(value) =>
                             handleSizeDataChange(
                               index,
                               size.size_id,
-                              e.target.value
+                              value
                             )
                           }
                           className="w-full border rounded p-2"
@@ -590,9 +590,11 @@ const AddStockForm = () => {
                   {typeItems.map((type) =>
                     sizeItems.map((size) => {
                       const value =
+                        typeData[type.menu_type_id]?.[row.id]?.[size.size_id] ||
                         typeData[type.menu_type_id]?.[rowIndex]?.[
                           size.size_id
-                        ] || "-";
+                        ] ||
+                        "-";
                       return (
                         <td
                           key={`${type.menu_type_id}-${size.size_id}`}

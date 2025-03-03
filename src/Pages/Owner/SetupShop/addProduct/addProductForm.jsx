@@ -4,6 +4,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const AddProductForm = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -198,11 +199,10 @@ const AddProductForm = () => {
             >
               ชื่อสินค้า
             </label>
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               id="menuName"
               value={menuName}
-              onChange={(e) => setMenuName(e.target.value)}
+              onChange={setMenuName}
               placeholder="กรอกชื่อสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -223,11 +223,11 @@ const AddProductForm = () => {
             >
               รายละเอียดสินค้า
             </label>
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
+
               id="productDetails"
               value={productDetails}
-              onChange={(e) => setProductDetails(e.target.value)}
+              onChange={setProductDetails}
               placeholder="กรอกรายละเอียดสินค้า..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -298,8 +298,7 @@ const AddProductForm = () => {
             >
               ราคาสินค้า (บาท)
             </label>
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               id="productPrice"
               value={productPrice}
               onChange={handlePriceChange}

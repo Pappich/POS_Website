@@ -5,6 +5,7 @@ import SideBar from "../../../../Components/Owner/sideBar";
 import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import OrderAndCancelCard from "../../../../Components/Owner/orderAndCancelCard";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const OrderSummary = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -92,6 +93,8 @@ const OrderSummary = () => {
     setSelectedSlip(null);
   };
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <div>
       <SideBar menuTab={"orderSummary"} />
@@ -100,6 +103,12 @@ const OrderSummary = () => {
         <span className="flex justify-end">
           <CalendarSelect setSelectedDate={setSelectedDate} />
         </span>
+        <ThaiVirtualKeyboardInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="ค้นหาออเดอร์..."
+          className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+        />
         <OrderAndCancelCard
           total_orders={orderData.total_orders}
           canceled_orders={orderData.canceled_orders}

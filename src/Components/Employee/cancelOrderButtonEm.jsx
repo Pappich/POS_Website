@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "react-simple-keyboard/build/css/index.css";
 import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
 
 const CancelOrderButtonEm = ({ order }) => {
   const environment = process.env.NODE_ENV || "development";
@@ -82,22 +83,22 @@ const CancelOrderButtonEm = ({ order }) => {
 
             <div className="mt-2">
               <label>ชื่อลูกค้า</label>
-              <input
-                type="text"
+              <ThaiVirtualKeyboardInput
+                
                 placeholder="กรอกชื่อของลูกค้า..."
                 value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
+                onChange={setCustomerName}
                 className="w-full border border-[#D4B28C] rounded-full px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
             </div>
 
             <div className="mt-2">
               <label>เบอร์โทรศัพท์ลูกค้า</label>
-              <input
-                type="text"
+              <ThaiVirtualKeyboardInput
+                
                 placeholder="กรอกเบอร์โทรศัพท์ของลูกค้า..."
                 value={contact}
-                onChange={(e) => setContact(e.target.value)}
+                onChange={setContact}
                 className="w-full border border-[#D4B28C] rounded-full px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
             </div>
