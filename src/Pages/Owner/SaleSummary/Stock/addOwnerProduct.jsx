@@ -71,7 +71,7 @@ const AddOwnerProduct = () => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      setProductImage(window.URL.createObjectURL(file)); 
+      setProductImage(window.URL.createObjectURL(file));
     }
   };
 
@@ -131,6 +131,8 @@ const AddOwnerProduct = () => {
           ? expirationDate.toISOString().split("T")[0]
           : null,
       };
+
+      console.log("ingredientData POST", ingredientData);
 
       const response = await fetchApi(
         `${URL}/owner/create-stock-ingredients`,
@@ -216,7 +218,7 @@ const AddOwnerProduct = () => {
 
             <div className="grid grid-cols-7 gap-4">
               {/* จำนวน */}
-              <div className="col-span-4">
+              <div className="col-span-7">
                 <div className="py-2">
                   <span className="font-bold">จำนวน</span>
                 </div>
@@ -227,43 +229,6 @@ const AddOwnerProduct = () => {
                   placeholder="กรอกจำนวนของสินค้า"
                   className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
-              </div>
-
-              {/* หน่วย */}
-              <div className="col-span-3">
-                <div className="py-2">
-                  <span className="font-bold">หน่วย</span>
-                </div>
-                <div className="relative w-full">
-                  <div
-                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                    className={`border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
-                      isUnitDropdownOpen ? "ring-2 ring-brown-400" : ""
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      {unitOption
-                        ? unitOptions.find((opt) => opt.value === unitOption)
-                            ?.label
-                        : "เลือกหน่วย"}
-                      <IoIosArrowDown size={16} />
-                    </div>
-                  </div>
-
-                  {isUnitDropdownOpen && (
-                    <div className="absolute mt-2 w-full bg-white border border-[#D4B28C] rounded-lg shadow-lg z-10">
-                      {unitOptions.map((option, index) => (
-                        <div
-                          key={index}
-                          onClick={() => handleSelectUnit(option)}
-                          className="p-3 hover:bg-[#F3E5D8] cursor-pointer text-gray-600"
-                        >
-                          {option.label}{" "}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
 
@@ -331,39 +296,36 @@ const AddOwnerProduct = () => {
                   className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
               </div>
-              {/* หน่วยปริมาตร */}
+              {/* หน่วย */}
               <div className="col-span-3">
                 <div className="py-2">
-                  <span className="font-bold">หน่วยปริมาตร</span>
+                  <span className="font-bold">หน่วย</span>
                 </div>
                 <div className="relative w-full">
                   <div
-                    onClick={() =>
-                      setIsVolumeUnitDropdownOpen(!isVolumeUnitDropdownOpen)
-                    }
+                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
                     className={`border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
-                      isVolumeUnitDropdownOpen ? "ring-2 ring-brown-400" : ""
+                      isUnitDropdownOpen ? "ring-2 ring-brown-400" : ""
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      {volumeUnit
-                        ? volumeUnitOptions.find(
-                            (opt) => opt.value === volumeUnit
-                          )?.label
+                      {unitOption
+                        ? unitOptions.find((opt) => opt.value === unitOption)
+                            ?.label
                         : "เลือกหน่วย"}
                       <IoIosArrowDown size={16} />
                     </div>
                   </div>
 
-                  {isVolumeUnitDropdownOpen && (
+                  {isUnitDropdownOpen && (
                     <div className="absolute mt-2 w-full bg-white border border-[#D4B28C] rounded-lg shadow-lg z-10">
-                      {volumeUnitOptions.map((option, index) => (
+                      {unitOptions.map((option, index) => (
                         <div
                           key={index}
-                          onClick={() => handleSelectVolumeUnit(option)}
+                          onClick={() => handleSelectUnit(option)}
                           className="p-3 hover:bg-[#F3E5D8] cursor-pointer text-gray-600"
                         >
-                          {option.label}
+                          {option.label}{" "}
                         </div>
                       ))}
                     </div>

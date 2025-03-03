@@ -26,6 +26,10 @@ const OrderSummary = () => {
 
   const [selectedDate, setSelectedDate] = useState(formattedDate);
 
+  // Add these state variables
+  const [slipModalVisible, setSlipModalVisible] = useState(false);
+  const [selectedSlip, setSelectedSlip] = useState(null);
+
   const handleTimeRangeClick = (timeRange) => {
     setSelectedTimeRange(timeRange);
   };
@@ -75,6 +79,18 @@ const OrderSummary = () => {
   useEffect(() => {
     fetchOrderData();
   }, [selectedDate]);
+
+  // Add this function to handle viewing the slip
+  const handleViewSlip = (slipUrl) => {
+    setSelectedSlip(slipUrl);
+    setSlipModalVisible(true);
+  };
+
+  // Add this function to close the slip modal
+  const closeSlipModal = () => {
+    setSlipModalVisible(false);
+    setSelectedSlip(null);
+  };
 
   return (
     <div>
@@ -131,6 +147,9 @@ const OrderSummary = () => {
                 <th className="pr-5 py-2 text-center border-b border-[#000000]">
                   ช่องทางการชำระเงิน
                 </th>
+                <th className="py-2 text-center border-b border-[#000000]">
+                  ใบเสร็จ
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -158,12 +177,24 @@ const OrderSummary = () => {
                         {item.payment_method}
                       </div>
                     </td>
+                    <td className="py-2 text-center border-b border-[#F1F4F7]">
+                      {item.payment_slip_url ? (
+                        <button
+                          onClick={() => handleViewSlip(item.payment_slip_url)}
+                          className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                        >
+                          ดูใบเสร็จโอนเงิน
+                        </button>
+                      ) : (
+                        <span className="text-gray-400">ไม่มีใบเสร็จ</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan="5" className="text-center py-4">
-                    No orders available.
+                    ยังไม่มีรายการคำสั่งซื้อในขณะนี้
                   </td>
                 </tr>
               )}
@@ -171,6 +202,53 @@ const OrderSummary = () => {
           </table>
         </div>
       </div>
+
+      {/* Slip Modal */}
+      {slipModalVisible && selectedSlip && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold">ใบเสร็จการโอนเงิน</h2>
+              <button
+                onClick={closeSlipModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex justify-center">
+              <img
+                src={`${URL}/${selectedSlip.replace(/\\/g, "/")}`}
+                alt="Payment Slip"
+                className="max-h-[70vh] object-contain"
+              />
+            </div>
+
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={closeSlipModal}
+                className="px-6 py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+              >
+                ปิด
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
