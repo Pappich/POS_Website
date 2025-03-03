@@ -56,11 +56,9 @@ const cartSlice = createSlice({
       state.items = state.items.filter(
         (item) =>
           item.menuId !== action.payload.menuId ||
-          item.menuName !== action.payload.menuName ||
-          item.menu_img !== action.payload.menu_img ||
-          item.selectedSize !== action.payload.selectedSize ||
-          item.selectedSweetness !== action.payload.selectedSweetness ||
-          item.selectedType !== action.payload.selectedType ||
+          item.selectedSize.id !== action.payload.selectedSize.id ||
+          item.selectedSweetness.id !== action.payload.selectedSweetness.id ||
+          item.selectedType.id !== action.payload.selectedType.id ||
           JSON.stringify(item.selectedAddOn) !==
             JSON.stringify(action.payload.selectedAddOn)
       );

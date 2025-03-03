@@ -19,6 +19,29 @@ const DoneOrderButton = ({ order, onSuccess }) => {
     setIsModalOpen(false);
   };
 
+  const speakQueueNumber = (queueNumber) => {
+    // ตรวจสอบว่าเบราว์เซอร์รองรับ Speech Synthesis หรือไม่
+    if ("speechSynthesis" in window) {
+      // สร้างข้อความที่จะพูด
+      const message = `คิวที่ ${queueNumber} เชิญรับเครื่องดื่มที่เคาน์เตอร์`;
+      const utterance = new SpeechSynthesisUtterance(message);
+
+      // ตั้งค่าเสียงเป็นภาษาไทย
+      utterance.lang = "th-TH";
+      // ปรับความเร็วของการพูด (0.1 ถึง 10)
+      utterance.rate = 0.6;
+      // ปรับระดับเสียง (0 ถึง 1)
+      utterance.volume = 1;
+      // ปรับความถี่เสียง (0 ถึง 2)
+      utterance.pitch = 1;
+
+      // เล่นเสียง
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.log("เบราว์เซอร์ไม่รองรับ Speech Synthesis");
+    }
+  };
+
   const completeOrder = async () => {
     const orderData = {
       order_id: order.order_id,
@@ -43,6 +66,10 @@ const DoneOrderButton = ({ order, onSuccess }) => {
 
       if (response.ok) {
         console.log("Order completed successfully!");
+        // เรียกใช้ฟังก์ชันพูดหมายเลขคิว
+        if (order.queue_number) {
+          speakQueueNumber(order.queue_number);
+        }
         closeModal();
         await onSuccess();
       } else {
