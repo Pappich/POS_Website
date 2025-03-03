@@ -14,6 +14,8 @@ import LogoutButton from "../../../Components/General/logoutButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import CheckSlip from "../../../Components/Employee/checkSlip";
+import PayWithCash from "../../../Components/Employee/payWithCash";
+import { useWebSocket } from "../../../webSocketContext";
 
 const Order = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -33,96 +35,197 @@ const Order = () => {
   });
   const [checkSlipData, setCheckSlipData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPayWithCash, setShowPayWithCash] = useState(false);
+  const [cashPaymentData, setCashPaymentData] = useState(null);
+  const socket = useWebSocket();
 
-  //connect web socket
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8080");
+    if (socket) {
+      console.log("Setting up WebSocket listener in Order page");
 
-    socket.onopen = () => {
-      console.log("WebSocket connection established");
-    };
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
 
-    socket.onmessage = async (event) => {
-      try {
-        let messageData;
-        if (event.data instanceof Blob) {
-          const text = await event.data.text();
-          messageData = JSON.parse(text);
-        } else {
-          messageData = JSON.parse(event.data);
+          console.log("Order page received message:", messageData);
+
+          switch (messageData.type) {
+            case "NEW_SLIP":
+              console.log("New slip received:", messageData.data);
+              if (messageData.data.startsWith("data:image")) {
+                setCheckSlipData(messageData.data);
+              }
+              break;
+
+            case "CONFIRM_SLIP":
+              setCheckSlipData(null);
+              break;
+
+            case "CASH_PAYMENT":
+              console.log("Cash payment received:", messageData.data);
+              setCashPaymentData(messageData.data);
+              setShowPayWithCash(true);
+              break;
+
+            default:
+              break;
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
         }
+      };
 
-        switch (messageData.type) {
-          case "NEW_SLIP":
-            console.log("New slip received:", messageData.data);
-            if (messageData.data.startsWith("data:image")) {
-              setCheckSlipData(messageData.data);
-            }
-            break;
+      socket.addEventListener("message", messageHandler);
+      return () => socket.removeEventListener("message", messageHandler);
+    }
+  }, [socket]);
 
-          case "CONFIRM_SLIP":
-            setCheckSlipData(null);
-            break;
-
-          default:
-            break;
-        }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetchApi(`${URL}/employee/orders`, "GET");
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders");
       }
-    };
+      const data = await response.json();
 
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+      setOrderStats({
+        total_orders: data.total_orders || 0,
+        pending_orders: data.pending_orders || 0,
+        completed_orders: data.completed_orders || 0,
+      });
 
-    return () => {
-      socket.close();
-    };
-  }, []);
+      if (data.orders && Array.isArray(data.orders)) {
+        const pendingOrders = data.orders.filter(
+          (order) => order.status === "รอทำ"
+        );
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetchApi(`${URL}/employee/orders`, "GET");
-        if (!response.ok) {
-          throw new Error("Failed to fetch orders");
-        }
-        const data = await response.json();
-
-        setOrderStats({
-          total_orders: data.total_orders || 0,
-          pending_orders: data.pending_orders || 0,
-          completed_orders: data.completed_orders || 0,
-        });
-
-        if (data.orders && Array.isArray(data.orders)) {
-          const formattedOrders = data.orders.map((order) => ({
-            ...order,
-            order_items: order.order_item || [],
-            order_date: new Date(order.order_date).toLocaleString("th-TH", {
-              timeZone: "Asia/Bangkok",
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-            }),
-          }));
-          setOrders(formattedOrders);
-        } else {
-          setOrders([]);
-        }
-      } catch (err) {
-        setError(err.message);
+        const formattedOrders = pendingOrders.map((order) => ({
+          ...order,
+          order_items: order.order_item || [],
+          order_date: new Date(order.order_date).toLocaleString("th-TH", {
+            timeZone: "Asia/Bangkok",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }),
+        }));
+        setOrders(formattedOrders);
+      } else {
         setOrders([]);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (err) {
+      setError(err.message);
+      setOrders([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
   }, [URL]);
+
+  const handlePaymentSuccess = async (paymentData) => {
+    try {
+      const orderData = {
+        createOrderDto: {
+          order_date: new Date().toISOString(),
+          total_price: cashPaymentData.totalAmount,
+          queue_number: null,
+          status: "รอทำ",
+          payment_method: "cash",
+          cash_given: paymentData.cashReceived,
+          change: paymentData.change,
+          cancel_status: null,
+        },
+        items: cashPaymentData.items,
+      };
+
+      console.log("Sending order data:", orderData);
+
+      const response = await fetchApi(
+        `${URL}/employee/orders`,
+        "POST",
+        orderData
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Order created successfully:", responseData);
+
+        if (socket) {
+          const message = {
+            type: "CASH_PAYMENT_CONFIRMED",
+            data: responseData,
+          };
+          socket.send(JSON.stringify(message));
+        }
+        await fetchOrders();
+      } else {
+        throw new Error("Failed to create order");
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      alert("เกิดข้อผิดพลาดในการสร้างออเดอร์");
+    }
+
+    setShowPayWithCash(false);
+  };
+
+  const handlePaymentCancel = async () => {
+    try {
+      const orderData = {
+        createOrderDto: {
+          order_date: new Date().toISOString(),
+          total_price: cashPaymentData.totalAmount,
+          queue_number: null,
+          status: "รอทำ",
+          payment_method: "cash",
+          cash_given: 0,
+          change: 0,
+          cancel_status: "ยกเลิกโดยพนักงาน",
+        },
+        items: cashPaymentData.items,
+      };
+
+      console.log("Sending cancel order data:", orderData);
+
+      const response = await fetchApi(
+        `${URL}/employee/orders`,
+        "POST",
+        orderData
+      );
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Order cancelled successfully:", responseData);
+
+        if (socket) {
+          const message = {
+            type: "CASH_PAYMENT_CANCELLED",
+            data: responseData,
+          };
+          socket.send(JSON.stringify(message));
+        }
+        await fetchOrders();
+      } else {
+        throw new Error("Failed to cancel order");
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      alert("เกิดข้อผิดพลาดในการยกเลิกออเดอร์");
+    }
+
+    setShowPayWithCash(false);
+  };
 
   const getTodayDate = () => {
     return new Date().toLocaleDateString("th-TH", {
@@ -224,8 +327,11 @@ const Order = () => {
                 )}
               </div>
               <div className="space-y-2 w-full py-4 mt-auto">
-                <CancelOrderButtonEm order={orders[0]} />
-                <DoneOrderButton order={orders[0]} />
+                <CancelOrderButtonEm
+                  order={orders[0]}
+                  onSuccess={fetchOrders}
+                />
+                <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
               </div>
             </div>
           </>
@@ -357,7 +463,10 @@ const Order = () => {
                           )}
                         </div>
                         <div className="space-y-2 w-full pt-2 pb-2">
-                          <CancelOrderButtonEm order={order} />
+                          <CancelOrderButtonEm
+                            order={order}
+                            onSuccess={fetchOrders}
+                          />
                         </div>
                       </div>
                     </div>
@@ -367,6 +476,13 @@ const Order = () => {
         </div>
       </div>
       {checkSlipData && <CheckSlip imageUrl={checkSlipData} />}
+      <PayWithCash
+        isOpen={showPayWithCash}
+        onClose={() => setShowPayWithCash(false)}
+        totalAmount={cashPaymentData?.totalAmount || 0}
+        onConfirm={handlePaymentSuccess}
+        onCancel={handlePaymentCancel}
+      />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import "react-simple-keyboard/build/css/index.css";
 import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
 
-const DoneOrderButton = ({ order }) => {
+const DoneOrderButton = ({ order, onSuccess }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -32,6 +32,7 @@ const DoneOrderButton = ({ order }) => {
     };
 
     console.log("orderData", orderData);
+    console.log("order", order);
 
     try {
       const response = await fetchApi(
@@ -43,6 +44,7 @@ const DoneOrderButton = ({ order }) => {
       if (response.ok) {
         console.log("Order completed successfully!");
         closeModal();
+        await onSuccess();
       } else {
         console.log(response);
         console.log("Failed to complete the order.");

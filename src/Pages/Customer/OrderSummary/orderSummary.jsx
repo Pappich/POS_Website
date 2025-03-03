@@ -8,6 +8,8 @@ import configureAPI from "../../../Config/configureAPI";
 import { useDispatch } from "react-redux";
 import { removeFromCart } from "../../../Config/redux/cartSlice";
 import { AiOutlineDelete } from "react-icons/ai";
+import { useWebSocket } from "../../../webSocketContext";
+import PayWithCash from "../../../Components/Employee/payWithCash";
 
 const Summary = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -19,6 +21,9 @@ const Summary = () => {
   const [selectedPayment, setSelectedPayment] = useState("qr");
   const [menuData, setMenuData] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [showPayWithCash, setShowPayWithCash] = useState(false);
+  const [cashPaymentData, setCashPaymentData] = useState(null);
+  const socket = useWebSocket();
 
   const items = useSelector((state) => state.cart.items);
 

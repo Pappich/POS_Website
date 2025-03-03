@@ -21,9 +21,9 @@ const PaymentMethod = () => {
   const items = orderDetails?.items;
   const selectedPayment = orderDetails?.selectedPayment;
 
-  console.log("orderDetails: ", orderDetails);
-  console.log("selectedPayment: ", selectedPayment);
-  console.log("TOTAL:", total);
+  console.log("Full orderDetails:", orderDetails);
+  console.log("selectedPayment type:", typeof selectedPayment);
+  console.log("selectedPayment value:", selectedPayment);
 
   const accountNumber = "0869201512";
   const qrData = generatePayload(accountNumber, { amount: parseFloat(total) });
@@ -61,64 +61,67 @@ const PaymentMethod = () => {
 
           console.log("PaymentMethod received message:", messageData);
 
-          if (messageData.type === "CONFIRM_SLIP") {
-            console.log("Got slip path:", messageData.data);
+          switch (messageData.type) {
+            case "CONFIRM_SLIP":
+              console.log("Got slip path:", messageData.data);
 
-            // สร้าง createOrderDto ตามโครงสร้างที่ backend ต้องการ
-            const createOrderDto = {
-              order_date: new Date().toISOString(),
-              total_price: total,
-              queue_number: null,
-              status: "รอทำ",
-              payment_method: selectedPayment,
-              path_img: messageData.data,
-              cancel_status: null,
-            };
+              // สร้าง createOrderDto ตามโครงสร้างที่ backend ต้องการ
+              const createOrderDto = {
+                order_date: new Date().toISOString(),
+                total_price: total,
+                queue_number: null,
+                status: "รอทำ",
+                payment_method: selectedPayment,
+                path_img: messageData.data,
+                cancel_status: null,
+              };
 
-            // แปลงโครงสร้าง items ให้ตรงกับ backend
-            const formattedItems = items.map((item) => ({
-              menu_id: item.menuId,
-              sweetness_id: item.selectedSweetness.id,
-              size_id: item.selectedSize.id,
-              add_on_id: item.selectedAddOn.map((addon) => addon.id), // แปลงเป็น array ของ id
-              menu_type_id: item.selectedType.id,
-              quantity: item.quantity,
-              price: item.price,
-            }));
+              // แปลงโครงสร้าง items ให้ตรงกับ backend
+              const formattedItems = items.map((item) => ({
+                menu_id: item.menuId,
+                sweetness_id: item.selectedSweetness.id,
+                size_id: item.selectedSize.id,
+                add_on_id: item.selectedAddOn.map((addon) => addon.id), // แปลงเป็น array ของ id
+                menu_type_id: item.selectedType.id,
+                quantity: item.quantity,
+                price: item.price,
+              }));
 
-            const payload = {
-              createOrderDto,
-              items: formattedItems,
-            };
+              const payload = {
+                createOrderDto,
+                items: formattedItems,
+              };
 
-            console.log("Sending order payload:", payload);
+              console.log("Sending order payload:", payload);
 
-            try {
-              const response = await fetchApi(
-                `${URL}/employee/orders`,
-                "POST",
-                payload
-              );
+              try {
+                const response = await fetchApi(
+                  `${URL}/employee/orders`,
+                  "POST",
+                  payload
+                );
 
-              console.log("Got response:", response);
+                console.log("Got response:", response);
 
-              if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Error data:", errorData);
-                throw new Error("Error submitting the order");
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  console.error("Error data:", errorData);
+                  throw new Error("Error submitting the order");
+                }
+
+                const responseData = await response.json();
+                console.log("Order submitted successfully:", responseData);
+
+                navigate("/queue-summary", {
+                  state: { orderData: responseData },
+                });
+              } catch (error) {
+                console.error("Error during order submission:", error);
               }
-
-              const responseData = await response.json();
-              console.log("Order submitted successfully:", responseData);
-
-              navigate("/queue-summary", {
-                state: { orderData: responseData },
-              });
-            } catch (error) {
-              console.error("Error during order submission:", error);
-            }
-          } else if (messageData.type === "RETAKE_SLIP") {
-            setShowPhoneDetect(true);
+              break;
+            case "RETAKE_SLIP":
+              setShowPhoneDetect(true);
+              break;
           }
         } catch (error) {
           console.error("Error in WebSocket message handler:", error);
@@ -139,7 +142,33 @@ const PaymentMethod = () => {
   const handleBack = () => navigate("/summary");
 
   const handleConfirmPayment = () => {
-    setShowPhoneDetect(true);
+    console.log("selectedPayment:", selectedPayment);
+    console.log("socket:", socket);
+    console.log("total:", total);
+    console.log("items:", items);
+
+    if (selectedPayment === "cash" && socket) {
+      console.log("Sending cash payment message");
+      const message = {
+        type: "CASH_PAYMENT",
+        data: {
+          totalAmount: total,
+          items: items.map((item) => ({
+            menu_id: item.menuId,
+            sweetness_id: item.selectedSweetness.id,
+            size_id: item.selectedSize.id,
+            add_on_id: item.selectedAddOn.map((addon) => addon.id),
+            menu_type_id: item.selectedType.id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      };
+      console.log("Sending WebSocket message:", message);
+      socket.send(JSON.stringify(message));
+    } else if (selectedPayment === "qr") {
+      setShowPhoneDetect(true);
+    }
   };
 
   const handlePhoneDetectCapture = async (imageData) => {
@@ -189,6 +218,29 @@ const PaymentMethod = () => {
       reader.onerror = (error) => reject(error);
     });
   };
+
+  useEffect(() => {
+    if (selectedPayment === "cash" && socket) {
+      console.log("Sending cash payment message");
+      const message = {
+        type: "CASH_PAYMENT",
+        data: {
+          totalAmount: total,
+          items: items.map((item) => ({
+            menu_id: item.menuId,
+            sweetness_id: item.selectedSweetness.id,
+            size_id: item.selectedSize.id,
+            add_on_id: item.selectedAddOn.map((addon) => addon.id),
+            menu_type_id: item.selectedType.id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      };
+      console.log("Sending WebSocket message:", message);
+      socket.send(JSON.stringify(message));
+    }
+  }, [selectedPayment, socket, total, items]);
 
   return (
     <div>

@@ -4,7 +4,7 @@ import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
 
-const CancelOrderButtonEm = ({ order }) => {
+const CancelOrderButtonEm = ({ order, onSuccess }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -45,12 +45,13 @@ const CancelOrderButtonEm = ({ order }) => {
       if (response.ok) {
         console.log("Order cancel successfully!");
         closeModal();
+        await onSuccess();
       } else {
-        console.log(response);
-        console.log("Failed to cancel the order.");
+        throw new Error("Failed to cancel order");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error cancelling order:", error);
+      alert("เกิดข้อผิดพลาดในการยกเลิกออเดอร์");
     }
   };
 
