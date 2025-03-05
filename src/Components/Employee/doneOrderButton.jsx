@@ -24,7 +24,7 @@ const DoneOrderButton = ({ order, onSuccess }) => {
     // ตรวจสอบว่าเบราว์เซอร์รองรับ Speech Synthesis หรือไม่
     if ("speechSynthesis" in window) {
       // สร้างข้อความที่จะพูด
-      const message = `คิวที่ ${queueNumber} เชิญรับเครื่องดื่มที่เคาน์เตอร์`;
+      const message = `ออเดอร์คิวที่ ${queueNumber} เชิญรับเครื่องดื่มที่เคาน์เตอร์`;
       const utterance = new SpeechSynthesisUtterance(message);
 
       // ตั้งค่าเสียงเป็นภาษาไทย
