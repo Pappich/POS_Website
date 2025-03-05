@@ -19,8 +19,8 @@ const PaymentMethodFilter = () => {
               onClick={() => handleTagClick(tag)}
               className={`px-4 py-1  ${
                 selectedTag === tag
-                  ? "bg-[#C6B399] text-white rounded-full border"
-                  : "bg-[#F5F5F5] border-[#C6B399]"
+                  ? "bg-[#DD9F52] text-white rounded-full border"
+                  : "bg-[#F5F5F5] border-[#DD9F52]"
               }`}
             >
               {tag}

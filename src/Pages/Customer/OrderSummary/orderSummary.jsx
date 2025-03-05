@@ -168,7 +168,7 @@ const Summary = () => {
                   <td>
                     <button
                       onClick={() => handleRemove(item)}
-                      className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white"
+                      className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
                     >
                       <AiOutlineDelete size={36} />
                     </button>
@@ -239,7 +239,7 @@ const Summary = () => {
             <div className="w-full flex justify-between space-x-8">
               <button
                 onClick={closePaymentPopup}
-                className="w-full py-2 mt-4 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors"
+                className="w-full py-2 mt-4 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
               >
                 ย้อนกลับ
               </button>

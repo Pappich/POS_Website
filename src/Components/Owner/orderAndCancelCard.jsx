@@ -42,7 +42,7 @@ const OrderAndCancelCard = ({ total_orders, canceled_orders }) => {
             <p className="font-bold">{canceled_orders} ออเดอร์</p>
           </div>
         </div>
-        <IoIosArrowForward size={30} className="text-[#C6B399]" />
+        <IoIosArrowForward size={30} className="text-[#DD9F52]" />
       </div>
     </div>
   );

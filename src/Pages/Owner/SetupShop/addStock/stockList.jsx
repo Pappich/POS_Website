@@ -171,7 +171,7 @@ const StockList = () => {
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full justify-start">
         <button
           onClick={handleBack}
-          className="px-14 py-4 w-[300px] rounded-full border border-[#DD9F52] text-[#DD9F52] bg-transparent font-bold transition duration-300 hover:bg-[#DD9F52] hover:text-white"
+          className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
         >
           ย้อนกลับ
         </button>

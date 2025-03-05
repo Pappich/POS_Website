@@ -133,7 +133,7 @@ const PauseIngredient = () => {
 
   return (
     <div className="w-full h-screen-navbar">
-      <div className="flex justify-center text-lg font-bold">
+      <div className="flex justify-center text-xl font-bold">
         <div className="text-center mb-10 mt-[40px]">
           <h1 className="text-3xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>
           <div className="w-20 h-1 bg-[#DD9F52]"></div>

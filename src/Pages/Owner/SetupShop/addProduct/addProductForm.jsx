@@ -235,12 +235,12 @@ const AddProductForm = () => {
       case 3:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-xl mb-5 font-bold">
               3. อัปโหลดรูปภาพสินค้า
             </div>
             <label
               htmlFor="productDetails"
-              className="text-lg mb-2 w-full text-center"
+              className="text-xl mb-2 w-full text-center"
             >
               รูปภาพสินค้า
             </label>
@@ -288,12 +288,12 @@ const AddProductForm = () => {
       case 4:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-xl mb-5 font-bold">
               4. กรอกราคาของสินค้า
             </div>
             <label
               htmlFor="productPrice"
-              className="text-lg mb-2 w-full text-center"
+              className="text-xl mb-2 w-full text-center"
             >
               ราคาสินค้า (บาท)
             </label>
@@ -318,7 +318,7 @@ const AddProductForm = () => {
       case 5:
         return (
           <>
-            <div className="w-full flex justify-start text-lg mb-5 font-bold">
+            <div className="w-full flex justify-start text-xl mb-5 font-bold">
               5. สรุปรายการสินค้า
             </div>
             <div className="flex w-full space-x-8 justify-between mb-2">

@@ -59,7 +59,7 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
   return (
     <div className="relative">
       <button
-        className="w-full border border-[#C6B399] hover:bg-[#a89982] hover:text-white text-[#C6B399] font-bold py-2 px-4 rounded-full"
+        className="w-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold py-2 px-4 rounded-full"
         onClick={openModal}
       >
         ยกเลิกออเดอร์
@@ -68,7 +68,7 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
           <div className="bg-[#F5F5F5] w-[500px] h-auto rounded-lg p-6 shadow-lg">
-            <h2 className="text-lg font-bold text-center mb-1">
+            <h2 className="text-xl font-bold text-center mb-1">
               ยกเลิกออเดอร์
             </h2>
             <hr className="h-0.5 bg-[#DD9F52] border-0" />
@@ -105,13 +105,13 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
 
             <div className="flex justify-between space-x-4 mt-10">
               <button
-                className="w-full text-[#C6B399] border border-[#C6B399]   hover:bg-[#afafaf] hover:text-white font-bold py-2 px-4 rounded-full"
+                className="w-full text-[#DD9F52] border border-[#DD9F52]   hover:bg-[#afafaf] hover:text-white font-bold py-2 px-4 rounded-full"
                 onClick={closeModal}
               >
                 ยกเลิก
               </button>
               <button
-                className="w-full bg-[#C6B399] hover:bg-[#a69781] text-white font-bold py-2 px-4 rounded-full"
+                className="w-full bg-[#DD9F52] hover:bg-[#C68A47] text-white font-bold py-2 px-4 rounded-full"
                 onClick={cancelOrder}
               >
                 ยกเลิกออเดอร์

@@ -32,9 +32,16 @@ const ProductList = () => {
     fetchMenus();
   }, [menuItems]);
 
-  const filteredItems = menuItems.filter((item) =>
-    item.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
-  );
+  const filteredItems = menuItems?.length
+    ? menuItems.filter((item) =>
+        item.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
+      )
+    : []; // Return an empty array if menuItems is empty or undefined
+
+  // Optional: Display a message or handle when there are no results
+  if (filteredItems.length === 0) {
+    console.log("No menu items match the search term.");
+  }
 
   const handleSearch = (value) => {
     setSearchTerm(value);

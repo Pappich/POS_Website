@@ -41,7 +41,7 @@ const AddCategoryButton = () => {
     <div>
       <button
         type="button"
-        className="text-[#C6B399] bg-[#F5F5F5] border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-3 py-1"
+        className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-3 py-1"
         onClick={toggleModal}
       >
         <div className="flex items-center">
@@ -78,14 +78,14 @@ const AddCategoryButton = () => {
                 id="categoryName"
                 placeholder="กรอกชื่อหมวดหมู่..."
                 onChange={setCategoryName}
-                className="w-full border border-[#C6B399] rounded-full p-2 focus:outline-none focus:ring-1 focus:ring-[#C6B399]"
+                className="w-full border border-[#DD9F52] rounded-full p-2 focus:outline-none focus:ring-1 focus:ring-[#DD9F52]"
               />
             </div>
 
             <div className="flex justify-between mt-8">
               <button
                 type="button"
-                className="text-[#C6B399] w-40 bg-[#F5F5F5] border border-[#C6B399] hover:bg-[#C6B399] hover:text-white rounded-full text-xl px-4 py-2"
+                className="w-40 bg-[#F5F5F5] border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold rounded-full text-xl px-4 py-2"
                 onClick={toggleModal}
               >
                 ย้อนกลับ
@@ -94,7 +94,7 @@ const AddCategoryButton = () => {
               <button
                 type="button"
                 onClick={handleAddIngredientCategory}
-                className="text-white  w-40 bg-[#C6B399] focus:outline-none hover:bg-[#A38B70] focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-xl px-4 py-2"
+                className="text-white  w-40 bg-[#DD9F52] focus:outline-none hover:bg-[#C68A47] focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-xl px-4 py-2"
               >
                 บันทึก
               </button>

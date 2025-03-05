@@ -343,7 +343,7 @@ const GlassChoice = () => {
                     className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
                   {errors.choiceName && (
-                    <div className="absolute text-[#C94C4C] text-lg mt-1">
+                    <div className="absolute text-[#C94C4C] text-xl mt-1">
                       {errors.choiceName}
                     </div>
                   )}
@@ -359,23 +359,23 @@ const GlassChoice = () => {
                     className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
                   {errors.price && (
-                    <div className="absolute text-[#C94C4C] text-lg mt-1">
+                    <div className="absolute text-[#C94C4C] text-xl mt-1">
                       {errors.price}
                     </div>
                   )}
                 </div>
                 <button
                   onClick={() => removeChoice(index)}
-                  className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white"
+                  className="flex items-center justify-center w-10 h-10 border border-[#C94C4C] text-[#C94C4C] rounded-full transition duration-200 hover:bg-[#C94C4C] hover:text-white"
                 >
-                  <AiOutlineDelete size={36} />
+                  <span className="text-2xl">−</span>
                 </button>
               </div>
             ))}
 
             <button
               onClick={addChoice}
-              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-4"
+              className="w-full py-2 bg-[#F0ECE3] text-[#DD9F52] rounded-full font-semibold mt-4"
             >
               + เพิ่มช้อยส์
             </button>
@@ -576,7 +576,7 @@ const GlassChoice = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-[#F5F5F5] mt-[40px]">
+    <div className="flex flex-col items-center bg-[#F5F5F5] mt-[40px] h-screen-navbar">
       {/* Header */}
       <div className="text-center mb-10 mt-[40px]">
         <h1 className="text-3xl font-bold mb-2">เพิ่มตัวเลือก</h1>

@@ -294,9 +294,9 @@ const Stock = () => {
         <div className="flex justify-between items-center">
           <span className="flex items-center">
             <span className="font-bold mt-2">หมวดหมู่</span>
-            <span className="pl-2 text-[#DD9F52]">
+            {/* <span className="pl-2 text-[#DD9F52]">
               <LuInfo size={24} />
-            </span>
+            </span> */}
           </span>
           <AddCategoryButton />
         </div>
@@ -307,8 +307,8 @@ const Stock = () => {
               onClick={() => handleCategoryChange(null)}
               className={`px-4 py-1 ${
                 selectedCategory === null
-                  ? "bg-[#C6B399] text-white rounded-full border"
-                  : "bg-[#F5F5F5] border-[#C6B399]"
+                  ? "bg-[#DD9F52] text-white rounded-full border"
+                  : "bg-[#F5F5F5] border-[#DD9F52]"
               }`}
             >
               ทั้งหมด
@@ -321,8 +321,8 @@ const Stock = () => {
                 onClick={() => handleCategoryChange(category.category_id)}
                 className={`px-4 py-1 ${
                   selectedCategory === category.category_id
-                    ? "bg-[#C6B399] text-white rounded-full border"
-                    : "bg-[#F5F5F5] border-[#C6B399]"
+                    ? "bg-[#DD9F52] text-white rounded-full border"
+                    : "bg-[#F5F5F5] border-[#DD9F52]"
                 }`}
               >
                 {category.category_name}
@@ -363,8 +363,8 @@ const Stock = () => {
 
           {/* Search Bar */}
           <div className="my-4 relative flex">
-            <div className="mr-5 flex items-center bg-[#F5F5F5] border-[#C6B399] border rounded-full px-4 py-1 w-full">
-              <FiSearch className="text-[#C6B399] mr-2" size={36} />
+            <div className="mr-5 flex items-center bg-[#F5F5F5] border-[#DD9F52] border rounded-full px-4 py-1 w-full">
+              <FiSearch className="text-[#DD9F52] mr-2" size={36} />
               <ThaiVirtualKeyboardInput
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -375,7 +375,7 @@ const Stock = () => {
             {/* เพิมรายการสินค้า */}
             <button
               type="button"
-              className="flex justify-center items-center w-1/4 text-white border border-[#C6B399] bg-[#C6B399] hover:bg-[#b8a78f] focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-2xl px-3 py-1"
+              className="flex justify-center items-center w-1/4 text-white border border-[#DD9F52] bg-[#DD9F52] hover:bg-[#C68A47] focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-2xl px-3 py-1"
               onClick={handleAddOwnerProduct}
             >
               <div className="flex items-center whitespace-nowrap">
@@ -407,9 +407,7 @@ const Stock = () => {
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
                     อัปเดต
                   </th>
-                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
-                    ลบ
-                  </th>
+                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -441,19 +439,19 @@ const Stock = () => {
                           e.stopPropagation(); // Prevent the row click handler from firing
                           handleShowHistory(item.ingredient_id);
                         }}
-                        className="text-[#C6B399] bg-[#F5F5F5] border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
+                        className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
                       >
                         อัปเดต
                       </button>
                     </td>
-                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7] flex justify-center">
                       <button
                         onClick={(event) => {
                           event.stopPropagation(); // Prevent the row click event
                           setIngredientToDelete(item);
                           setDeleteModalOpen(true);
                         }}
-                        className="font-bold border border-red-300 text-red-300 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white z-10"
+                        className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
                       >
                         <AiOutlineDelete size={24} />
                       </button>
@@ -470,7 +468,7 @@ const Stock = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
               {/* Product Name */}
-              <h2 className="text-lg font-bold text-center mb-4 absolute top-4 w-full">
+              <h2 className="text-xl font-bold text-center mb-4 absolute top-4 w-full">
                 {selectedProduct?.ingredient_name}
               </h2>
 
@@ -605,7 +603,7 @@ const Stock = () => {
               {/* Buttons */}
               <div className="flex justify-between mt-6">
                 <button
-                  className="px-6 py-3 w-full border rounded-full text-gray-700 border-gray-400 hover:bg-gray-100 transition-colors font-bold"
+                  className="px-6 py-3 w-full border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={closeModal}
                 >
                   ย้อนกลับ
@@ -626,7 +624,7 @@ const Stock = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
               {/* Modal Header */}
-              <h2 className="text-lg font-bold text-center mb-4">
+              <h2 className="text-xl font-bold text-center mb-4">
                 ประวัติการอัปเดต {ingredientHistory.ingredient_name}
               </h2>
 
@@ -681,7 +679,7 @@ const Stock = () => {
                               setHistoryModalVisible(false);
                               handleUpdate(update.update_id);
                             }}
-                            className="text-[#C6B399] bg-[#F5F5F5] border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                            className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
                           >
                             อัปเดต
                           </button>

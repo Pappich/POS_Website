@@ -428,7 +428,7 @@ const AddStockForm = () => {
               <div>
                 <button
                   onClick={() => removeChoice(ingredient.id)}
-                  className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white"
+                  className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
                 >
                   <AiOutlineDelete size={36} />
                 </button>
@@ -439,7 +439,7 @@ const AddStockForm = () => {
           {/* Button to add new row */}
           <button
             onClick={handleAddRow}
-            className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold transition mt-8"
+            className="w-full py-2 bg-[#F0ECE3] text-[#DD9F52] rounded-full font-semibold transition mt-8"
           >
             + เพิ่มวัตถุดิบ
           </button>
@@ -618,7 +618,7 @@ const AddStockForm = () => {
 
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

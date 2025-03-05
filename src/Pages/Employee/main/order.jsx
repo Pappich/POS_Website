@@ -357,7 +357,7 @@ const Order = () => {
           {/* Button */}
           <button
             onClick={handlePauseSection}
-            className="py-2 bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full w-full"
+            className="py-2 bg-[#DD9F52] hover:bg-[#C68A47] text-white rounded-full w-full"
           >
             <div className="flex justify-center items-center gap-2 text-2xl">
               <MdOutlinePauseCircleOutline size={36} />

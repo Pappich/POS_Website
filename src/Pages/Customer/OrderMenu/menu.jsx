@@ -132,7 +132,7 @@ const Menu = () => {
                 src={imageUrl}
                 alt={menu.menu_name}
               />
-              <div className="font-bold text-lg">{menu.menu_name}</div>
+              <div className="font-bold text-xl">{menu.menu_name}</div>
               <div className="text-gray-600">{menu.description}</div>
             </button>
           );

@@ -314,7 +314,7 @@ const AddGroupForm = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center bg-[#F5F5F5]">
+      <div className="flex flex-col items-center bg-[#F5F5F5] h-screen-navbar">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold mb-2">เพิ่มกลุ่มรายการสินค้า</h1>
           <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>

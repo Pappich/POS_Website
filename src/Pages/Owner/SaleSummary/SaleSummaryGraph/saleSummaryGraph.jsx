@@ -51,19 +51,21 @@ const SaleSummaryGraph = () => {
   return (
     <div className="h-screen-website flex flex-col">
       <SideBar menuTab={"saleSummaryGraph"} />
-      <h1 className="font-bold text-xl">ภาพรวมยอดขาย</h1>
-      <span className="flex justify-end">
-        <CalendarSelect setSelectedDate={setSelectedDate} />
-      </span>
-      <IncomeOrderCancel data={data} />
-      <div className="mt-3 flex-1">
-        {/* Line Chart Section */}
-        <div className="bg-[#F5F5F5] p-4 border rounded-lg flex flex-col">
-          <h2 className="text-lg text-center font-semibold mb-2 ">
-            กราฟสรุปรายรับประจำเดือน
-          </h2>
-          <div className="flex-1">
-            <LineChart dailyStats={data?.daily_stats} />
+      <div className="ml-8 mr-8">
+        <h1 className="font-bold text-xl">ภาพรวมยอดขาย</h1>
+        <span className="flex justify-end">
+          <CalendarSelect setSelectedDate={setSelectedDate} />
+        </span>
+        <IncomeOrderCancel data={data} />
+        <div className="mt-3 flex-1">
+          {/* Line Chart Section */}
+          <div className="bg-[#F5F5F5] p-4 border rounded-lg flex flex-col">
+            <h2 className="text-xl text-center font-semibold mb-2 ">
+              กราฟสรุปรายรับประจำเดือน
+            </h2>
+            <div className="flex-1">
+              <LineChart dailyStats={data?.daily_stats} />
+            </div>
           </div>
         </div>
       </div>

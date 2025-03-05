@@ -176,7 +176,7 @@ const MenuDetail = () => {
   if (!menu) return <div>Loading...</div>;
 
   return (
-    <div className="font-noto flex flex-col bg-[#F5F5F5]">
+    <div className="font-noto flex flex-col bg-[#F5F5F5] mb-8">
       <div className="flex justify-between items-center mb-6 relative">
         <button onClick={handleBack}>
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
@@ -325,7 +325,7 @@ const MenuDetail = () => {
 
         <button
           onClick={handleAddToCart}
-          className="w-full py-3 bg-[#DD9F52] text-white rounded-full font-semibold"
+          className="w-full py-3 bg-[#DD9F52] text-white rounded-full font-semibold mb-8"
         >
           + เพิ่มเข้าตระกร้า
         </button>

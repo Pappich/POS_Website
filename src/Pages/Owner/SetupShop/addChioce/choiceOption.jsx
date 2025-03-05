@@ -29,7 +29,7 @@ const ChoiceOptions = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-[#F5F5F5]">
+    <div className="flex flex-col items-center bg-[#F5F5F5] h-screen-navbar">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold mb-2 mt-[40px]">
           ตัวเลือกรายการสินค้า

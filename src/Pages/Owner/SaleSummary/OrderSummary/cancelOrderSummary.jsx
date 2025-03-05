@@ -5,8 +5,10 @@ import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
+import { useNavigate } from "react-router-dom";
 
 const CancelOrderSummary = () => {
+  const navigate = useNavigate();
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -119,6 +121,10 @@ const CancelOrderSummary = () => {
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const handleBack = () => {
+    navigate("/order-summary");
   };
 
   return (
@@ -265,7 +271,7 @@ const CancelOrderSummary = () => {
                   <p>สถานะ </p>
                   <div className="px-2">
                     <button
-                      className="border border-[#C6B399] text-[#C6B399] rounded-full px-2 hover:bg-[#C6B399] hover:text-white"
+                      className="border border-[#DD9F52] text-[#DD9F52] rounded-full px-2 hover:bg-[#DD9F52] hover:text-white"
                       onClick={openEditModal}
                     >
                       แก้ไข
@@ -329,7 +335,7 @@ const CancelOrderSummary = () => {
               </div>
               <div className="flex justify-between mt-6">
                 <button
-                  className="w-32 py-1 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors"
+                  className="w-32 py-1 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={() => setIsEditModalOpen(false)}
                 >
                   ย้อนกลับ
@@ -345,7 +351,16 @@ const CancelOrderSummary = () => {
           </div>
         )}
       </div>
+      <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-[#F5F5F5]">
+        <button
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
+          onClick={handleBack}
+        >
+          ย้อนกลับ
+        </button>
+      </div>
     </div>
+    // </div>
   );
 };
 

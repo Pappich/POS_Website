@@ -70,7 +70,7 @@ const CalendarSelect = ({ setSelectedDate }) => {
     <div>
       <button
         type="button"
-        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-2xl px-1 py-0.2 mb-2"
+        className="text-[#DD9F52] bg-white border border-[#DD9F52] focus:outline-none hover:bg-[#f5e9dc] transition-colors font-medium rounded-full text-2xl px-1 py-0.2 mb-2"
         onClick={toggleModal}
       >
         <div className="flex justify-center items-center">
@@ -103,7 +103,7 @@ const CalendarSelect = ({ setSelectedDate }) => {
                     key={day}
                     className={`px-4 py-1 cursor-pointer text-center ${
                       selectedDay === day
-                        ? "bg-[#C6B399] rounded-full text-white"
+                        ? "bg-[#DD9F52] rounded-full text-white"
                         : "hover:bg-[#F1EBE1] hover:rounded-full"
                     }`}
                     onClick={() => setSelectedDay(day)}
@@ -152,7 +152,7 @@ const CalendarSelect = ({ setSelectedDate }) => {
                   <span className="font-bold text-2xl">เลือกปี</span>
                   <button
                     onClick={() => setIsYearSelector(false)}
-                    className="text-[#C6B399] hover:text-gray-700 font-medium"
+                    className="text-[#DD9F52] hover:text-gray-700 font-medium"
                   >
                     กลับไปเลือกเดือน
                   </button>
@@ -163,7 +163,7 @@ const CalendarSelect = ({ setSelectedDate }) => {
                       key={year}
                       className={`px-4 py-1 cursor-pointer text-center ${
                         selectedYear === year
-                          ? "bg-[#C6B399] rounded-full text-white"
+                          ? "bg-[#DD9F52] rounded-full text-white"
                           : "hover:bg-[#F1EBE1] hover:rounded-full"
                       }`}
                       onClick={() => {
@@ -216,7 +216,7 @@ const CalendarSelect = ({ setSelectedDate }) => {
                       key={month}
                       className={`px-4 py-1 cursor-pointer text-center ${
                         selectedMonth === month
-                          ? "bg-[#C6B399] rounded-full text-white"
+                          ? "bg-[#DD9F52] rounded-full text-white"
                           : "hover:bg-[#F1EBE1] hover:rounded-full"
                       }`}
                       onClick={() => {
@@ -233,7 +233,7 @@ const CalendarSelect = ({ setSelectedDate }) => {
 
             <button
               type="button"
-              className="text-[#C6B399] mt-6 bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full px-8 py-2 mb-2"
+              className="text-[#DD9F52] mt-6 bg-white border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full px-8 py-2 mb-2"
               onClick={toggleModal}
             >
               <div className="flex items-center justify-center">

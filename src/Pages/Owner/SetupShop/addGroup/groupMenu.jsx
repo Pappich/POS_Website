@@ -84,7 +84,7 @@ const GroupMenu = () => {
                   readOnly
                   className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                 />
-                <span className="text-lg">{menuName}</span>
+                <span className="text-xl">{menuName}</span>
               </div>
             ))}
           </div>

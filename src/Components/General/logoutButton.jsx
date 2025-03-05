@@ -32,7 +32,7 @@ const LogoutButton = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-[#F5F5F5] rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-lg font-semibold text-center mb-4">
+            <h2 className="text-xl font-semibold text-center mb-4">
               ยืนยันการออกจากระบบ
             </h2>
             <p className="text-gray-700 text-center mb-6">
