@@ -31,8 +31,10 @@ const LogoutButton = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-lg font-semibold text-center mb-4">ยืนยันการออกจากระบบ</h2>
+          <div className="bg-[#F5F5F5] rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-xl font-semibold text-center mb-4">
+              ยืนยันการออกจากระบบ
+            </h2>
             <p className="text-gray-700 text-center mb-6">
               หากกดยืนยันแล้วจะต้องเข้าสู่ระบบใหม่อีกครั้ง
             </p>
@@ -45,7 +47,7 @@ const LogoutButton = () => {
               </button>
               <button
                 onClick={handleConfirmLogout}
-                className="bg-red-500 text-white hover:bg-red-600 rounded-full px-4 py-2"
+                className="bg-[#C94C4C] text-white hover:bg-red-600 rounded-full px-4 py-2"
               >
                 ยืนยัน
               </button>

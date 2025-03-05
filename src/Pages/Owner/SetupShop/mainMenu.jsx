@@ -75,10 +75,10 @@ const MainMenu = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white mt-[120px]">
+    <div className="flex flex-col items-center h-screen-navbar mt-[120px]">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold mb-2">ตัวเลือกรายการสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <div className="w-full ml-16 mt-[120px]">
@@ -89,7 +89,7 @@ const MainMenu = () => {
               className={`flex flex-col items-center cursor-pointer transition-all ${
                 disabled
                   ? "text-gray-300 cursor-not-allowed"
-                  : "text-[#D4B28C] hover:text-orange-500"
+                  : "text-[#DD9F52] hover:text-[#C68A47]"
               }`}
               onClick={() => handleClick(id)}
             >
@@ -97,7 +97,7 @@ const MainMenu = () => {
                 className={`p-3 transition-colors duration-300 mb-2 ${
                   disabled
                     ? "text-gray-300"
-                    : "text-[#D4B28C] hover:text-orange-500"
+                    : "text-[#DD9F52] hover:text-[#C68A47]"
                 }`}
               >
                 {icon}
@@ -110,7 +110,7 @@ const MainMenu = () => {
 
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

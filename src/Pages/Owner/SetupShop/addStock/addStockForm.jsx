@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const AddStockForm = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const AddStockForm = () => {
   const [filterIngredientData, setFilterIngredientData] = useState([]);
   const [menuIngredientDataSet, setMenuIngredientDataSet] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // List options
   const unitOptions = [
     { value: "กรัม", label: "กรัม (g)" },
@@ -289,6 +290,7 @@ const AddStockForm = () => {
   // แก้ไข handleNext สำหรับการ POST ข้อมูล
   const handleNext = async () => {
     if (step === 3) {
+      setLoading(true);
       try {
         const requestData = {
           menuData: rows.map((row, rowIndex) => ({
@@ -322,6 +324,8 @@ const AddStockForm = () => {
         }
       } catch (error) {
         console.error("Error:", error);
+      } finally {
+        setLoading(false);
       }
     } else {
       setStep(step + 1);
@@ -372,10 +376,10 @@ const AddStockForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center h-screen-navbar bg-[#F5F5F5]">
       <div className="text-center mb-8 mt-[40px]">
         <h1 className="text-3xl font-bold mb-2">ระบบตัดคลังสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <div className="flex items-start w-full font-bold text-2xl">
@@ -410,7 +414,7 @@ const AddStockForm = () => {
                   onChange={(e) => {
                     handleInputChange(index, "unit", e.target.value);
                   }}
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 >
                   <option value="">เลือกหน่วย</option>
                   {unitOptions.map((option) => (
@@ -424,7 +428,7 @@ const AddStockForm = () => {
               <div>
                 <button
                   onClick={() => removeChoice(ingredient.id)}
-                  className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                  className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
                 >
                   <AiOutlineDelete size={36} />
                 </button>
@@ -435,7 +439,7 @@ const AddStockForm = () => {
           {/* Button to add new row */}
           <button
             onClick={handleAddRow}
-            className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold transition mt-8"
+            className="w-full py-2 bg-[#F0ECE3] text-[#DD9F52] rounded-full font-semibold transition mt-8"
           >
             + เพิ่มวัตถุดิบ
           </button>
@@ -455,8 +459,8 @@ const AddStockForm = () => {
                   onClick={() => handleTypeClick(type)}
                   className={`px-6 py-3 rounded-full border border-[#DD9F52] font-bold ml-2 ${
                     selectedType === type.menu_type_id
-                      ? "bg-[#D4B28C] text-white"
-                      : "bg-white text-[#DD9F52]"
+                      ? "bg-[#DD9F52] text-white"
+                      : "bg-[#F5F5F5] text-[#DD9F52]"
                   }`}
                 >
                   {type.menu_type_name}
@@ -496,7 +500,7 @@ const AddStockForm = () => {
               {rows.map((row, index) => (
                 <tr
                   key={row.id || row.ingredient_id || index}
-                  className="bg-white text-start"
+                  className="bg-[#F5F5F5] text-start"
                 >
                   <td className="border border-gray-300 px-4 py-2">
                     {index + 1}. {row.material} ({row.unit})
@@ -521,11 +525,7 @@ const AddStockForm = () => {
                             ""
                           }
                           onChange={(value) =>
-                            handleSizeDataChange(
-                              index,
-                              size.size_id,
-                              value
-                            )
+                            handleSizeDataChange(index, size.size_id, value)
                           }
                           className="w-full border rounded p-2"
                           placeholder="กรอกข้อมูล"
@@ -582,7 +582,10 @@ const AddStockForm = () => {
             {/* Table Body */}
             <tbody>
               {rows.map((row, rowIndex) => (
-                <tr key={row.id || rowIndex} className="bg-white text-start">
+                <tr
+                  key={row.id || rowIndex}
+                  className="bg-[#F5F5F5] text-start"
+                >
                   <td className="border border-gray-300 px-4 py-2">
                     {rowIndex + 1}. {row.material} ({row.unit})
                   </td>
@@ -615,18 +618,19 @@ const AddStockForm = () => {
 
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ
         </button>
         <button
-          className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
           onClick={handleNext}
         >
           {step < 3 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

@@ -56,10 +56,10 @@ const GroupMenu = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-white mt-[40px]">
+    <div className="flex flex-col items-center bg-[#F5F5F5] mt-[40px]">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold mb-2">กลุ่มรายการสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <div className="w-full flex justify-between items-center mb-6">
@@ -84,7 +84,7 @@ const GroupMenu = () => {
                   readOnly
                   className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                 />
-                <span className="text-lg">{menuName}</span>
+                <span className="text-xl">{menuName}</span>
               </div>
             ))}
           </div>
@@ -97,7 +97,7 @@ const GroupMenu = () => {
 
       <div className="flex fixed bottom-4 left-0 px-4 py-4 mt-8 w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

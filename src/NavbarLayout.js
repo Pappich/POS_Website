@@ -3,9 +3,9 @@ import Navbar from "./Components/General/navBar";
 
 function NavbarLayout() {
   return (
-    <div className="border-gray-100 w-full">
+    <div className="border-[#F5F5F5] w-full">
       <Navbar />
-      <div className="px-10 border-gray-100">
+      <div className="px-10 border-[#F5F5F5]">
         <Outlet />
       </div>
     </div>

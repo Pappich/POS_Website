@@ -199,13 +199,13 @@ function PhoneDetect({ onCapture, socket }) {
           <div className="w-full flex justify-between mt-4">
             <button
               onClick={handleCancel}
-              className="w-[200px] py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+              className="w-[200px] py-2 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             >
               ถ่ายใหม่
             </button>
             <button
               onClick={handleAccept}
-              className="w-[200px] py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+              className="w-[200px] py-2 bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
             >
               ส่งให้พนักงาน
             </button>

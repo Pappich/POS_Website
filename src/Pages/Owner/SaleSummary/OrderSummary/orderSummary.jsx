@@ -96,7 +96,7 @@ const OrderSummary = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div>
+    <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"orderSummary"} />
       <div className="px-10">
         <h1 className="font-bold text-3xl mt-[40px]">ออเดอร์ทั้งหมด</h1>
@@ -107,7 +107,7 @@ const OrderSummary = () => {
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder="ค้นหาออเดอร์..."
-          className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+          className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 mb-4"
         />
         <OrderAndCancelCard
           total_orders={orderData.total_orders}
@@ -129,8 +129,8 @@ const OrderSummary = () => {
                       onClick={() => handleTimeRangeClick(timeRange)}
                       className={`px-4 py-1 ${
                         selectedTimeRange === timeRange
-                          ? "bg-[#C6B399] text-white rounded-full border"
-                          : "bg-white border-[#C6B399]"
+                          ? "bg-[#DD9F52] text-white rounded-full border"
+                          : "bg-[#F5F5F5] border-[#DD9F52]"
                       }`}
                     >
                       {timeRange}
@@ -190,7 +190,7 @@ const OrderSummary = () => {
                       {item.payment_slip_url ? (
                         <button
                           onClick={() => handleViewSlip(item.payment_slip_url)}
-                          className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                          className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
                         >
                           ดูใบเสร็จโอนเงิน
                         </button>
@@ -215,9 +215,9 @@ const OrderSummary = () => {
       {/* Slip Modal */}
       {slipModalVisible && selectedSlip && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full">
+          <div className="bg-[#F5F5F5] rounded-lg p-6 max-w-2xl w-full">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold">ใบเสร็จการโอนเงิน</h2>
+              <h2 className="text-xl font-bold">ใบเสร็จการโอนเงิน</h2>
               <button
                 onClick={closeSlipModal}
                 className="text-gray-500 hover:text-gray-700"
@@ -250,7 +250,7 @@ const OrderSummary = () => {
             <div className="mt-4 flex justify-center">
               <button
                 onClick={closeSlipModal}
-                className="px-6 py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                className="px-6 py-2 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
               >
                 ปิด
               </button>

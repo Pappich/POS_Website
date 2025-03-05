@@ -20,17 +20,17 @@ const PauseSection = () => {
       {/* <div className="flex justify-end">
         <HomeEmButton />
       </div> */}
-      <div className="flex flex-col items-center bg-white">
+      <div className="flex flex-col items-center bg-[#F5F5F5] h-screen-navbar">
         <div className="text-center mb-10 mt-[40px]">
           <h1 className="text-3xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>
-          <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+          <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
         </div>
 
         <div className="w-full">
           <div className="w-full mb-4">
             <div className="flex justify-between items-start">
               <p className="text-2xl">วัตถุดิบที่เลือกทั้งหมด</p>
-              <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+              <div className="flex items-center space-x-4 text-[#DD9F52] font-bold">
                 {/* <button className="hover:underline font-bold">ดูรายการ</button>
                 <span className="text-gray-300">|</span> */}
                 <button
@@ -48,7 +48,7 @@ const PauseSection = () => {
           <div className="w-full mb-4">
             <div className="flex justify-between items-start">
               <p className="text-2xl">เมนูที่เลือกทั้งหมด</p>
-              <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+              <div className="flex items-center space-x-4 text-[#DD9F52] font-bold">
                 {/* <button className="hover:underline font-bold">ดูรายการ</button>
                 <span className="text-gray-300">|</span> */}
                 <button
@@ -66,11 +66,11 @@ const PauseSection = () => {
         <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
           <button
             onClick={handleBackButton}
-            className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           >
             ย้อนกลับ
           </button>
-          {/* <button className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold">
+          {/* <button className="px-6 py-3 w-[250px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold">
             บันทึก
           </button> */}
         </div>

@@ -9,6 +9,7 @@ import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import { useWebSocket } from "../../../webSocketContext";
 import PhoneDetect from "../../../Components/PhoneDetect/phoneDetect";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const PaymentMethod = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -59,9 +60,9 @@ const PaymentMethod = () => {
           } else {
             messageData = JSON.parse(event.data);
           }
-  
+
           console.log("PaymentMethod received message:", messageData);
-  
+
           let createOrderDto = {
             order_date: new Date().toISOString(),
             total_price: total,
@@ -71,24 +72,24 @@ const PaymentMethod = () => {
             path_img: messageData.data,
             cancel_status: null,
           };
-  
+
           switch (messageData.type) {
             case "CONFIRM_SLIP":
               console.log("Got slip path:", messageData.data);
               break;
-  
+
             case "RETAKE_SLIP":
               setShowPhoneDetect(true);
-              return; 
-  
+              return;
+
             case "CANCEL_SLIP":
               createOrderDto.cancel_status = "ยกเลิกโดยพนักงาน";
               break;
-  
+
             default:
               return;
           }
-  
+
           // Format items for backend
           const formattedItems = items.map((item) => ({
             menu_id: item.menuId,
@@ -99,28 +100,33 @@ const PaymentMethod = () => {
             quantity: item.quantity,
             price: item.price,
           }));
-  
+
           const payload = {
             createOrderDto,
             items: formattedItems,
           };
-  
+
           console.log("Sending order payload:", payload);
-  
+
           try {
-            const response = await fetchApi(`${URL}/employee/orders`, "POST", payload);
-  
+            setLoading(true);
+            const response = await fetchApi(
+              `${URL}/employee/orders`,
+              "POST",
+              payload
+            );
+
             console.log("Got response:", response);
-  
+
             if (!response.ok) {
               const errorData = await response.json();
               console.error("Error data:", errorData);
               throw new Error("Error submitting the order");
             }
-  
+
             const responseData = await response.json();
             console.log("Order submitted successfully:", responseData);
-  
+
             navigate("/queue-summary", {
               state: { orderData: responseData },
             });
@@ -130,17 +136,18 @@ const PaymentMethod = () => {
         } catch (error) {
           console.error("Error in WebSocket message handler:", error);
           console.error("Event data:", event.data);
+        } finally {
+          setLoading(false);
         }
       };
-  
+
       socket.addEventListener("message", messageHandler);
-  
+
       return () => {
         socket.removeEventListener("message", messageHandler);
       };
     }
   }, [socket, total, selectedPayment, items, navigate, URL]);
-  
 
   const handleBack = () => navigate("/summary");
 
@@ -185,7 +192,6 @@ const PaymentMethod = () => {
       socket.send(JSON.stringify(message));
     }
   };
-
 
   useEffect(() => {
     if (selectedPayment === "cash" && socket) {
@@ -269,7 +275,7 @@ const PaymentMethod = () => {
         <div className="flex flex-col items-center">
           <h1 className="text-3xl font-bold mb-[4px]">ชำระด้วยเงินสด</h1>
           <div className="my-[20px]">
-            <BsCashCoin className="w-[200px] h-[200px] text-[#cda777]" />
+            <BsCashCoin className="w-[200px] h-[200px] text-[#C68A47]" />
           </div>
           <h2 className="text-3xl text-[#DD9F52] font-bold mb-[40px]">
             รวมทั้งสิ้น {total} บาท
@@ -284,7 +290,7 @@ const PaymentMethod = () => {
       {/* Phone Detect Modal */}
       {showPhoneDetect && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-4/5 max-w-3xl text-center">
+          <div className="bg-[#F5F5F5] p-6 rounded-xl shadow-lg w-4/5 max-w-3xl text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               ตรวจจับใบเสร็จโอนเงิน
             </h2>
@@ -293,6 +299,7 @@ const PaymentMethod = () => {
           </div>
         </div>
       )}
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

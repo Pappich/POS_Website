@@ -15,8 +15,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md w-full">
-      <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8">
+    <nav className="border-b border-[#2C586E] mb-4 dark:bg-[#2C586E] shadow-md w-full">
+      <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8 bg-[#2C586E]">
         {/* Shop logo */}
         <a className="flex items-center space-y-2">
           <svg
@@ -41,7 +41,7 @@ const Navbar = () => {
             />
             <rect x="6" y="27" width="47" height="3" rx="1.5" fill="#2F2105" />
           </svg>
-          <span class="self-center text-3xl font-semibold whitespace-nowrap text-black">
+          <span className="self-center text-3xl font-semibold whitespace-nowrap text-white">
             สุขเสมอคาเฟ่
           </span>
         </a>
@@ -50,25 +50,22 @@ const Navbar = () => {
         <div className="flex items-center space-x-6 w-auto">
           <button
             onClick={() => navigate("/role")}
-            className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+            className="flex p-2 text-white hover:text-[#C68A47] transition-all duration-300"
           >
             <HiOutlineHome size={24} />
             <span className="text-xl font-bold">หน้าหลัก</span>
           </button>
           <button
             onClick={handleLogout}
-            className="flex p-2 text-black hover:text-red-600 transition-all duration-300"
+            className="flex p-2 text-white hover:text-red-600 transition-all duration-300"
           >
             <TbLogout size={24} />
             <span className="text-xl font-bold">ออกจากระบบ</span>
           </button>
           {role && (
-            <div className="flex items-center justify-center w-[150px] p-1 space-x-1 bg-[#D4B28C] rounded-full">
-              <PiUserCircleBold size={24} />
-              <span className="text-xl font-bold text-black">
-                {/* {role == "owner" ? "เจ้าของร้าน" : "พนักงาน"} */}
-                เจ้าของร้าน
-              </span>
+            <div className="flex items-center justify-center w-[150px] p-1 space-x-1 bg-[#DD9F52] rounded-full">
+              <PiUserCircleBold size={24} className="text-white" />
+              <span className="text-xl font-bold text-white">เจ้าของร้าน</span>
             </div>
           )}
         </div>

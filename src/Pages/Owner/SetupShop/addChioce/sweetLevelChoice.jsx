@@ -8,6 +8,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const SweetLevelChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -139,6 +140,7 @@ const SweetLevelChoice = () => {
 
     if (valid) {
       if (step === 4) {
+        setLoading(true);
         try {
           let endpoint = `${URL}/owner/menus/options/sweetness`;
           let method = "POST";
@@ -188,6 +190,8 @@ const SweetLevelChoice = () => {
         } catch (error) {
           console.error("Error saving sweetness options:", error);
           alert("An error occurred while saving");
+        } finally {
+          setLoading(false);
         }
       } else {
         setStep(step + 1);
@@ -276,10 +280,10 @@ const SweetLevelChoice = () => {
               value={groupName}
               onChange={(value) => setGroupName(value)}
               placeholder="กรอกชื่อกลุ่ม..."
-              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             {errors.groupName && (
-              <p className="text-red-500 text-sm mt-2">{errors.groupName}</p>
+              <p className="text-[#C94C4C] text-sm mt-2">{errors.groupName}</p>
             )}
           </>
         );
@@ -288,7 +292,7 @@ const SweetLevelChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               2. เพิ่มช้อยส์ในตัวเลือก:
-              <span className="text-[#D4B28C] ml-2">ความหวาน</span>
+              <span className="text-[#DD9F52] ml-2">ความหวาน</span>
             </div>
 
             {/* Form Section */}
@@ -307,27 +311,27 @@ const SweetLevelChoice = () => {
                         onChange={(value) =>
                           handleChoiceChange(index, "name", value)
                         }
-                        className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                        className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                       />
                       {errors.choiceName && (
-                        <div className="absolute text-red-500 text-lg mt-1">
+                        <div className="absolute text-[#C94C4C] text-xl mt-1">
                           {errors.choiceName}
                         </div>
                       )}
                     </div>
                     <button
-                      onClick={() => removeChoice(index)}
-                      className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
-                    >
-                      <AiOutlineDelete size={36} />
-                    </button>
+                  onClick={() => removeChoice(index)}
+                  className="flex items-center justify-center w-10 h-10 border border-[#C94C4C] text-[#C94C4C] rounded-full transition duration-200 hover:bg-[#C94C4C] hover:text-white"
+                >
+                  <span className="text-2xl">−</span>
+                </button>
                   </div>
                 ))}
               </div>
             </div>
             <button
               onClick={addChoice}
-              className="w-full py-2 bg-[#F0ECE3] text-[#C6B399] rounded-full font-semibold mt-6"
+              className="w-full py-2 bg-[#F0ECE3] text-[#DD9F52] rounded-full font-semibold mt-6"
             >
               + เพิ่มช้อยส์
             </button>
@@ -338,13 +342,13 @@ const SweetLevelChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               3. เลือกเมนูที่ต้องการใช้ตัวเลือก:
-              <span className="text-[#D4B28C] ml-2">ความหวาน</span>
+              <span className="text-[#DD9F52] ml-2">ความหวาน</span>
             </div>
 
             <div className="w-full flex justify-start text-xl mb-8">
               <div className="relative flex items-start w-full">
                 <FaSearch
-                  style={{ color: "#D4B28C" }}
+                  style={{ color: "#DD9F52" }}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
                 />
                 <ThaiVirtualKeyboardInput
@@ -352,7 +356,7 @@ const SweetLevelChoice = () => {
                   placeholder="ค้นหาด้วยชื่อสินค้า..."
                   value={searchTerm}
                   onChange={handleSearch}
-                  className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
               </div>
             </div>
@@ -465,7 +469,7 @@ const SweetLevelChoice = () => {
             )}
 
             {errors.menuSelection && (
-              <div className="text-red-500 text-sm mt-2">
+              <div className="text-[#C94C4C] text-sm mt-2">
                 {errors.menuSelection}
               </div>
             )}
@@ -476,7 +480,7 @@ const SweetLevelChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               4. สรุปตัวเลือก:
-              <span className="text-[#D4B28C] ml-2">ความหวาน</span>
+              <span className="text-[#DD9F52] ml-2">ความหวาน</span>
             </div>
 
             <div className="w-full ml-16">
@@ -530,31 +534,32 @@ const SweetLevelChoice = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-white">
+    <div className="flex flex-col items-center h-screen-navbar bg-[#F5F5F5]">
       {/* Header */}
       <div className="text-center mb-10 mt-[40px]">
         <h1 className="text-3xl font-bold mb-2">เพิ่มตัวเลือก</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       {/* Render step content using switch */}
       {renderStepContent()}
 
       {/* Buttons */}
-      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
+      <div className="flex fixed bottom-4 left-0 px-4 py-4 bg-[#F5F5F5] w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ
         </button>
         <button
-          className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
           onClick={handleNext}
         >
           {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

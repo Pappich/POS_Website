@@ -28,8 +28,8 @@ const SideBar = ({ menuTab }) => {
 
   return (
     <div>
-      <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md">
-        <div className="w-screen-xl flex items-center justify-between mx-auto p-3">
+      <nav className="border-b border-[#2C586E] mb-4 dark:bg-[#2C586E] shadow-md w-full">
+        <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8 bg-[#2C586E]">
           {/* Shop logo */}
           <a className="flex items-center space-y-2">
             <svg
@@ -61,80 +61,80 @@ const SideBar = ({ menuTab }) => {
                 fill="#2F2105"
               />
             </svg>
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-black">
+            <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
               สุขเสมอคาเฟ่
             </span>
           </a>
 
           {/* menu list */}
-          <div className="flex items-center space-x-6 w-auto text-black">
+          <div className="flex items-center space-x-6 w-auto text-white">
             {/* home */}
             <button
               onClick={() => navigate("/role")}
-              className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+              className="flex p-2 text-black hover:text-[#C68A47] transition-all duration-300"
             >
-              <HiOutlineHome size={24} className="text-black" />
+              <HiOutlineHome size={24} className="text-white" />
             </button>
 
             {/* dashboard */}
             <button
               onClick={handleDashBoard}
-              className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+              className="flex p-2 text-white hover:text-[#C68A47] transition-all duration-300"
             >
               <div
                 className={`flex items-center p-2 text-gray-900 rounded-lg ${
                   menuTab === "overview"
-                    ? "bg-[#DEBB90]"
+                    ? "bg-[#C68A47]"
                     : "hover:bg-transparent"
                 }`}
               >
-                <TiThLargeOutline size={24} className="text-black" />
+                <TiThLargeOutline size={24} className="text-white" />
               </div>
             </button>
 
             {/* order */}
             <button
               onClick={handleOrderSummary}
-              className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+              className="flex p-2 text-white hover:text-[#C68A47] transition-all duration-300"
             >
               <div
                 className={`flex items-center p-2 text-gray-900 rounded-lg  ${
                   menuTab === "orderSummary"
-                    ? "bg-[#DEBB90]"
+                    ? "bg-[#C68A47]"
                     : "hover:bg-transparent"
                 }`}
               >
-                <PiShoppingCart size={24} className="text-black" />
+                <PiShoppingCart size={24} className="text-white" />
               </div>
             </button>
 
             {/* sale summary */}
             <button
               onClick={handleSaleSummaryGraph}
-              className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+              className="flex p-2 text-white hover:text-[#C68A47] transition-all duration-300"
             >
               <div
                 className={`flex items-center p-2 text-gray-900 rounded-lg  ${
                   menuTab === "saleSummaryGraph"
-                    ? "bg-[#DEBB90]"
+                    ? "bg-[#C68A47]"
                     : "hover:bg-transparent"
                 }`}
               >
-                <GoGraph size={24} className="text-black" />
+                <GoGraph size={24} className="text-white" />
               </div>
             </button>
 
             {/* stock */}
             <button
               onClick={handleStock}
-              className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+              className="flex p-2 text-white hover:text-[#C68A47] transition-all duration-300"
             >
               <div
                 className={`flex items-center p-2 text-gray-900 rounded-lg  ${
-                  menuTab === "stock" ? "bg-[#DEBB90]" : "hover:bg-transparent"
+                  menuTab === "stock" ? "bg-[#C68A47]" : "hover:bg-transparent"
                 }`}
               >
-                <BsBox2 size={24} className="text-black" />
+                <BsBox2 size={24} className="text-white" />
               </div>
             </button>
 
@@ -143,7 +143,7 @@ const SideBar = ({ menuTab }) => {
               onClick={() => navigate("/")}
               className="flex p-2 text-black hover:text-red-600 transition-all duration-300"
             >
-              <TbLogout size={24} className="text-black" />
+              <TbLogout size={24} className="text-white" />
             </button>
           </div>
         </div>

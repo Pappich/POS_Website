@@ -5,8 +5,10 @@ import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
+import { useNavigate } from "react-router-dom";
 
 const CancelOrderSummary = () => {
+  const navigate = useNavigate();
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -121,8 +123,12 @@ const CancelOrderSummary = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate("/order-summary");
+  };
+
   return (
-    <div>
+    <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"orderSummary"} />
       <div className="px-10">
         <h1 className="font-bold text-3xl mt-[40px]">ออเดอร์ทั้งหมด</h1>
@@ -188,7 +194,7 @@ const CancelOrderSummary = () => {
         {/* Order Detail Modal */}
         {selectedOrderData && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-10 rounded-lg shadow-lg w-[1024px] overflow-y-auto">
+            <div className="bg-[#F5F5F5] p-10 rounded-lg shadow-lg w-[1024px] overflow-y-auto">
               <div className="flex justify-center">
                 <h2 className="text-3lg font-bold mb-4">ออเดอร์ที่ถูกยกเลิก</h2>
               </div>
@@ -265,7 +271,7 @@ const CancelOrderSummary = () => {
                   <p>สถานะ </p>
                   <div className="px-2">
                     <button
-                      className="border border-[#C6B399] text-[#C6B399] rounded-full px-2 hover:bg-[#C6B399] hover:text-white"
+                      className="border border-[#DD9F52] text-[#DD9F52] rounded-full px-2 hover:bg-[#DD9F52] hover:text-white"
                       onClick={openEditModal}
                     >
                       แก้ไข
@@ -286,7 +292,7 @@ const CancelOrderSummary = () => {
               </div>
               <div className="flex justify-center mt-3">
                 <button
-                  className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                  className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={closeModal}
                 >
                   ย้อนกลับ
@@ -299,7 +305,7 @@ const CancelOrderSummary = () => {
         {/* Edit Status Modal */}
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-10 rounded-lg shadow-lg w-[600px]">
+            <div className="bg-[#F5F5F5] p-10 rounded-lg shadow-lg w-[600px]">
               <h2 className="text-3xl font-bold mb-4 text-center">สถานะ</h2>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -329,13 +335,13 @@ const CancelOrderSummary = () => {
               </div>
               <div className="flex justify-between mt-6">
                 <button
-                  className="w-32 py-1 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+                  className="w-32 py-1 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={() => setIsEditModalOpen(false)}
                 >
                   ย้อนกลับ
                 </button>
                 <button
-                  className="w-32 py-1 bg-[#D4B28C] text-white rounded-full hover:bg-[#c4a27c] transition-colors"
+                  className="w-32 py-1 bg-[#DD9F52] text-white rounded-full hover:bg-[#c4a27c] transition-colors"
                   onClick={handleStatusChange}
                 >
                   บันทึก
@@ -345,7 +351,16 @@ const CancelOrderSummary = () => {
           </div>
         )}
       </div>
+      <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-[#F5F5F5]">
+        <button
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
+          onClick={handleBack}
+        >
+          ย้อนกลับ
+        </button>
+      </div>
     </div>
+    // </div>
   );
 };
 

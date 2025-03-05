@@ -53,8 +53,9 @@ const Menu = () => {
 
   // Add a group for "ทั้งหมด" with unique menus
   const allMenus = categories.flatMap((category) => category.menus || []);
-  const uniqueMenus = Array.from(new Set(allMenus.map(menu => menu.menu_id)))
-    .map(id => allMenus.find(menu => menu.menu_id === id));
+  const uniqueMenus = Array.from(
+    new Set(allMenus.map((menu) => menu.menu_id))
+  ).map((id) => allMenus.find((menu) => menu.menu_id === id));
 
   groupedMenus.unshift({
     category_name: "ทั้งหมด",
@@ -88,12 +89,12 @@ const Menu = () => {
   };
 
   return (
-    <div className="font-noto flex flex-col min-h-screen bg-white">
+    <div className="font-noto flex flex-col bg-[#F5F5F5]">
       {/* Cart */}
       <div className="flex justify-end items-center mb-6 relative">
         <button onClick={handleAddToCart} className="relative">
           <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+          <span className="absolute -top-2 -right-2 bg-[#C94C4C] text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
             {getCartItemCount()}
           </span>
         </button>
@@ -105,10 +106,10 @@ const Menu = () => {
           <button
             key={group.category_name}
             onClick={() => handleCategoryClick(group.category_name)}
-            className={`px-4 py-2 rounded-full border border-[#D4B28C] ${
+            className={`px-4 py-2 rounded-full border border-[#DD9F52] ${
               activeCategory === group.category_name
-                ? "bg-[#D4B28C] text-white"
-                : "border-[#D4B28C] text-[#D4B28C]"
+                ? "bg-[#DD9F52] text-white"
+                : "border-[#DD9F52] text-[#DD9F52]"
             }`}
           >
             {group.category_name}
@@ -122,7 +123,7 @@ const Menu = () => {
           const imageUrl = `${URL}/${menu.image_url.replace(/\\/g, "/")}`;
           return (
             <button
-              className="px-6 py-3 rounded-md border border-[#D4B28C] shadow-md ml-2"
+              className="px-6 py-3 rounded-md border border-[#DD9F52] shadow-md ml-2"
               key={index}
               onClick={() => handleMenuClick(menu.menu_id)}
             >
@@ -131,7 +132,7 @@ const Menu = () => {
                 src={imageUrl}
                 alt={menu.menu_name}
               />
-              <div className="font-bold text-lg">{menu.menu_name}</div>
+              <div className="font-bold text-xl">{menu.menu_name}</div>
               <div className="text-gray-600">{menu.description}</div>
             </button>
           );

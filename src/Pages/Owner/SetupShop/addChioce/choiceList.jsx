@@ -81,12 +81,12 @@ const ChoiceList = () => {
 
     return (
       <div key={title} className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 text-[#D4B28C]">{title}</h2>
+        <h2 className="text-2xl font-bold mb-4 text-[#DD9F52]">{title}</h2>
         {filteredItems.map((item, index) => (
           <div key={index} className="w-full mb-4">
             <div className="flex justify-between items-center">
               <p className="text-xl">{item.name}</p>
-              <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+              <div className="flex items-center space-x-4 text-[#DD9F52] font-bold">
                 <button
                   className="hover:underline font-bold"
                   onClick={() => handleMenuClick(item)}
@@ -229,12 +229,12 @@ const ChoiceList = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center bg-white">
+      <div className="flex flex-col items-center h-screen-navbar bg-[#F5F5F5]">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold mb-2 mt-[40px]">
             ตัวเลือกรายการสินค้า
           </h1>
-          <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+          <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
         </div>
 
         <div className="w-full flex justify-between items-center mb-6">
@@ -245,14 +245,14 @@ const ChoiceList = () => {
         <div className="w-full flex justify-start text-xl mb-8">
           <div className="relative flex items-center w-full">
             <FaSearch
-              style={{ color: "#D4B28C" }}
+              style={{ color: "#DD9F52" }}
               className="absolute left-3 top-1/2 transform -translate-y-1/2"
             />
             <ThaiVirtualKeyboardInput
               placeholder="ค้นหาด้วยชื่อตัวเลือก..."
               value={searchTerm}
               onChange={handleSearch}
-              className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
           </div>
         </div>
@@ -271,15 +271,15 @@ const ChoiceList = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-white">
+        <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-[#F5F5F5]">
           <button
-            className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-14 py-4 w-[300px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold"
             onClick={handleAddChoice}
           >
             เพิ่มตัวเลือก

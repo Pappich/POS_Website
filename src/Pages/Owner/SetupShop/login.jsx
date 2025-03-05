@@ -8,6 +8,7 @@ import configureAPI from "../../../Config/configureAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../Config/redux/userSlice";
 import { jwtDecode } from "jwt-decode";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const Login = () => {
   const [passwordInput, setPasswordInput] = useState("");
   const [keyboardLayout, setKeyboardLayout] = useState("default");
   const [loading, setLoading] = useState(false);
-  
+
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -108,10 +109,10 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen">
+    <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen bg-[#F5F5F5]">
       <div
         ref={formRef}
-        className="max-w-md w-full bg-white p-8 rounded-lg shadow-md"
+        className="max-w-md w-full bg-[#F5F5F5] p-8 rounded-lg shadow-md"
       >
         <h2 className="text-2xl text-black mb-2 text-left">
           ยินดีต้อนรับสู่ระบบการขายหน้าร้าน
@@ -119,7 +120,7 @@ const Login = () => {
         <p className="text-primaryRegular text-gray-500 mb-6 text-left">
           โปรดลงทะเบียนเพื่อเข้าสู่ระบบ
         </p>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
 
         {/* Username Input */}
         <div className="mb-4 relative">
@@ -127,7 +128,7 @@ const Login = () => {
             ชื่อผู้ใช้
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
-            <FaUserAlt style={{ color: "#D4B28C" }} className="mr-2" />
+            <FaUserAlt style={{ color: "#DD9F52" }} className="mr-2" />
             <input
               type="text"
               id="username"
@@ -146,7 +147,7 @@ const Login = () => {
             รหัสผ่าน
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
-            <FaLock style={{ color: "#D4B28C" }} className="mr-2" />
+            <FaLock style={{ color: "#DD9F52" }} className="mr-2" />
             <input
               type="password"
               id="password"
@@ -162,9 +163,9 @@ const Login = () => {
               className="ml-2"
             >
               {showPassword ? (
-                <BsEyeSlash style={{ color: "#D4B28C" }} />
+                <BsEyeSlash style={{ color: "#DD9F52" }} />
               ) : (
-                <BsEye style={{ color: "#D4B28C" }} />
+                <BsEye style={{ color: "#DD9F52" }} />
               )}
             </button>
           </div>
@@ -173,7 +174,7 @@ const Login = () => {
         <div className="flex justify-end">
           <button
             onClick={handleForgotPassword}
-            style={{ color: "#D4B28C" }}
+            style={{ color: "#DD9F52" }}
             className="block mb-6"
           >
             ลืมรหัสผ่าน?
@@ -182,7 +183,7 @@ const Login = () => {
 
         <button
           onClick={() => handleLogin(usernameInput, passwordInput)}
-          className="w-full py-2 bg-[#D4B28C] text-white rounded-full font-semibold hover:bg-[#c9a07e] transition"
+          className="w-full py-2 bg-[#DD9F52] text-white rounded-full font-semibold hover:bg-[#c9a07e] transition"
         >
           เข้าสู่ระบบ
         </button>

@@ -72,12 +72,12 @@ const EnterNewPassword = () => {
 
   return (
     <div className="w-full font-noto flex flex-col justify-center items-center min-h-screen">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+      <div className="max-w-md w-full bg-[#F5F5F5] p-8 rounded-lg shadow-md">
         <h2 className="text-2xl text-black mb-2 text-left">ตั้งรหัสผ่านใหม่</h2>
         <p className="text-primaryRegular text-gray-500 mb-6 text-left">
           กรุณากรอกรหัสผ่านที่ต้องการเพื่อตั้งค่ารหัสผ่านใหม่
         </p>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
 
         {/* Password Field */}
         <div className="mb-4">
@@ -85,7 +85,7 @@ const EnterNewPassword = () => {
             รหัสผ่าน
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
-            <FaLock style={{ color: "#D4B28C" }} className="mr-2" />
+            <FaLock style={{ color: "#DD9F52" }} className="mr-2" />
             <input
               type={showPassword ? "text" : "password"}
               id="password"
@@ -100,14 +100,14 @@ const EnterNewPassword = () => {
               className="ml-2"
             >
               {showPassword ? (
-                <BsEyeSlash style={{ color: "#D4B28C" }} />
+                <BsEyeSlash style={{ color: "#DD9F52" }} />
               ) : (
-                <BsEye style={{ color: "#D4B28C" }} />
+                <BsEye style={{ color: "#DD9F52" }} />
               )}
             </button>
           </div>
           {passwordError && (
-            <p className="text-red-500 text-sm mt-2">{passwordError}</p>
+            <p className="text-[#C94C4C] text-sm mt-2">{passwordError}</p>
           )}
         </div>
 
@@ -120,7 +120,7 @@ const EnterNewPassword = () => {
             ยืนยันรหัสผ่าน
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
-            <FaLock style={{ color: "#D4B28C" }} className="mr-2" />
+            <FaLock style={{ color: "#DD9F52" }} className="mr-2" />
             <ThaiVirtualKeyboardInput
               type={showPassword ? "text" : "password"}
               id="confirmPassword"
@@ -135,21 +135,23 @@ const EnterNewPassword = () => {
               className="ml-2"
             >
               {showPassword ? (
-                <BsEyeSlash style={{ color: "#D4B28C" }} />
+                <BsEyeSlash style={{ color: "#DD9F52" }} />
               ) : (
-                <BsEye style={{ color: "#D4B28C" }} />
+                <BsEye style={{ color: "#DD9F52" }} />
               )}
             </button>
           </div>
           {confirmPasswordError && (
-            <p className="text-red-500 text-sm mt-2">{confirmPasswordError}</p>
+            <p className="text-[#C94C4C] text-sm mt-2">
+              {confirmPasswordError}
+            </p>
           )}
         </div>
 
         {/* <div className="flex justify-end">
           <button
             onClick={handleSignIn}
-            style={{ color: "#D4B28C" }}
+            style={{ color: "#DD9F52" }}
             className="block mb-6"
           >
             กลับไปเข้าสู่ระบบ
@@ -158,7 +160,7 @@ const EnterNewPassword = () => {
 
         <button
           onClick={handleConfirm}
-          className="w-full py-2 bg-[#D4B28C] text-white rounded-full font-semibold hover:bg-[#c9a07e] transition"
+          className="w-full py-2 bg-[#DD9F52] text-white rounded-full font-semibold hover:bg-[#c9a07e] transition"
         >
           ยืนยัน
         </button>

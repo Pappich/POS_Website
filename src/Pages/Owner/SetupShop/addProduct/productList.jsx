@@ -32,9 +32,16 @@ const ProductList = () => {
     fetchMenus();
   }, [menuItems]);
 
-  const filteredItems = menuItems.filter((item) =>
-    item.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
-  );
+  const filteredItems = menuItems?.length
+    ? menuItems.filter((item) =>
+        item.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
+      )
+    : []; // Return an empty array if menuItems is empty or undefined
+
+  // Optional: Display a message or handle when there are no results
+  if (filteredItems.length === 0) {
+    console.log("No menu items match the search term.");
+  }
 
   const handleSearch = (value) => {
     setSearchTerm(value);
@@ -70,10 +77,10 @@ const ProductList = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center bg-white mt-[40px]">
+      <div className="flex flex-col items-center h-screen-navbar bg-[#F5F5F5] mt-[40px]">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold mb-2">รายการสินค้า</h1>
-          <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+          <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
         </div>
 
         <div className="w-full flex justify-between items-center mb-6">
@@ -83,14 +90,14 @@ const ProductList = () => {
         <div className="w-full flex justify-start text-2xl mb-8">
           <div className="relative flex items-center w-full">
             <FaSearch
-              style={{ color: "#D4B28C" }}
+              style={{ color: "#DD9F52" }}
               className="absolute left-3 top-1/2 transform -translate-y-1/2"
             />
             <ThaiVirtualKeyboardInput
               placeholder="ค้นหาด้วยชื่อสินค้า..."
               value={searchTerm}
               onChange={handleSearch}
-              className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
           </div>
         </div>
@@ -102,7 +109,7 @@ const ProductList = () => {
               <div key={item.menu_id} className="w-full mb-4">
                 <div className="flex justify-between items-start">
                   <p className="text-2xl">{item.menu_name}</p>
-                  <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+                  <div className="flex items-center space-x-4 text-[#DD9F52] font-bold">
                     <button
                       className="hover:underline font-bold"
                       onClick={() => handleEditClick(item)}
@@ -128,13 +135,13 @@ const ProductList = () => {
 
         <div className="flex fixed bottom-4 left-0 w-full px-4 py-4 space-x-8 justify-between">
           <button
-            className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-14 py-4 w-[300px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold"
             onClick={handleAddProduct}
           >
             เพิ่มรายการสินค้า

@@ -16,6 +16,8 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 import { AiOutlineDelete } from "react-icons/ai";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
+import DeleteIngredientModal from "../../../../Components/Owner/deleteIngredient";
 
 const thLocaleWithMondayStart = {
   ...th,
@@ -196,6 +198,7 @@ const Stock = () => {
 
   // Handle form submission for update
   const handleUpdateSubmit = async () => {
+    setLoading(true);
     try {
       // ถ้าไม่มี update_id แสดงว่าเป็นการเพิ่มใหม่
       if (!selectedProduct.update_id) {
@@ -254,6 +257,8 @@ const Stock = () => {
       setModalVisible(false);
     } catch (error) {
       console.error("Error updating/creating product:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -282,16 +287,16 @@ const Stock = () => {
   console.log("ingredient history", ingredientHistory);
 
   return (
-    <div>
+    <div className="bg-[#F5F5F5] h-screen-website">
       <SideBar menuTab={"stock"} />
       <div className="px-10 mt-[40px]">
         <h1 className="font-bold text-3xl ">คลังสินค้า</h1>
         <div className="flex justify-between items-center">
           <span className="flex items-center">
             <span className="font-bold mt-2">หมวดหมู่</span>
-            <span className="pl-2 text-[#DD9F52]">
+            {/* <span className="pl-2 text-[#DD9F52]">
               <LuInfo size={24} />
-            </span>
+            </span> */}
           </span>
           <AddCategoryButton />
         </div>
@@ -302,8 +307,8 @@ const Stock = () => {
               onClick={() => handleCategoryChange(null)}
               className={`px-4 py-1 ${
                 selectedCategory === null
-                  ? "bg-[#C6B399] text-white rounded-full border"
-                  : "bg-white border-[#C6B399]"
+                  ? "bg-[#DD9F52] text-white rounded-full border"
+                  : "bg-[#F5F5F5] border-[#DD9F52]"
               }`}
             >
               ทั้งหมด
@@ -316,8 +321,8 @@ const Stock = () => {
                 onClick={() => handleCategoryChange(category.category_id)}
                 className={`px-4 py-1 ${
                   selectedCategory === category.category_id
-                    ? "bg-[#C6B399] text-white rounded-full border"
-                    : "bg-white border-[#C6B399]"
+                    ? "bg-[#DD9F52] text-white rounded-full border"
+                    : "bg-[#F5F5F5] border-[#DD9F52]"
                 }`}
               >
                 {category.category_name}
@@ -329,8 +334,8 @@ const Stock = () => {
         <div>
           <div className="flex">
             {/* รายรับทั้งหมด */}
-            <div className="flex py-2 px-4 w-3/4 mr-2 bg-white border rounded-lg ">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DC9494]">
+            <div className="flex py-2 px-4 w-3/4 mr-2 bg-[#F5F5F5] border rounded-lg ">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#C94C4C]">
                 <div className="pb-1">
                   <IoWarningOutline color="white" size={32} />
                 </div>
@@ -345,8 +350,8 @@ const Stock = () => {
             </div>
 
             {/* สินค้าที่ใกล้จะหมดอายุ */}
-            <div className="flex py-2 px-4 w-full bg-white border rounded-lg ">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+            <div className="flex py-2 px-4 w-full bg-[#F5F5F5] border rounded-lg ">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
                 <IoMdTime color="white" size={32} />
               </div>
               <div className="ml-3">
@@ -358,8 +363,8 @@ const Stock = () => {
 
           {/* Search Bar */}
           <div className="my-4 relative flex">
-            <div className="mr-5 flex items-center bg-white border-[#C6B399] border rounded-full px-4 py-1 w-full">
-              <FiSearch className="text-[#C6B399] mr-2" size={36} />
+            <div className="mr-5 flex items-center bg-[#F5F5F5] border-[#DD9F52] border rounded-full px-4 py-1 w-full">
+              <FiSearch className="text-[#DD9F52] mr-2" size={36} />
               <ThaiVirtualKeyboardInput
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -370,7 +375,7 @@ const Stock = () => {
             {/* เพิมรายการสินค้า */}
             <button
               type="button"
-              className="flex justify-center items-center w-1/4 text-white border border-[#C6B399] bg-[#C6B399] hover:bg-[#b8a78f] focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-2xl px-3 py-1"
+              className="flex justify-center items-center w-1/4 text-white border border-[#DD9F52] bg-[#DD9F52] hover:bg-[#C68A47] focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-2xl px-3 py-1"
               onClick={handleAddOwnerProduct}
             >
               <div className="flex items-center whitespace-nowrap">
@@ -402,9 +407,7 @@ const Stock = () => {
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
                     อัปเดต
                   </th>
-                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
-                    ลบ
-                  </th>
+                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -436,19 +439,19 @@ const Stock = () => {
                           e.stopPropagation(); // Prevent the row click handler from firing
                           handleShowHistory(item.ingredient_id);
                         }}
-                        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
+                        className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
                       >
                         อัปเดต
                       </button>
                     </td>
-                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7] flex justify-center">
                       <button
                         onClick={(event) => {
                           event.stopPropagation(); // Prevent the row click event
                           setIngredientToDelete(item);
                           setDeleteModalOpen(true);
                         }}
-                        className="font-bold border border-red-300 text-red-300 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white z-10"
+                        className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
                       >
                         <AiOutlineDelete size={24} />
                       </button>
@@ -463,9 +466,9 @@ const Stock = () => {
         {/* Update/Create Product Modal */}
         {modalVisible && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
+            <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
               {/* Product Name */}
-              <h2 className="text-lg font-bold text-center mb-4 absolute top-4 w-full">
+              <h2 className="text-xl font-bold text-center mb-4 absolute top-4 w-full">
                 {selectedProduct?.ingredient_name}
               </h2>
 
@@ -543,9 +546,9 @@ const Stock = () => {
                         type="button"
                         className={`px-4 py-2 rounded-full font-medium ${
                           isEditingNetVolume
-                            ? "bg-orange-300 text-white"
-                            : "border border-orange-300 text-orange-300"
-                        } hover:bg-orange-300 hover:text-white`}
+                            ? "bg-[#C68A47] text-white"
+                            : "border border-[#C68A47] text-[#C68A47]"
+                        } hover:bg-[#C68A47] hover:text-white`}
                         onClick={() =>
                           setIsEditingNetVolume(!isEditingNetVolume)
                         }
@@ -579,7 +582,7 @@ const Stock = () => {
                       </span>
                       <button
                         type="button"
-                        className="px-3 py-3 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                        className="px-3 py-3 bg-[#C94C4C] text-white rounded-full flex items-center justify-center hover:bg-red-600"
                         onClick={() =>
                           setUpdateFormData((prev) => ({
                             ...prev,
@@ -600,13 +603,13 @@ const Stock = () => {
               {/* Buttons */}
               <div className="flex justify-between mt-6">
                 <button
-                  className="px-6 py-3 w-full border rounded-full text-gray-700 border-gray-400 hover:bg-gray-100 transition-colors font-bold"
+                  className="px-6 py-3 w-full border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={closeModal}
                 >
                   ย้อนกลับ
                 </button>
                 <button
-                  className="px-6 py-3 w-full  bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                  className="px-6 py-3 w-full  bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
                   onClick={handleUpdateSubmit}
                 >
                   บันทึก
@@ -619,9 +622,9 @@ const Stock = () => {
         {/* Ingredient History Modal */}
         {historyModalVisible && ingredientHistory && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
+            <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
               {/* Modal Header */}
-              <h2 className="text-lg font-bold text-center mb-4">
+              <h2 className="text-xl font-bold text-center mb-4">
                 ประวัติการอัปเดต {ingredientHistory.ingredient_name}
               </h2>
 
@@ -676,7 +679,7 @@ const Stock = () => {
                               setHistoryModalVisible(false);
                               handleUpdate(update.update_id);
                             }}
-                            className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                            className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
                           >
                             อัปเดต
                           </button>
@@ -691,7 +694,7 @@ const Stock = () => {
               <div className="mt-4 flex justify-between">
                 <button
                   onClick={() => setHistoryModalVisible(false)}
-                  className="px-6 py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                  className="px-6 py-2 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                 >
                   ปิด
                 </button>
@@ -711,7 +714,7 @@ const Stock = () => {
                     });
                     setModalVisible(true);
                   }}
-                  className="px-6 py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                  className="px-6 py-2 bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
                 >
                   เพิ่มการอัปเดต
                 </button>
@@ -726,41 +729,6 @@ const Stock = () => {
           onConfirm={removeIngredient}
           ingredient={ingredientToDelete}
         />
-      </div>
-    </div>
-  );
-};
-
-const DeleteIngredientModal = ({ isOpen, onClose, onConfirm, ingredient }) => {
-  if (!isOpen || !ingredient) return null;
-
-  return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
-        <h2 className="text-3xl mb-4">
-          ลบส่วนผสม{" "}
-          <span className="font-bold">{ingredient.ingredient_name}</span>{" "}
-          หรือไม่?
-        </h2>
-        <p className="text-gray-600 mb-8">
-          การลบส่วนผสมจะไม่สามารถย้อนกลับมาแก้ไขได้อีก
-        </p>
-        <div className="w-full flex justify-between space-x-8">
-          <button
-            onClick={onClose}
-            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={() => {
-              onConfirm(ingredient.ingredient_id);
-            }}
-            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors"
-          >
-            ลบ
-          </button>
-        </div>
       </div>
     </div>
   );

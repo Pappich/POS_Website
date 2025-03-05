@@ -3,14 +3,13 @@ import configureAPI from "../../Config/configureAPI";
 import { useWebSocket } from "../../webSocketContext";
 import fetchApi from "../../Config/fetchApi";
 import { useState } from "react";
-
+import LoadingPopup from "../General/loadingPopup";
 
 const CheckSlip = ({ imageUrl }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
   const [loading, setLoading] = useState(false);
-  
 
   const handleRetake = () => {
     if (socket) {
@@ -22,6 +21,7 @@ const CheckSlip = ({ imageUrl }) => {
   };
 
   const handleConfirm = async () => {
+    setLoading(true);
     try {
       // แปลง base64 เป็น blob และอัพโหลดไป backend
       const response = await fetch(imageUrl);
@@ -52,10 +52,13 @@ const CheckSlip = ({ imageUrl }) => {
       }
     } catch (error) {
       console.error("Error handling slip confirmation:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = async () => {
+    setLoading(true);
     try {
       // แปลง base64 เป็น blob และอัพโหลดไป backend
       const response = await fetch(imageUrl);
@@ -82,13 +85,15 @@ const CheckSlip = ({ imageUrl }) => {
       }
     } catch (error) {
       console.error("Error handling slip confirmation:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-      <div className="bg-white w-[500px] rounded-lg p-6 shadow-lg">
-        <h2 className="text-lg font-bold text-center mb-2">
+      <div className="bg-[#F5F5F5] w-[500px] rounded-lg p-6 shadow-lg">
+        <h2 className="text-xl font-bold text-center mb-2">
           ตรวจสอบสลิปโอนเงิน
         </h2>
         <hr className="h-0.5 bg-[#DD9F52] border-0 mb-4" />
@@ -115,19 +120,20 @@ const CheckSlip = ({ imageUrl }) => {
             ยกเลิก
           </button>
           <button
-            className="w-full border border-[#C6B399] text-[#C6B399] bg-transparent hover:bg-[#C6B399] hover:text-white font-bold py-2 rounded-full transition-all"
+            className="w-full border border-[#DD9F52] text-[#DD9F52] bg-transparent hover:bg-[#DD9F52] hover:text-white font-bold py-2 rounded-full transition-all"
             onClick={handleRetake}
           >
             ถ่ายใหม่
           </button>
           <button
-            className="w-full bg-[#C6B399] text-white font-bold py-2 rounded-full hover:bg-[#a69781] transition-all"
+            className="w-full bg-[#DD9F52] text-white font-bold py-2 rounded-full hover:bg-[#C68A47] transition-all"
             onClick={handleConfirm}
           >
             ตกลง
           </button>
         </div>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

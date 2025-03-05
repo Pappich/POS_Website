@@ -53,23 +53,25 @@ const Home = () => {
   }, [selectedDate]);
 
   return (
-    <div>
+    <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"overview"} />
-      <h1 className="font-bold text-xl">ภาพรวมการขาย</h1>
-      <span className="flex justify-end">
-        <CalendarSelect setSelectedDate={setSelectedDate} />
-      </span>
-      <IncomeOrderCancel data={data} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
-        <div className="bg-white p-4 border rounded-lg col-span-2">
-          <h2 className="text-lg font-semibold mb-2">
-            กราฟสรุปรายรับประจำเดือน
-          </h2>
-          <BarChart monthlyRevenue={data?.monthly_revenue} />
-        </div>
-        <div className="bg-white p-4 border rounded-lg">
-          <h2 className="text-lg font-semibold mb-2">เมนูขายดี</h2>
-          <PieChart topThree={data?.top_three} />
+      <div className="ml-8 mr-8">
+        <h1 className="font-bold text-xl">ภาพรวมการขาย</h1>
+        <span className="flex justify-end">
+          <CalendarSelect setSelectedDate={setSelectedDate} />
+        </span>
+        <IncomeOrderCancel data={data} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
+          <div className="bg-[#F5F5F5] p-4 border rounded-lg col-span-2">
+            <h2 className="text-xl font-semibold mb-2">
+              กราฟสรุปรายรับประจำเดือน
+            </h2>
+            <BarChart monthlyRevenue={data?.monthly_revenue} />
+          </div>
+          <div className="bg-[#F5F5F5] p-4 border rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">เมนูขายดี</h2>
+            <PieChart topThree={data?.top_three} />
+          </div>
         </div>
       </div>
     </div>

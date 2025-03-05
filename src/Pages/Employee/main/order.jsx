@@ -16,6 +16,7 @@ import configureAPI from "../../../Config/configureAPI";
 import CheckSlip from "../../../Components/Employee/checkSlip";
 import PayWithCash from "../../../Components/Employee/payWithCash";
 import { useWebSocket } from "../../../webSocketContext";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const Order = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -26,7 +27,7 @@ const Order = () => {
     navigate("/pause-section");
   };
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [orderStats, setOrderStats] = useState({
     total_orders: 0,
@@ -134,6 +135,7 @@ const Order = () => {
   }, [URL]);
 
   const handlePaymentSuccess = async (paymentData) => {
+    setLoading(true);
     try {
       const orderData = {
         createOrderDto: {
@@ -175,12 +177,15 @@ const Order = () => {
     } catch (error) {
       console.error("Error creating order:", error);
       alert("เกิดข้อผิดพลาดในการสร้างออเดอร์");
+    } finally {
+      setLoading(false);
     }
 
     setShowPayWithCash(false);
   };
 
   const handlePaymentCancel = async () => {
+    setLoading(true);
     try {
       const orderData = {
         createOrderDto: {
@@ -222,6 +227,8 @@ const Order = () => {
     } catch (error) {
       console.error("Error cancelling order:", error);
       alert("เกิดข้อผิดพลาดในการยกเลิกออเดอร์");
+    } finally {
+      setLoading(false);
     }
 
     setShowPayWithCash(false);
@@ -247,7 +254,7 @@ const Order = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-red-500">เกิดข้อผิดพลาด: {error}</p>
+        <p className="text-xl text-[#C94C4C]">เกิดข้อผิดพลาด: {error}</p>
       </div>
     );
   }
@@ -257,7 +264,7 @@ const Order = () => {
   console.log("FIRST ORDER ITEM:", orders[0].order_items); // Check order items
 
   return (
-    <div className="grid grid-cols-3 gap-4 bg-white">
+    <div className="grid grid-cols-3 gap-4 bg-[#F5F5F5] h-screen-navbar mt-4">
       <div className="bg-white rounded-2xl shadow-md col-span-1 flex flex-col border border-gray-200">
         {!isLoading && orders && orders.length > 0 ? (
           <>
@@ -292,7 +299,7 @@ const Order = () => {
               </div>
               <div className="flex-grow">
                 {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
-                  <div className="h-[400px] overflow-y-auto mt-4">
+                  <div className="h-[150px] overflow-y-auto mt-4">
                     {orders[0].order_items.map(
                       (item, idx) => (
                         console.log("ITEM IN MAP:", item),
@@ -350,7 +357,7 @@ const Order = () => {
           {/* Button */}
           <button
             onClick={handlePauseSection}
-            className="py-2 bg-[#C6B399] hover:bg-[#a69781] text-white rounded-full w-full"
+            className="py-2 bg-[#DD9F52] hover:bg-[#C68A47] text-white rounded-full w-full"
           >
             <div className="flex justify-center items-center gap-2 text-2xl">
               <MdOutlinePauseCircleOutline size={36} />
@@ -362,7 +369,7 @@ const Order = () => {
 
         <div className="flex justify-between space-x-4 w-full mb-4 mt-4">
           <div className="flex py-4 px-6 w-full bg-white border rounded-lg">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DCC894]">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DD9F52]">
               <MdOutlineShoppingCart color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
@@ -374,7 +381,7 @@ const Order = () => {
           </div>
 
           <div className="flex py-4 px-6 w-full bg-white border rounded-lg">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DCC894]">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DD9F52]">
               <IoMdStopwatch color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
@@ -386,7 +393,7 @@ const Order = () => {
           </div>
 
           <div className="flex py-4 px-6 w-full bg-white border rounded-l">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DCC894]">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DD9F52]">
               <MdDone color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
@@ -432,7 +439,7 @@ const Order = () => {
                           <div>จำนวน</div>
                         </div>
 
-                        <div className="h-[620px] overflow-y-auto">
+                        <div className="h-[530px] overflow-y-auto">
                           {order?.order_items &&
                           order.order_items.length > 0 ? (
                             order.order_items.map(
@@ -492,6 +499,7 @@ const Order = () => {
         onConfirm={handlePaymentSuccess}
         onCancel={handlePaymentCancel}
       />
+      <LoadingPopup loading={loading} />
     </div>
   );
 };
