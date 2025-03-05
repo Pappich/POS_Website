@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Import the CSS
 import { registerLocale, setLocale } from "react-datepicker";
@@ -11,8 +11,11 @@ import { FiSearch } from "react-icons/fi"; // Import magnifier icon
 import { FaPlus, FaRegCalendar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { FaMinus } from "react-icons/fa";
-import { useEffect } from "react";
 import SideBar from "../../../../Components/Owner/sideBar";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const thLocaleWithMondayStart = {
   ...th,
@@ -23,51 +26,88 @@ const thLocaleWithMondayStart = {
 };
 
 const Stock = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [ingredients, setIngredients] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [ingredientHistory, setIngredientHistory] = useState(null);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [updateFormData, setUpdateFormData] = useState({
+    quantity_in_stock: "",
+    total_volume: "",
+    net_volume: "",
+    expiration_date: "",
+  });
+  const [isEditingNetVolume, setIsEditingNetVolume] = useState(false);
+  const [isEditingTotalVolume, setIsEditingTotalVolume] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [ingredientToDelete, setIngredientToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch products
+  const fetchProducts = async () => {
+    try {
+      const response = await fetchApi(`${URL}/owner/stock-ingredients`, "GET");
+      const data = await response.json();
+
+      const processedData = data.map((category) => {
+        if (category.category_id === null) {
+          return {
+            ...category,
+            ingredients: category.ingredients.filter(
+              (ingredient, index, self) =>
+                index ===
+                self.findIndex(
+                  (i) => i.ingredient_id === ingredient.ingredient_id
+                )
+            ),
+          };
+        }
+        return category;
+      });
+
+      setIngredients(processedData);
+    } catch (error) {
+      console.error("Error fetching ingredients:", error);
+    }
+  };
+  console.log("Ingredient: ", ingredients);
   useEffect(() => {
-    // Fetch data from the backend
-    const fetchIngredients = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:3000/owner/stock-ingredients"
-        );
-        const data = await response.json();
-        setIngredients(data); // Store the data in state
-      } catch (error) {
-        console.error("Error fetching ingredients:", error);
-      }
-    };
-
-    fetchIngredients();
+    fetchProducts();
   }, []);
 
+  // Fetch categories when component mounts
   useEffect(() => {
-    // Fetch categories
     const fetchCategories = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/owner/stock-ingredients/categories"
+        const response = await fetchApi(
+          `${URL}/owner/stock-ingredients/categories`,
+          "GET"
         );
-        const data = await response.json();
-        setCategories(data.categories);
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.categories);
+        } else {
+          console.error("Failed to fetch categories");
+        }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
     fetchCategories();
-  }, [selectedCategory]);
+  }, [URL]);
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
   };
 
   const handleAddOwnerProduct = () => {
@@ -88,9 +128,158 @@ const Stock = () => {
     setSelectedCategory(categoryId);
   };
 
-  const filteredIngredients = ingredients.filter((item) =>
-    selectedCategory ? item.category_id === selectedCategory : true
-  );
+  const filteredIngredients = ingredients.flatMap((category) => {
+    if (
+      selectedCategory === null ||
+      category.category_id === selectedCategory
+    ) {
+      return category.ingredients.map((ingredient) => ({
+        ...ingredient,
+        category_name: category.category_name || "-",
+      }));
+    }
+    return [];
+  });
+
+  console.log("Filter Ingredient", filteredIngredients);
+  // Fetch ingredient history
+  const handleShowHistory = async (ingredientId) => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/stock-ingredients/sub-ingredient/${ingredientId}`,
+        "GET"
+      );
+      const data = await response.json();
+      setIngredientHistory(data);
+      setHistoryModalVisible(true);
+    } catch (error) {
+      console.error("Error fetching ingredient history:", error);
+    }
+  };
+
+  // Fetch product details when clicking อัปเดต button
+  const handleUpdate = async (updateId) => {
+    console.log("Update ID", updateId);
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/update-stock-ingredients/${updateId}`,
+        "GET"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch product details");
+      }
+
+      const data = await response.json();
+
+      // แปลงวันที่จาก string เป็น Date object
+      const expDate = data.expiration_date
+        ? new Date(data.expiration_date + "T00:00:00") // เพิ่มเวลาเพื่อให้ parse ถูกต้อง
+        : new Date();
+
+      setSelectedDate(expDate);
+      setSelectedProduct(data);
+      setUpdateFormData({
+        quantity_in_stock: data.quantity || "",
+        total_volume: data.total_volume || "",
+        net_volume: data.net_volume || "",
+        expiration_date: data.expiration_date || "", // เก็บวันที่ในรูปแบบ YYYY-MM-DD
+      });
+      setIsUpdateMode(true);
+      setModalVisible(true);
+
+      console.log("Update Form Data", updateFormData);
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
+  };
+
+  // Handle form submission for update
+  const handleUpdateSubmit = async () => {
+    try {
+      // ถ้าไม่มี update_id แสดงว่าเป็นการเพิ่มใหม่
+      if (!selectedProduct.update_id) {
+        // ตรวจสอบว่ามีวันที่หรือไม่ ถ้าไม่มีให้ใช้วันที่ปัจจุบัน
+        const expDate =
+          updateFormData.expiration_date ||
+          new Date().toISOString().split("T")[0];
+
+        const payload = {
+          image_url: selectedProduct.image_url,
+          ingredient_name: selectedProduct.ingredient_name,
+          net_volume: parseInt(updateFormData.net_volume),
+          unit: selectedProduct.unit,
+          quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
+          category_name: selectedProduct.category_name,
+          expiration_date: updateFormData.expiration_date,
+        };
+
+        console.log("payload POST", payload);
+
+        const response = await fetchApi(
+          `${URL}/owner/create-stock-ingredients`,
+          "POST",
+          payload
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to create product");
+        }
+      } else {
+        // ถ้ามี update_id แสดงว่าเป็นการอัพเดต
+        console.log("update_id", selectedProduct.update_id);
+
+        const payload = {
+          update_id: selectedProduct.update_id,
+          quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
+          total_volume: parseInt(updateFormData.total_volume),
+          net_volume: parseInt(updateFormData.net_volume),
+          expiration_date: updateFormData.expiration_date,
+        };
+
+        console.log("payload", payload);
+
+        const response = await fetchApi(
+          `${URL}/owner/update-stock-ingredients/${selectedProduct.update_id}`,
+          "PATCH",
+          payload
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to update product");
+        }
+      }
+
+      await fetchProducts();
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error updating/creating product:", error);
+    }
+  };
+
+  const removeIngredient = async (ingredientId) => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/stock-ingredients/${ingredientId}`,
+        "PATCH"
+      );
+
+      if (response.ok) {
+        console.log("Ingredient removed successfully!");
+        await fetchProducts(); // Refresh the ingredient list
+      } else {
+        throw new Error("Failed to remove ingredient");
+      }
+    } catch (error) {
+      console.error("Error removing ingredient:", error);
+      alert("เกิดข้อผิดพลาดในการลบส่วนผสม");
+    } finally {
+      setDeleteModalOpen(false); // Close the modal
+      setIngredientToDelete(null); // Reset the selected ingredient
+    }
+  };
+
+  console.log("ingredient history", ingredientHistory);
 
   return (
     <div>
@@ -171,8 +360,7 @@ const Stock = () => {
           <div className="my-4 relative flex">
             <div className="mr-5 flex items-center bg-white border-[#C6B399] border rounded-full px-4 py-1 w-full">
               <FiSearch className="text-[#C6B399] mr-2" size={36} />
-              <input
-                type="text"
+              <ThaiVirtualKeyboardInput
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="ค้นหาสินค้า..."
@@ -214,6 +402,9 @@ const Stock = () => {
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
                     อัปเดต
                   </th>
+                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
+                    ลบ
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -232,22 +423,34 @@ const Stock = () => {
                       {item.ingredient_name}
                     </td>
                     <td className="py-2 text-center border-b border-[#F1F4F7]">
-                      {item.quantity_in_stock}
+                      {item.total_volume && item.net_volume
+                        ? `${item.total_volume / item.net_volume} ชิ้น`
+                        : "-"}
                     </td>
                     <td className="py-2 pl-10 text-center border-b border-[#F1F4F7]">
-                      {categories.find(
-                        (category) => category.category_id === item.category_id
-                      )?.category_name || "-"}
+                      {item.category_name}
                     </td>
                     <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent the row click handler from firing
-                          handleUpdateClick(item);
+                          handleShowHistory(item.ingredient_id);
                         }}
                         className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
                       >
                         อัปเดต
+                      </button>
+                    </td>
+                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation(); // Prevent the row click event
+                          setIngredientToDelete(item);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="font-bold border border-red-300 text-red-300 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white z-10"
+                      >
+                        <AiOutlineDelete size={24} />
                       </button>
                     </td>
                   </tr>
@@ -256,89 +459,136 @@ const Stock = () => {
             </table>
           </div>
         </div>
-        {/* Modal */}
+
+        {/* Update/Create Product Modal */}
         {modalVisible && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg p-8 flex just flex-col h-[500px] w-[700px] relative">
+            <div className="bg-white rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
               {/* Product Name */}
               <h2 className="text-lg font-bold text-center mb-4 absolute top-4 w-full">
-                ผงชานมใต้หวัน
+                {selectedProduct?.ingredient_name}
               </h2>
 
               {/* Modal Content */}
               <div className="flex mt-10">
                 <div className="flex-shrink-0">
-                  <img
-                    src="https://sordaotieam.com/cdn/shop/files/200.webp?v=1687934958"
-                    alt="product"
-                    className="object-cover w-auto h-[310px] rounded-md border-solid border-4 border-[#848484]"
-                  />
+                  {selectedProduct?.image_url && (
+                    <img
+                      src={`${URL}/${selectedProduct?.image_url.replace(
+                        /\\/g,
+                        "/"
+                      )}`}
+                      alt={selectedProduct?.image_url}
+                      className="w-[240px] h-[240px] object-cover rounded-lg border border-gray-300 shadow-md"
+                    />
+                  )}
                 </div>
-                <div className="pl-8 flex-1">
+
+                {/* Product Details */}
+                <div className="flex-1 space-y-4 text-gray-700">
                   {/* Category */}
-                  <p className="mb-4">
-                    <span className="font-bold pr-2">หมวดหมู่</span>
-                    <span className="px-3 border border-[#613080] rounded-full text-[#613080]">
-                      น้ำชา
+                  <p className="flex items-center">
+                    <span className="font-bold text-gray-800">หมวดหมู่:</span>
+                    <span className="ml-2 px-3 py-1 border border-purple-600 rounded-full text-purple-600">
+                      {selectedProduct?.category_name || "ไม่ระบุ"}
                     </span>
                   </p>
 
                   {/* Expiry Date */}
-                  <div className="mb-4">
-                    <div className="font-bold mb-2">วันหมดอายุของสินค้า</div>
+                  <div>
+                    <div className="font-bold text-gray-800 mb-1">
+                      วันหมดอายุของสินค้า
+                    </div>
                     <div className="relative">
                       <DatePicker
                         selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
+                        onChange={(date) => {
+                          setSelectedDate(date);
+                          const formattedDate = date
+                            .toISOString()
+                            .split("T")[0];
+                          setUpdateFormData((prev) => ({
+                            ...prev,
+                            expiration_date: formattedDate,
+                          }));
+                        }}
                         dateFormat="dd / MM / yyyy"
                         placeholderText="DD / MM / YYYY"
                         locale={thLocaleWithMondayStart}
-                        className="pl-10 py-2 border border-[#C6B399] rounded-full "
+                        className="pl-10 py-2 border border-gray-300 rounded-full w-full"
                       />
-                      <FaRegCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#C6B399] w-5 h-5" />
+                      <FaRegCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     </div>
                   </div>
 
                   {/* Net Volume */}
-                  <div className="mb-4">
-                    <div className="font-bold mb-2">ปริมาตรสุทธิต่อหน่วย</div>
+                  <div>
+                    <div className="font-bold text-gray-800 mb-1">
+                      ปริมาตรสุทธิต่อหน่วย
+                    </div>
                     <div className="flex items-center">
-                      <input
-                        value="1000 กรัม"
-                        type="text"
-                        readOnly
-                        className="border border-[#D4B28C] rounded-full p-2 text-gray-600 focus:outline-none pr-8 mr-3"
+                      <ThaiVirtualKeyboardInput
+                        value={updateFormData.net_volume}
+                        onChange={(value) =>
+                          setUpdateFormData((prev) => ({
+                            ...prev,
+                            net_volume: value,
+                          }))
+                        }
+                        type="number"
+                        readOnly={!isEditingNetVolume}
+                        className="border border-gray-300 rounded-full p-2 text-gray-600 focus:outline-none w-full mr-3"
                       />
                       <button
                         type="button"
-                        className="px-4 text-[#C6B399] border border-[#C6B399] bg-white hover:bg-[#C6B399] hover:text-white rounded-full font-medium"
+                        className={`px-4 py-2 rounded-full font-medium ${
+                          isEditingNetVolume
+                            ? "bg-orange-300 text-white"
+                            : "border border-orange-300 text-orange-300"
+                        } hover:bg-orange-300 hover:text-white`}
+                        onClick={() =>
+                          setIsEditingNetVolume(!isEditingNetVolume)
+                        }
                       >
-                        แก้ไข
+                        {isEditingNetVolume ? "บันทึก" : "แก้ไข"}
                       </button>
                     </div>
                   </div>
 
                   {/* Stock Quantity */}
-                  <div className="mb-4">
-                    <div className="font-bold mb-2">
-                      จำนวนคงเหลือในสต็อคสินค้า
+                  <div>
+                    <div className="font-bold text-gray-800 mb-1">
+                      จำนวนคงเหลือในสต็อค
                     </div>
                     <div className="flex items-center">
                       <button
                         type="button"
-                        className="px-3 py-3 text-white bg-[#A2DC94] border border-[#A2DC94] hover:bg-white hover:text-[#A2DC94] rounded-full flex items-center justify-center"
+                        className="px-3 py-3 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600"
+                        onClick={() =>
+                          setUpdateFormData((prev) => ({
+                            ...prev,
+                            quantity_in_stock:
+                              parseInt(prev.quantity_in_stock || 0) + 1,
+                          }))
+                        }
                       >
                         <FaPlus />
                       </button>
-                      <div className="px-8 relative inline-block">
-                        <span className="font-bold">
-                          {selectedProduct.quantity}
-                        </span>
-                        <span className="absolute left-[10%] right-[10%] bottom-0 h-[1px] bg-[#848484]"></span>
-                      </div>
+                      <span className="px-6 font-bold text-gray-800">
+                        {updateFormData.quantity_in_stock || 0}
+                      </span>
                       <button
                         type="button"
-                        className="px-3 py-3 text-white bg-[#DC9494] border border-[#DC9494] hover:bg-white hover:text-[#DC9494] rounded-full flex items-center justify-center"
+                        className="px-3 py-3 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                        onClick={() =>
+                          setUpdateFormData((prev) => ({
+                            ...prev,
+                            quantity_in_stock: Math.max(
+                              0,
+                              parseInt(prev.quantity_in_stock || 0) - 1
+                            ),
+                          }))
+                        }
                       >
                         <FaMinus />
                       </button>
@@ -348,16 +598,16 @@ const Stock = () => {
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-between mt-auto">
+              <div className="flex justify-between mt-6">
                 <button
-                  className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                  className="px-6 py-3 w-full border rounded-full text-gray-700 border-gray-400 hover:bg-gray-100 transition-colors font-bold"
                   onClick={closeModal}
                 >
                   ย้อนกลับ
                 </button>
                 <button
-                  className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
-                  onClick={closeModal}
+                  className="px-6 py-3 w-full  bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                  onClick={handleUpdateSubmit}
                 >
                   บันทึก
                 </button>
@@ -365,6 +615,152 @@ const Stock = () => {
             </div>
           </div>
         )}
+
+        {/* Ingredient History Modal */}
+        {historyModalVisible && ingredientHistory && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
+              {/* Modal Header */}
+              <h2 className="text-lg font-bold text-center mb-4">
+                ประวัติการอัปเดต {ingredientHistory.ingredient_name}
+              </h2>
+
+              {/* Table Section */}
+              <div className="overflow-x-auto border rounded-lg p-5 flex-grow">
+                <table className="border-collapse table-auto w-full">
+                  <thead>
+                    <tr>
+                      <th className="py-2 pr-5 text-center border-b border-[#000000]">
+                        ลำดับที่
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        จำนวนคงเหลือ
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        ปริมาณรวม
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        ปริมาณสุทธิ
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        วันหมดอายุ
+                      </th>
+                      <th className="py-2 text-center border-b border-[#000000]">
+                        การดำเนินการ
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ingredientHistory.updates.map((update, index) => (
+                      <tr key={update.update_id}>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {index + 1}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {update.quantity_in_stock} ชิ้น
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {update.total_volume}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {update.net_volume}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          {new Date(update.expiration_date).toLocaleDateString(
+                            "th-TH"
+                          )}
+                        </td>
+                        <td className="py-2 text-center border-b border-[#F1F4F7]">
+                          <button
+                            onClick={() => {
+                              setHistoryModalVisible(false);
+                              handleUpdate(update.update_id);
+                            }}
+                            className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                          >
+                            อัปเดต
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Add Button */}
+              <div className="mt-4 flex justify-between">
+                <button
+                  onClick={() => setHistoryModalVisible(false)}
+                  className="px-6 py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                >
+                  ปิด
+                </button>
+                <button
+                  onClick={() => {
+                    setHistoryModalVisible(false);
+                    // เซ็ตค่าเริ่มต้นสำหรับการเพิ่มใหม่
+                    setUpdateFormData({
+                      quantity_in_stock: "",
+                      total_volume: "",
+                      net_volume: ingredientHistory.net_volume || "", // เก็บค่า net_volume เดิม
+                      expiration_date: "", // วันที่เป็นค่าว่าง
+                    });
+                    setSelectedProduct({
+                      ...ingredientHistory,
+                      update_id: null, // ส่ง update_id เป็น null เพื่อบอกว่าเป็นการเพิ่มใหม่
+                    });
+                    setModalVisible(true);
+                  }}
+                  className="px-6 py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                >
+                  เพิ่มการอัปเดต
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <DeleteIngredientModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={removeIngredient}
+          ingredient={ingredientToDelete}
+        />
+      </div>
+    </div>
+  );
+};
+
+const DeleteIngredientModal = ({ isOpen, onClose, onConfirm, ingredient }) => {
+  if (!isOpen || !ingredient) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
+      <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
+        <h2 className="text-3xl mb-4">
+          ลบส่วนผสม{" "}
+          <span className="font-bold">{ingredient.ingredient_name}</span>{" "}
+          หรือไม่?
+        </h2>
+        <p className="text-gray-600 mb-8">
+          การลบส่วนผสมจะไม่สามารถย้อนกลับมาแก้ไขได้อีก
+        </p>
+        <div className="w-full flex justify-between space-x-8">
+          <button
+            onClick={onClose}
+            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+          >
+            ยกเลิก
+          </button>
+          <button
+            onClick={() => {
+              onConfirm(ingredient.ingredient_id);
+            }}
+            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors"
+          >
+            ลบ
+          </button>
+        </div>
       </div>
     </div>
   );

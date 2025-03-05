@@ -3,6 +3,7 @@ import { FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 import { useState } from "react";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const EnterOTP = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const EnterOTP = () => {
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
             <FaLock style={{ color: "#D4B28C" }} className="mr-2" />
-            <input
+            <ThaiVirtualKeyboardInput
               type={showPassword ? "text" : "password"}
               id="password"
               placeholder="กรอกรหัส OTP 6 หลัก..."

@@ -1,25 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BsCashCoin } from "react-icons/bs";
 import { IoChevronBack } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { QRCodeCanvas } from "qrcode.react";
-import { promptPay } from "promptpay-qr";
+import generatePayload from "promptpay-qr";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
+import { useWebSocket } from "../../../webSocketContext";
+import PhoneDetect from "../../../Components/PhoneDetect/phoneDetect";
 
 const PaymentMethod = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
-  const { selectedPayment, total } = location.state || {};
-  console.log("selectedPayment: ", selectedPayment);
-  console.log("TOTAL:", total);
+  const { orderDetails } = location.state || {};
+  const total = orderDetails?.total;
+  const items = orderDetails?.items;
+  const selectedPayment = orderDetails?.selectedPayment;
+
+  console.log("Full orderDetails:", orderDetails);
+  console.log("selectedPayment type:", typeof selectedPayment);
+  console.log("selectedPayment value:", selectedPayment);
 
   const accountNumber = "0869201512";
-  const qrData = promptPay(accountNumber, total);
+  const qrData = generatePayload(accountNumber, { amount: parseFloat(total) });
+
+  console.log("qrData: ", qrData);
 
   const bankIcons = [
     "BAAC.png",
@@ -34,40 +44,171 @@ const PaymentMethod = () => {
     "TTB.png",
   ];
 
+  const socket = useWebSocket();
+  const [showPhoneDetect, setShowPhoneDetect] = useState(false);
+
+  useEffect(() => {
+    console.log("Socket state:", socket);
+    if (socket) {
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+  
+          console.log("PaymentMethod received message:", messageData);
+  
+          let createOrderDto = {
+            order_date: new Date().toISOString(),
+            total_price: total,
+            queue_number: null,
+            status: "รอทำ",
+            payment_method: selectedPayment,
+            path_img: messageData.data,
+            cancel_status: null,
+          };
+  
+          switch (messageData.type) {
+            case "CONFIRM_SLIP":
+              console.log("Got slip path:", messageData.data);
+              break;
+  
+            case "RETAKE_SLIP":
+              setShowPhoneDetect(true);
+              return; 
+  
+            case "CANCEL_SLIP":
+              createOrderDto.cancel_status = "ยกเลิกโดยพนักงาน";
+              break;
+  
+            default:
+              return;
+          }
+  
+          // Format items for backend
+          const formattedItems = items.map((item) => ({
+            menu_id: item.menuId,
+            sweetness_id: item.selectedSweetness.id,
+            size_id: item.selectedSize.id,
+            add_on_id: item.selectedAddOn.map((addon) => addon.id),
+            menu_type_id: item.selectedType.id,
+            quantity: item.quantity,
+            price: item.price,
+          }));
+  
+          const payload = {
+            createOrderDto,
+            items: formattedItems,
+          };
+  
+          console.log("Sending order payload:", payload);
+  
+          try {
+            const response = await fetchApi(`${URL}/employee/orders`, "POST", payload);
+  
+            console.log("Got response:", response);
+  
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error("Error data:", errorData);
+              throw new Error("Error submitting the order");
+            }
+  
+            const responseData = await response.json();
+            console.log("Order submitted successfully:", responseData);
+  
+            navigate("/queue-summary", {
+              state: { orderData: responseData },
+            });
+          } catch (error) {
+            console.error("Error during order submission:", error);
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
+          console.error("Event data:", event.data);
+        }
+      };
+  
+      socket.addEventListener("message", messageHandler);
+  
+      return () => {
+        socket.removeEventListener("message", messageHandler);
+      };
+    }
+  }, [socket, total, selectedPayment, items, navigate, URL]);
+  
+
   const handleBack = () => navigate("/summary");
 
-  const handleConfirmPayment = async () => {
-    const createOrderDto = {
-      order_date: new Date().toISOString(),
-      total_price: total,
-      queue_number: 3,
-      status: "รอทำ",
-      payment_method: selectedPayment,
-    };
+  const handleConfirmPayment = () => {
+    console.log("selectedPayment:", selectedPayment);
+    console.log("socket:", socket);
+    console.log("total:", total);
+    console.log("items:", items);
 
-    const payload = {
-      createOrderDto,
-      items: [],
-    };
-
-    try {
-      const response = await fetchApi(
-        `${URL}/employee/orders`,
-        "POST",
-        payload
-      );
-
-      if (!response.ok) {
-        throw new Error("Error submitting the order");
-      }
-
-      const responseData = await response.json();
-      console.log("Order submission response:", responseData);
-      navigate("/order-summary", { state: { orderData: responseData } });
-    } catch (error) {
-      console.error("Error during order submission:", error);
+    if (selectedPayment === "cash" && socket) {
+      console.log("Sending cash payment message");
+      const message = {
+        type: "CASH_PAYMENT",
+        data: {
+          totalAmount: total,
+          items: items.map((item) => ({
+            menu_id: item.menuId,
+            sweetness_id: item.selectedSweetness.id,
+            size_id: item.selectedSize.id,
+            add_on_id: item.selectedAddOn.map((addon) => addon.id),
+            menu_type_id: item.selectedType.id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      };
+      console.log("Sending WebSocket message:", message);
+      socket.send(JSON.stringify(message));
+    } else if (selectedPayment === "qr") {
+      setShowPhoneDetect(true);
     }
   };
+
+  const handlePhoneDetectCapture = async (imageData) => {
+    setShowPhoneDetect(false);
+
+    if (socket) {
+      const message = {
+        type: "NEW_SLIP",
+        data: imageData,
+      };
+      socket.send(JSON.stringify(message));
+    }
+  };
+
+
+  useEffect(() => {
+    if (selectedPayment === "cash" && socket) {
+      console.log("Sending cash payment message");
+      const message = {
+        type: "CASH_PAYMENT",
+        data: {
+          totalAmount: total,
+          items: items.map((item) => ({
+            menu_id: item.menuId,
+            sweetness_id: item.selectedSweetness.id,
+            size_id: item.selectedSize.id,
+            add_on_id: item.selectedAddOn.map((addon) => addon.id),
+            menu_type_id: item.selectedType.id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      };
+      console.log("Sending WebSocket message:", message);
+      socket.send(JSON.stringify(message));
+    }
+  }, [selectedPayment, socket, total, items]);
 
   return (
     <div>
@@ -114,7 +255,7 @@ const PaymentMethod = () => {
               </div>
               <button
                 onClick={handleConfirmPayment}
-                className="px-4 py-2 bg-[#DD9F52] text-white rounded"
+                className="w-full mt-8 px-4 py-2 bg-[#DD9F52] text-white rounded-full"
               >
                 ยืนยันการชำระเงิน
               </button>
@@ -137,6 +278,19 @@ const PaymentMethod = () => {
             กรุณาชำระเงินที่เคาน์เตอร์พนักงาน
           </p>
           <p className="text-2xl">อย่าลืมรับสลิปที่ช่องทางด้านขวามือ</p>
+        </div>
+      )}
+
+      {/* Phone Detect Modal */}
+      {showPhoneDetect && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-4/5 max-w-3xl text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              ตรวจจับใบเสร็จโอนเงิน
+            </h2>
+            <hr className="h-0.5 bg-[#DD9F52] border-0" />
+            <PhoneDetect onCapture={handlePhoneDetectCapture} socket={socket} />
+          </div>
         </div>
       )}
     </div>

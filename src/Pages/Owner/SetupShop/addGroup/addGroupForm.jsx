@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import configureAPI from "../../../../Config/configureAPI";
 import LoadingPopup from "../../../../Components/General/loadingPopup";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const AddGroupForm = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -30,7 +31,9 @@ const AddGroupForm = () => {
   const [errors, setErrors] = useState("");
   const [selectedMenuErrors, setSelectedMenuErrors] = useState("");
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   useEffect(() => {
     const fetchMenus = async () => {
@@ -197,11 +200,11 @@ const AddGroupForm = () => {
             >
               ชื่อกลุ่ม
             </label>
-            <input
+            <ThaiVirtualKeyboardInput
               type="text"
               id="groupName"
               value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
+              onChange={setGroupName}
               placeholder="กรอกชื่อกลุ่ม..."
               className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
@@ -224,7 +227,7 @@ const AddGroupForm = () => {
                   style={{ color: "#D4B28C" }}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
                 />
-                <input
+                <ThaiVirtualKeyboardInput
                   type="text"
                   placeholder="ค้นหาด้วยชื่อเมนู..."
                   value={searchTerm}

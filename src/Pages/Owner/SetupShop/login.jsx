@@ -19,7 +19,8 @@ const Login = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [keyboardLayout, setKeyboardLayout] = useState("default");
-
+  const [loading, setLoading] = useState(false);
+  
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -36,7 +37,7 @@ const Login = () => {
         return;
       }
 
-      const response = await fetchApi(`${URL}/owner/login`, "POST", {
+      const response = await fetchApi(`${URL}/auth/login`, "POST", {
         email: email,
         password: password,
       });

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import configureAPI from "../../Config/configureAPI";
 import fetchApi from "../../Config/fetchApi";
+import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
 
 const AddCategoryButton = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -10,7 +11,6 @@ const AddCategoryButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categoryName, setCategoryName] = useState("");
-  const owner_id = 16;
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const handleOutsideClick = (e) => {
@@ -22,14 +22,12 @@ const AddCategoryButton = () => {
   const handleAddIngredientCategory = async () => {
     setLoading(true);
     try {
-      if (owner_id) {
-        const response = await fetchApi(`${URL}/owner/stock-group`, "POST", {
-          category_name: categoryName,
-        });
+      const response = await fetchApi(`${URL}/owner/stock-group`, "POST", {
+        category_name: categoryName,
+      });
 
-        if (response.ok) {
-          toggleModal();
-        }
+      if (response.ok) {
+        toggleModal();
       }
     } catch (error) {
       console.error("Error create ingredient category:", error);
@@ -75,11 +73,10 @@ const AddCategoryButton = () => {
               >
                 ชื่อหมวดหมู่
               </label>
-              <input
-                type="text"
+              <ThaiVirtualKeyboardInput
                 id="categoryName"
                 placeholder="กรอกชื่อหมวดหมู่..."
-                onChange={(e) => setCategoryName(e.target.value)}
+                onChange={setCategoryName}
                 className="w-full border border-[#C6B399] rounded-full p-2 focus:outline-none focus:ring-1 focus:ring-[#C6B399]"
               />
             </div>

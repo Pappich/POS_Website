@@ -4,6 +4,7 @@ import { FaSearch } from "react-icons/fa";
 import HomeEmButton from "../../../Components/Employee/homeEmButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const PauseIngredient = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -62,7 +63,9 @@ const PauseIngredient = () => {
         .includes(searchTerm.normalize("NFD"))
   );
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleBackButton = () => navigate("/pause-section");
 
@@ -143,8 +146,7 @@ const PauseIngredient = () => {
             style={{ color: "#D4B28C" }}
             className="absolute left-3 top-1/2 transform -translate-y-1/2"
           />
-          <input
-            type="text"
+          <ThaiVirtualKeyboardInput
             placeholder="ค้นหาด้วยชื่อวัตถุดิบ..."
             value={searchTerm}
             onChange={handleSearch}

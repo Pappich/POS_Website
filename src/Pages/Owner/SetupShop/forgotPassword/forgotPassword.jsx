@@ -2,7 +2,7 @@ import React from "react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { MdEmail } from "react-icons/md";
-
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
@@ -28,8 +28,7 @@ const ForgotPassword = () => {
           </label>
           <div className="flex items-center border rounded-full bg-gray-50 px-3">
             <MdEmail style={{ color: "#D4B28C" }} className="mr-2" />
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               id="email"
               placeholder="กรอกอีเมล..."
               className="w-full py-2 px-3 bg-transparent outline-none text-gray-700"

@@ -3,9 +3,9 @@ import Navbar from "./Components/General/navBar";
 
 function NavbarEmployeeLayout() {
   return (
-    <div className="w-full bg-gray-200">
+    <div className="w-full bg-white">
       <Navbar />
-      <div className="px-4 bg-gray-200">
+      <div className="px-4 bg-white">
         <Outlet />
       </div>
     </div>

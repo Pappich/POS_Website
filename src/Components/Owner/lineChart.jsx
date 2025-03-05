@@ -22,29 +22,35 @@ ChartJS.defaults.font.family = "Noto Sans Thai";
 ChartJS.defaults.font.size = 16;
 ChartJS.defaults.color = "black";
 
-const LineChart = () => {
+const LineChart = ({ dailyStats }) => {
+  // Array of month names in Thai
+  const monthNames = [
+    "ม.ค.",
+    "ก.พ.",
+    "มี.ค.",
+    "เม.ย.",
+    "พ.ค.",
+    "มิ.ย.",
+    "ก.ค.",
+    "ส.ค.",
+    "ก.ย.",
+    "ต.ค.",
+    "พ.ย.",
+    "ธ.ค.",
+  ];
+
   const data = {
-    labels: [
-      "ม.ค.",
-      "ก.พ.",
-      "มี.ค.",
-      "เม.ย.",
-      "พ.ค.",
-      "มิ.ย.",
-      "ก.ค.",
-      "ส.ค.",
-      "ก.ย.",
-      "ต.ค.",
-      "พ.ย.",
-      "ธ.ค.",
-    ],
+    labels: dailyStats
+      ? dailyStats.map((stat) => {
+          const date = new Date(stat.date);
+          // date + month
+          return `${date.getDate()} ${monthNames[date.getMonth()]}`;
+        })
+      : [],
     datasets: [
       {
         label: "รายรับทั้งหมด",
-        data: [
-          50000, 10000, 40000, 30000, 60000, 50000, 80000, 70000, 90000, 60000,
-          70000, 40000,
-        ],
+        data: dailyStats ? dailyStats.map((stat) => stat.totalRevenue) : [],
         borderColor: "#A3C4DC", // Light blue line color
         backgroundColor: "rgba(163, 196, 220, 0.3)", // Transparent fill color
         fill: true, // Enable area under the line to be filled
@@ -73,6 +79,10 @@ const LineChart = () => {
     },
     scales: {
       x: {
+        title: {
+          display: true,
+          text: "วันที่", // Title for the x-axis
+        },
         grid: {
           display: false, // Turn off the grid on the x-axis
         },

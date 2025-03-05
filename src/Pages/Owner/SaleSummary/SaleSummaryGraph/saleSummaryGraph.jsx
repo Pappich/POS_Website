@@ -1,25 +1,69 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import SideBar from "../../../../Components/Owner/sideBar";
 import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import IncomeOrderCancel from "../../../../Components/Owner/incomeOrderCancel";
 import LineChart from "../../../../Components/Owner/lineChart";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+
 const SaleSummaryGraph = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
+  // Set default date to today's date in the format YYYY-MM-DD
+  const today = new Date();
+  const options = {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  const formattedDate = today.toLocaleDateString("en-CA", options); // Format as YYYY-MM-DD
+
+  const [selectedDate, setSelectedDate] = useState(formattedDate);
+  const [data, setData] = useState(null);
+
+  // Function to fetch sales data based on the selected year and month
+  const fetchSalesData = async (year, month) => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/stock-sale/${year}/${month}`,
+        "GET"
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        setData(result); // Set the fetched data
+      } else {
+        console.error("Failed to fetch sales data");
+      }
+    } catch (error) {
+      console.error("Error fetching sales data:", error);
+    }
+  };
+
+  // Fetch data when the selected date changes
+  useEffect(() => {
+    const [year, month] = selectedDate.split("-");
+    fetchSalesData(year, month);
+  }, [selectedDate]);
+
   return (
     <div className="h-screen flex flex-col">
       <SideBar menuTab={"saleSummaryGraph"} />
       <h1 className="font-bold text-xl">ภาพรวมยอดขาย</h1>
       <span className="flex justify-end">
-        <CalendarSelect />
+        <CalendarSelect setSelectedDate={setSelectedDate} />
       </span>
-      <IncomeOrderCancel />
+      <IncomeOrderCancel data={data} />
       <div className="mt-3 flex-1">
-        {/* Bar Chart Section */}
-        <div className="bg-white p-4 border rounded-lg  flex flex-col">
+        {/* Line Chart Section */}
+        <div className="bg-white p-4 border rounded-lg flex flex-col">
           <h2 className="text-lg text-center font-semibold mb-2 ">
             กราฟสรุปรายรับประจำเดือน
           </h2>
           <div className="flex-1">
-            <LineChart />
+            <LineChart dailyStats={data?.daily_stats} />
           </div>
         </div>
       </div>

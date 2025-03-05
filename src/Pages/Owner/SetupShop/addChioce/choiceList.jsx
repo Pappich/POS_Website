@@ -6,6 +6,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const ChoiceList = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -115,7 +116,9 @@ const ChoiceList = () => {
     );
   };
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleSuccess = () => {
     navigate("/main-menu");
@@ -142,7 +145,7 @@ const ChoiceList = () => {
         endpoint = `${URL}/owner/menus/options/size/${productToDelete.name}`;
         break;
       case "ความหวาน":
-        endpoint = `${URL}owner/menus/options/sweetness/${productToDelete.name}`;
+        endpoint = `${URL}/owner/menus/options/sweetness/${productToDelete.name}`;
         break;
       case "ท็อปปิ้ง":
         endpoint = `${URL}/owner/menus/options/add-ons`;
@@ -245,8 +248,7 @@ const ChoiceList = () => {
               style={{ color: "#D4B28C" }}
               className="absolute left-3 top-1/2 transform -translate-y-1/2"
             />
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               placeholder="ค้นหาด้วยชื่อตัวเลือก..."
               value={searchTerm}
               onChange={handleSearch}

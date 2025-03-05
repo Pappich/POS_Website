@@ -3,11 +3,12 @@ import "react-simple-keyboard/build/css/index.css";
 import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
 
-const DoneOrderButton = ({ order }) => {
+const DoneOrderButton = ({ order, onSuccess }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   console.log("order", order);
 
@@ -17,6 +18,29 @@ const DoneOrderButton = ({ order }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const speakQueueNumber = (queueNumber) => {
+    // ตรวจสอบว่าเบราว์เซอร์รองรับ Speech Synthesis หรือไม่
+    if ("speechSynthesis" in window) {
+      // สร้างข้อความที่จะพูด
+      const message = `คิวที่ ${queueNumber} เชิญรับเครื่องดื่มที่เคาน์เตอร์`;
+      const utterance = new SpeechSynthesisUtterance(message);
+
+      // ตั้งค่าเสียงเป็นภาษาไทย
+      utterance.lang = "th-TH";
+      // ปรับความเร็วของการพูด (0.1 ถึง 10)
+      utterance.rate = 0.6;
+      // ปรับระดับเสียง (0 ถึง 1)
+      utterance.volume = 1;
+      // ปรับความถี่เสียง (0 ถึง 2)
+      utterance.pitch = 1;
+
+      // เล่นเสียง
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.log("เบราว์เซอร์ไม่รองรับ Speech Synthesis");
+    }
   };
 
   const completeOrder = async () => {
@@ -32,6 +56,7 @@ const DoneOrderButton = ({ order }) => {
     };
 
     console.log("orderData", orderData);
+    console.log("order", order);
 
     try {
       const response = await fetchApi(
@@ -42,7 +67,12 @@ const DoneOrderButton = ({ order }) => {
 
       if (response.ok) {
         console.log("Order completed successfully!");
+        // เรียกใช้ฟังก์ชันพูดหมายเลขคิว
+        if (order.queue_number) {
+          speakQueueNumber(order.queue_number);
+        }
         closeModal();
+        await onSuccess();
       } else {
         console.log(response);
         console.log("Failed to complete the order.");

@@ -44,77 +44,89 @@ import PauseMenu from "./Pages/Employee/main/pauseMenu";
 import NavbarCustomerLayout from "./NavbarCustomerLayout";
 import NavbarEmployeeLayout from "./NavbarEmployeeLayout";
 import CreateAccount from "./Pages/Owner/SetupShop/createAccount";
+import Branch from "./Pages/Owner/SetupShop/branch";
+import WebSocket from "ws";
+import { WebSocketProvider } from "./webSocketContext";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Routes without Navbar : login flow */}
-        <Route path="/" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/enter-otp" element={<EnterOTP />} />
-        <Route path="/enter-new-password" element={<EnterNewPassword />} />
-        <Route path="/create-account" element={<CreateAccount />} />
+    <WebSocketProvider>
+      <Router>
+        <Routes>
+          {/* Routes without Navbar : login flow */}
+          <Route path="/" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/enter-otp" element={<EnterOTP />} />
+          <Route path="/enter-new-password" element={<EnterNewPassword />} />
+          <Route path="/create-account" element={<CreateAccount />} />
+          <Route path="/branch" element={<Branch />} />
 
-        {/* Sale summary */}
-        <Route path="/overview" element={<Home />} />
-        <Route path="/order-summary" element={<OrderSummary />} />
-        <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
-        <Route path="/stock" element={<Stock />} />
-        <Route path="/notification-summary" element={<NotificationSummary />} />
-        <Route path="/add-owner-product" element={<AddOwnerProduct />} />
-        <Route path="/product-detail" element={<ProductDetail />} />
-        <Route path="/cancel-order-summary" element={<CancelOrderSummary />} />
+          {/* Sale summary */}
+          <Route path="/overview" element={<Home />} />
+          <Route path="/order-summary" element={<OrderSummary />} />
+          <Route path="/sale-summary-graph" element={<SaleSummaryGraph />} />
+          <Route path="/stock" element={<Stock />} />
+          <Route
+            path="/notification-summary"
+            element={<NotificationSummary />}
+          />
+          <Route path="/add-owner-product" element={<AddOwnerProduct />} />
+          <Route path="/product-detail" element={<ProductDetail />} />
+          <Route
+            path="/cancel-order-summary"
+            element={<CancelOrderSummary />}
+          />
 
-        {/* Customer flow */}
-        <Route element={<NavbarCustomerLayout />}>
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/menu-detail" element={<MenuDetail />} />
-          <Route path="/summary" element={<Summary />} />
-          <Route path="/payment-method" element={<PaymentMethod />} />
-          <Route path="/queue-summary" element={<QueueSummary />} />
-        </Route>
+          {/* Customer flow */}
+          <Route element={<NavbarCustomerLayout />}>
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/menu-detail" element={<MenuDetail />} />
+            <Route path="/summary" element={<Summary />} />
+            <Route path="/payment-method" element={<PaymentMethod />} />
+            <Route path="/queue-summary" element={<QueueSummary />} />
+          </Route>
 
-        {/* Employee flow */}
-        <Route element={<NavbarEmployeeLayout />}>
-          <Route path="/order-list" element={<Order />} />
-          <Route path="/pause-section" element={<PauseSection />} />
-          <Route path="/pause-ingredient" element={<PauseIngredient />} />
-          <Route path="/pause-menu" element={<PauseMenu />} />
-        </Route>
+          {/* Employee flow */}
+          <Route element={<NavbarEmployeeLayout />}>
+            <Route path="/order-list" element={<Order />} />
+            <Route path="/pause-section" element={<PauseSection />} />
+            <Route path="/pause-ingredient" element={<PauseIngredient />} />
+            <Route path="/pause-menu" element={<PauseMenu />} />
+          </Route>
 
-        {/* Routes with Navbar : other flow*/}
-        <Route element={<NavbarLayout />}>
-          <Route path="/main-menu" element={<MainMenu />} />
-          <Route path="/role" element={<UserRole />} />
-          <Route path="/owner" element={<OwnerMenu />} />
+          {/* Routes with Navbar : other flow*/}
+          <Route element={<NavbarLayout />}>
+            <Route path="/main-menu" element={<MainMenu />} />
+            <Route path="/role" element={<UserRole />} />
+            <Route path="/owner" element={<OwnerMenu />} />
 
-          {/* Add product flow */}
-          <Route path="/guideline" element={<GuideLine />} />
-          <Route path="/add-product" element={<AddProductForm />} />
-          <Route path="/product-list" element={<ProductList />} />
+            {/* Add product flow */}
+            <Route path="/guideline" element={<GuideLine />} />
+            <Route path="/add-product" element={<AddProductForm />} />
+            <Route path="/product-list" element={<ProductList />} />
 
-          {/* Add group flow */}
-          <Route path="/group-list" element={<GroupList />} />
-          <Route path="/add-group" element={<AddGroupForm />} />
-          <Route path="/group-menu" element={<GroupMenu />} />
+            {/* Add group flow */}
+            <Route path="/group-list" element={<GroupList />} />
+            <Route path="/add-group" element={<AddGroupForm />} />
+            <Route path="/group-menu" element={<GroupMenu />} />
 
-          {/* Add choice flow */}
-          <Route path="/choice-list" element={<ChoiceList />} />
-          <Route path="/choice-option" element={<ChoiceOptions />} />
-          <Route path="/glass-choice" element={<GlassChoice />} />
-          <Route path="/topping-choice" element={<ToppingChoice />} />
-          <Route path="/type-choice" element={<TypeChoice />} />
-          <Route path="/sweet-level-choice" element={<SweetLevelChoice />} />
-          <Route path="/choice-menu" element={<ChoiceMenu />} />
+            {/* Add choice flow */}
+            <Route path="/choice-list" element={<ChoiceList />} />
+            <Route path="/choice-option" element={<ChoiceOptions />} />
+            <Route path="/glass-choice" element={<GlassChoice />} />
+            <Route path="/topping-choice" element={<ToppingChoice />} />
+            <Route path="/type-choice" element={<TypeChoice />} />
+            <Route path="/sweet-level-choice" element={<SweetLevelChoice />} />
+            <Route path="/choice-menu" element={<ChoiceMenu />} />
 
-          {/* Add stock flow */}
-          <Route path="/stock-list" element={<StockList />} />
-          <Route path="/add-stock" element={<AddStockForm />} />
-        </Route>
-      </Routes>
-      {/* </div> */}
-    </Router>
+            {/* Add stock flow */}
+            <Route path="/stock-list" element={<StockList />} />
+            <Route path="/add-stock" element={<AddStockForm />} />
+          </Route>
+        </Routes>
+        {/* </div> */}
+      </Router>
+    </WebSocketProvider>
   );
 }
 

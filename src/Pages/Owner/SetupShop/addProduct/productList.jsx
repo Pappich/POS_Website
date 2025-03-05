@@ -5,6 +5,7 @@ import DeleteProduct from "./deleteProduct";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useEffect } from "react";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const ProductList = () => {
   const navigate = useNavigate();
@@ -35,7 +36,9 @@ const ProductList = () => {
     item.menu_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
   );
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleSuccess = () => {
     navigate("/main-menu");
@@ -83,8 +86,7 @@ const ProductList = () => {
               style={{ color: "#D4B28C" }}
               className="absolute left-3 top-1/2 transform -translate-y-1/2"
             />
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               placeholder="ค้นหาด้วยชื่อสินค้า..."
               value={searchTerm}
               onChange={handleSearch}
