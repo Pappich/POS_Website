@@ -7,6 +7,7 @@ import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
 const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   const [cashReceived, setCashReceived] = useState("");
   const [change, setChange] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (cashReceived) {

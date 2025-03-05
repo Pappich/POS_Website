@@ -9,9 +9,6 @@ const IngredientDropdown = ({ value, onChange }) => {
 
   const [ingredients, setIngredients] = useState([]);
 
-  // mock owner_id
-  const owner_id = 16;
-
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
@@ -30,7 +27,7 @@ const IngredientDropdown = ({ value, onChange }) => {
     };
 
     fetchIngredients();
-  }, [URL, owner_id]);
+  }, [URL]);
 
   const customStyles = {
     control: (provided, state) => ({

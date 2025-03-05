@@ -19,7 +19,8 @@ const Login = () => {
   const [usernameInput, setUsernameInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [keyboardLayout, setKeyboardLayout] = useState("default");
-
+  const [loading, setLoading] = useState(false);
+  
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 

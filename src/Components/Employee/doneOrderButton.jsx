@@ -8,6 +8,7 @@ const DoneOrderButton = ({ order, onSuccess }) => {
   const URL = configureAPI[environment].URL;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   console.log("order", order);
 

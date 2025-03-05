@@ -19,6 +19,7 @@ const Menu = () => {
   });
   const { categories } = menuData;
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
+  const [loading, setLoading] = useState(false);
 
   const getCartItemCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);

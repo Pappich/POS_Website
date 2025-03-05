@@ -23,6 +23,7 @@ const SweetLevelChoice = () => {
   const [expandedGroups, setExpandedGroups] = useState({});
   const [choices, setChoices] = useState([{ name: "" }]);
   const [sweetnessData, setSweetnessData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Add back the errors state
   const [errors, setErrors] = useState({

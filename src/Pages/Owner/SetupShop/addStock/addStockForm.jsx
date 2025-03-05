@@ -30,7 +30,8 @@ const AddStockForm = () => {
   const [menuIngredientData, setMenuIngredientData] = useState([]);
   const [filterIngredientData, setFilterIngredientData] = useState([]);
   const [menuIngredientDataSet, setMenuIngredientDataSet] = useState([]);
-
+  const [loading, setLoading] = useState(false);
+  
   // List options
   const unitOptions = [
     { value: "กรัม", label: "กรัม (g)" },

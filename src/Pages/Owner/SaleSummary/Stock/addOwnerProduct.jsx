@@ -29,6 +29,7 @@ const AddOwnerProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const unitOptions = [
     { value: "กรัม", label: "กรัม (g)" },

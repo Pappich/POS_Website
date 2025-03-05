@@ -15,6 +15,8 @@ import SideBar from "../../../../Components/Owner/sideBar";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import { AiOutlineDelete } from "react-icons/ai";
+
 const thLocaleWithMondayStart = {
   ...th,
   options: {
@@ -46,6 +48,9 @@ const Stock = () => {
   });
   const [isEditingNetVolume, setIsEditingNetVolume] = useState(false);
   const [isEditingTotalVolume, setIsEditingTotalVolume] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [ingredientToDelete, setIngredientToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Fetch products
   const fetchProducts = async () => {
@@ -224,21 +229,12 @@ const Stock = () => {
         // ถ้ามี update_id แสดงว่าเป็นการอัพเดต
         console.log("update_id", selectedProduct.update_id);
 
-        // ตรวจสอบว่ามีวันที่หรือไม่ ถ้าไม่มีให้ใช้วันที่ปัจจุบัน
-        const expDate =
-          updateFormData.expiration_date ||
-          new Date().toISOString().split("T")[0];
-
         const payload = {
-          updates: [
-            {
-              update_id: selectedProduct.update_id,
-              quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
-              total_volume: parseInt(updateFormData.total_volume),
-              net_volume: parseInt(updateFormData.net_volume),
-              expiration_date: expDate,
-            },
-          ],
+          update_id: selectedProduct.update_id,
+          quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
+          total_volume: parseInt(updateFormData.total_volume),
+          net_volume: parseInt(updateFormData.net_volume),
+          expiration_date: updateFormData.expiration_date,
         };
 
         console.log("payload", payload);
@@ -258,6 +254,28 @@ const Stock = () => {
       setModalVisible(false);
     } catch (error) {
       console.error("Error updating/creating product:", error);
+    }
+  };
+
+  const removeIngredient = async (ingredientId) => {
+    try {
+      const response = await fetchApi(
+        `${URL}/owner/stock-ingredients/${ingredientId}`,
+        "PATCH"
+      );
+
+      if (response.ok) {
+        console.log("Ingredient removed successfully!");
+        await fetchProducts(); // Refresh the ingredient list
+      } else {
+        throw new Error("Failed to remove ingredient");
+      }
+    } catch (error) {
+      console.error("Error removing ingredient:", error);
+      alert("เกิดข้อผิดพลาดในการลบส่วนผสม");
+    } finally {
+      setDeleteModalOpen(false); // Close the modal
+      setIngredientToDelete(null); // Reset the selected ingredient
     }
   };
 
@@ -384,6 +402,9 @@ const Stock = () => {
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
                     อัปเดต
                   </th>
+                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
+                    ลบ
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -418,6 +439,18 @@ const Stock = () => {
                         className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
                       >
                         อัปเดต
+                      </button>
+                    </td>
+                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation(); // Prevent the row click event
+                          setIngredientToDelete(item);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="font-bold border border-red-300 text-red-300 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white z-10"
+                      >
+                        <AiOutlineDelete size={24} />
                       </button>
                     </td>
                   </tr>
@@ -496,10 +529,10 @@ const Stock = () => {
                     <div className="flex items-center">
                       <ThaiVirtualKeyboardInput
                         value={updateFormData.net_volume}
-                        onChange={(value) => 
-                          setUpdateFormData(prev => ({
+                        onChange={(value) =>
+                          setUpdateFormData((prev) => ({
                             ...prev,
-                            net_volume: value
+                            net_volume: value,
                           }))
                         }
                         type="number"
@@ -686,6 +719,48 @@ const Stock = () => {
             </div>
           </div>
         )}
+
+        <DeleteIngredientModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={removeIngredient}
+          ingredient={ingredientToDelete}
+        />
+      </div>
+    </div>
+  );
+};
+
+const DeleteIngredientModal = ({ isOpen, onClose, onConfirm, ingredient }) => {
+  if (!isOpen || !ingredient) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
+      <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
+        <h2 className="text-3xl mb-4">
+          ลบส่วนผสม{" "}
+          <span className="font-bold">{ingredient.ingredient_name}</span>{" "}
+          หรือไม่?
+        </h2>
+        <p className="text-gray-600 mb-8">
+          การลบส่วนผสมจะไม่สามารถย้อนกลับมาแก้ไขได้อีก
+        </p>
+        <div className="w-full flex justify-between space-x-8">
+          <button
+            onClick={onClose}
+            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+          >
+            ยกเลิก
+          </button>
+          <button
+            onClick={() => {
+              onConfirm(ingredient.ingredient_id);
+            }}
+            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors"
+          >
+            ลบ
+          </button>
+        </div>
       </div>
     </div>
   );

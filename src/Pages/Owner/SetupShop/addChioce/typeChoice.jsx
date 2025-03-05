@@ -33,6 +33,7 @@ const TypeChoice = () => {
 
   const [oldGroupName, setOldGroupName] = useState("");
   const [groupName, setGroupName] = useState(initialGroupName);
+  const [loading, setLoading] = useState(false);
 
   const [menuData, setMenuData] = useState({
     available_category: [],

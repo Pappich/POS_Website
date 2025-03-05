@@ -11,6 +11,7 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [contact, setContact] = useState("");
+  const [loading, setLoading] = useState(false);
 
   console.log("cancel order", order);
 
@@ -29,7 +30,7 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
       // queue_number: order.queue_number,
       // status: "canceled",
       customer_name: customerName,
-      customer_contact: contact,
+      contact: contact,
       // cancel_status: "ยังไม่คืนเงิน",
     };
 

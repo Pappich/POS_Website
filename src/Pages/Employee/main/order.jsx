@@ -236,19 +236,6 @@ const Order = () => {
     });
   };
 
-  // const handleSubmitOrder = async (slipPath) => {
-  //   // Logic to submit order with confirmed slip
-  //   try {
-  //     const response = await fetchApi(`${URL}/employee/orders`, "POST", {
-  //       // ... order data
-  //       slip_image: slipPath,
-  //     });
-  //     // ... handle response
-  //   } catch (error) {
-  //     console.error("Error submitting order:", error);
-  //   }
-  // };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -266,8 +253,8 @@ const Order = () => {
   }
 
   console.log("ORDER DATA:", orders);
-  console.log(orders[0]); // Check the first order
-  console.log(orders[0].order_items); // Check order items
+  console.log("FIRST ORDER:", orders[0]); // Check the first order
+  console.log("FIRST ORDER ITEM:", orders[0].order_items); // Check order items
 
   return (
     <div className="grid grid-cols-3 gap-4 bg-white">
@@ -306,21 +293,31 @@ const Order = () => {
               <div className="flex-grow">
                 {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
                   <div className="h-[400px] overflow-y-auto mt-4">
-                    {orders[0].order_items.map((item, idx) => (
-                      <div key={idx} className="mb-4">
-                        <div className="flex justify-between text-2xl">
-                          <div>
-                            {item?.menu_name?.menu_name || "ไม่ระบุชื่อเมนู"}
+                    {orders[0].order_items.map(
+                      (item, idx) => (
+                        console.log("ITEM IN MAP:", item),
+                        (
+                          <div key={idx} className="mb-4">
+                            <div className="flex justify-between text-2xl">
+                              <div>
+                                {item?.menu_name?.menu_name ||
+                                  "ไม่ระบุชื่อเมนู"}
+                              </div>
+                              <div>{item?.menu_name?.quantity || 0}</div>
+                            </div>
+                            <span className="text-[#5B5B5B] text-xl">
+                              {item.details.length > 0 && (
+                                <>
+                                  ชนิด: {item.details[2]?.type_name || "-"} |
+                                  หวาน: {item.details[0]?.level_name || "-"} |
+                                  ขนาด: {item.details[1]?.size_name || "-"}
+                                </>
+                              )}
+                            </span>
                           </div>
-                          <div>{item?.menu_name?.quantity || 0}</div>
-                        </div>
-                        <span className="text-[#5B5B5B] text-xl">
-                          ชนิด: {item?.details?.[0]?.type_name || "เย็น"} |
-                          หวาน: {item?.details?.[0]?.level_name || "-"} | ขนาด:{" "}
-                          {item?.details?.[0]?.size_name || "กลาง"}
-                        </span>
-                      </div>
-                    ))}
+                        )
+                      )
+                    )}
                   </div>
                 ) : (
                   <p className="text-center mt-4">ไม่มีสินค้าในคำสั่งซื้อ</p>
@@ -438,24 +435,36 @@ const Order = () => {
                         <div className="h-[620px] overflow-y-auto">
                           {order?.order_items &&
                           order.order_items.length > 0 ? (
-                            order.order_items.map((item, idx) => (
-                              <div key={idx} className="mb-2">
-                                <div className="flex justify-between text-2xl">
-                                  <div>
-                                    {item?.menu_name?.menu_name ||
-                                      "ไม่ระบุชื่อเมนู"}
+                            order.order_items.map(
+                              (item, idx) => (
+                                console.log("ITEM DATA IN MAP:", item),
+                                (
+                                  <div key={idx} className="mb-2">
+                                    <div className="flex justify-between text-2xl">
+                                      <div>
+                                        {item?.menu_name?.menu_name ||
+                                          "ไม่ระบุชื่อเมนู"}
+                                      </div>
+                                      <div>
+                                        {item?.menu_name?.quantity || 0}
+                                      </div>
+                                    </div>
+                                    <span className="text-[#5B5B5B] text-xl">
+                                      {item.details.length > 0 && (
+                                        <>
+                                          ชนิด:{" "}
+                                          {item.details[2]?.type_name || "-"} |
+                                          หวาน:{" "}
+                                          {item.details[0]?.level_name || "-"} |
+                                          ขนาด:{" "}
+                                          {item.details[1]?.size_name || "-"}
+                                        </>
+                                      )}
+                                    </span>
                                   </div>
-                                  <div>{item?.menu_name?.quantity || 0}</div>
-                                </div>
-                                <span className="text-[#5B5B5B] text-xl">
-                                  ชนิด:{" "}
-                                  {item?.details?.[0]?.type_name || "ปั่น"} |
-                                  หวาน: {item?.details?.[0]?.level_name || "-"}{" "}
-                                  | ขนาด:{" "}
-                                  {item?.details?.[0]?.size_name || "เล็ก"}
-                                </span>
-                              </div>
-                            ))
+                                )
+                              )
+                            )
                           ) : (
                             <p className="text-center mt-4">
                               ไม่มีสินค้าในคำสั่งซื้อ

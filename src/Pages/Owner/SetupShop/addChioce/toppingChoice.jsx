@@ -36,6 +36,7 @@ const ToppingChoice = () => {
     choiceQuantity: "",
     menuSelection: "",
   });
+  const [loading, setLoading] = useState(false);
 
   console.log("CHOICE:", choices);
 

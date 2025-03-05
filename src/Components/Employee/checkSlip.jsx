@@ -2,11 +2,15 @@ import React from "react";
 import configureAPI from "../../Config/configureAPI";
 import { useWebSocket } from "../../webSocketContext";
 import fetchApi from "../../Config/fetchApi";
+import { useState } from "react";
+
 
 const CheckSlip = ({ imageUrl }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
+  const [loading, setLoading] = useState(false);
+  
 
   const handleRetake = () => {
     if (socket) {
@@ -51,6 +55,36 @@ const CheckSlip = ({ imageUrl }) => {
     }
   };
 
+  const handleCancel = async () => {
+    try {
+      // แปลง base64 เป็น blob และอัพโหลดไป backend
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      const formData = new FormData();
+      formData.append("file", blob, "slip.png");
+
+      const uploadResponse = await fetchApi(
+        `${URL}/owner/menus/upload`,
+        "POST",
+        formData
+      );
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload slip");
+      }
+
+      const uploadData = await uploadResponse.json();
+
+      if (socket) {
+        const message = { type: "CANCEL_SLIP", data: uploadData.filePath };
+        socket.send(JSON.stringify(message));
+      }
+    } catch (error) {
+      console.error("Error handling slip confirmation:", error);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
       <div className="bg-white w-[500px] rounded-lg p-6 shadow-lg">
@@ -76,9 +110,7 @@ const CheckSlip = ({ imageUrl }) => {
         <div className="flex gap-2 mt-6">
           <button
             className="w-full border border-gray-300 text-gray-600 hover:bg-gray-100 transition-all duration-300 py-2 rounded-full"
-            onClick={() => {
-              /* Cancel the payment */
-            }}
+            onClick={handleCancel}
           >
             ยกเลิก
           </button>

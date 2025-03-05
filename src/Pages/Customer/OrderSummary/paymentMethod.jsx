@@ -15,6 +15,7 @@ const PaymentMethod = () => {
   const URL = configureAPI[environment].URL;
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
   const { orderDetails } = location.state || {};
   const total = orderDetails?.total;
@@ -58,86 +59,88 @@ const PaymentMethod = () => {
           } else {
             messageData = JSON.parse(event.data);
           }
-
+  
           console.log("PaymentMethod received message:", messageData);
-
+  
+          let createOrderDto = {
+            order_date: new Date().toISOString(),
+            total_price: total,
+            queue_number: null,
+            status: "รอทำ",
+            payment_method: selectedPayment,
+            path_img: messageData.data,
+            cancel_status: null,
+          };
+  
           switch (messageData.type) {
             case "CONFIRM_SLIP":
               console.log("Got slip path:", messageData.data);
-
-              // สร้าง createOrderDto ตามโครงสร้างที่ backend ต้องการ
-              const createOrderDto = {
-                order_date: new Date().toISOString(),
-                total_price: total,
-                queue_number: null,
-                status: "รอทำ",
-                payment_method: selectedPayment,
-                path_img: messageData.data,
-                cancel_status: null,
-              };
-
-              // แปลงโครงสร้าง items ให้ตรงกับ backend
-              const formattedItems = items.map((item) => ({
-                menu_id: item.menuId,
-                sweetness_id: item.selectedSweetness.id,
-                size_id: item.selectedSize.id,
-                add_on_id: item.selectedAddOn.map((addon) => addon.id), // แปลงเป็น array ของ id
-                menu_type_id: item.selectedType.id,
-                quantity: item.quantity,
-                price: item.price,
-              }));
-
-              const payload = {
-                createOrderDto,
-                items: formattedItems,
-              };
-
-              console.log("Sending order payload:", payload);
-
-              try {
-                const response = await fetchApi(
-                  `${URL}/employee/orders`,
-                  "POST",
-                  payload
-                );
-
-                console.log("Got response:", response);
-
-                if (!response.ok) {
-                  const errorData = await response.json();
-                  console.error("Error data:", errorData);
-                  throw new Error("Error submitting the order");
-                }
-
-                const responseData = await response.json();
-                console.log("Order submitted successfully:", responseData);
-
-                navigate("/queue-summary", {
-                  state: { orderData: responseData },
-                });
-              } catch (error) {
-                console.error("Error during order submission:", error);
-              }
               break;
+  
             case "RETAKE_SLIP":
               setShowPhoneDetect(true);
+              return; 
+  
+            case "CANCEL_SLIP":
+              createOrderDto.cancel_status = "ยกเลิกโดยพนักงาน";
               break;
+  
+            default:
+              return;
+          }
+  
+          // Format items for backend
+          const formattedItems = items.map((item) => ({
+            menu_id: item.menuId,
+            sweetness_id: item.selectedSweetness.id,
+            size_id: item.selectedSize.id,
+            add_on_id: item.selectedAddOn.map((addon) => addon.id),
+            menu_type_id: item.selectedType.id,
+            quantity: item.quantity,
+            price: item.price,
+          }));
+  
+          const payload = {
+            createOrderDto,
+            items: formattedItems,
+          };
+  
+          console.log("Sending order payload:", payload);
+  
+          try {
+            const response = await fetchApi(`${URL}/employee/orders`, "POST", payload);
+  
+            console.log("Got response:", response);
+  
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error("Error data:", errorData);
+              throw new Error("Error submitting the order");
+            }
+  
+            const responseData = await response.json();
+            console.log("Order submitted successfully:", responseData);
+  
+            navigate("/queue-summary", {
+              state: { orderData: responseData },
+            });
+          } catch (error) {
+            console.error("Error during order submission:", error);
           }
         } catch (error) {
           console.error("Error in WebSocket message handler:", error);
           console.error("Event data:", event.data);
         }
       };
-
-      // เพิ่ม handler ให้กับ socket
+  
       socket.addEventListener("message", messageHandler);
-
-      // Cleanup
+  
       return () => {
         socket.removeEventListener("message", messageHandler);
       };
     }
   }, [socket, total, selectedPayment, items, navigate, URL]);
+  
 
   const handleBack = () => navigate("/summary");
 
@@ -183,41 +186,6 @@ const PaymentMethod = () => {
     }
   };
 
-  const handleUploadImage = async (productFile) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", productFile);
-
-      console.log("Uploading file:", productFile);
-
-      const response = await fetchApi(
-        `${URL}/owner/menus/upload`,
-        "POST",
-        formData
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("File uploaded successfully", data);
-        return data.filePath;
-      } else {
-        console.error("Image upload failed");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      return null;
-    }
-  };
-
-  const getBase64Image = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   useEffect(() => {
     if (selectedPayment === "cash" && socket) {
