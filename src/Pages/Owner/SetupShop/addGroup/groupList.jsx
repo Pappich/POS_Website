@@ -2,43 +2,58 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import DeleteGroup from "./deleteGroup";
+import fetchApi from "../../../../Config/fetchApi";
+import { useEffect } from "react";
+import configureAPI from "../../../../Config/configureAPI";
+import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 
 const GroupList = () => {
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+
   const navigate = useNavigate();
+  const [categoryItems, setCategoryItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
+  const [deleteCategory, setCategoryToDelete] = useState(null);
 
-  const menuItems = [
-    "โปรสุดคุ้ม",
-    "อิ่มท้อง",
-    "น้ำหวานชื่นใจ",
-    "ตาสว่างยันเช้า",
-    "เครื่องดื่มอุ่นๆ",
-  ];
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const response = await fetchApi(`${URL}/owner/categories`, "GET");
+        const data = await response.json();
+        setCategoryItems(data);
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
 
-  const filteredItems = menuItems.filter((item) =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
+    fetchCategory();
+  }, [categoryItems]);
+
+  const filteredItems = categoryItems.filter((item) =>
+    item.category_name.normalize("NFD").includes(searchTerm.normalize("NFD"))
   );
 
-  const handleSearch = (e) => setSearchTerm(e.target.value);
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+  };
 
   const handleSuccess = () => {
     navigate("/main-menu");
   };
 
   const handleAddGroup = () => {
-    navigate("/add-group");
+    navigate("/add-group", { state: { mode: "add" } });
   };
 
-  const handleDeleteClick = (product) => {
-    setProductToDelete(product);
+  const handleDeleteClick = (deleteCategory) => {
+    setCategoryToDelete(deleteCategory);
     setIsDeletePopupOpen(true);
   };
 
   const handleConfirmDelete = () => {
     // DELETE PRODUCT API PATH
-    console.log("Deleting:", productToDelete);
     setIsDeletePopupOpen(false);
   };
 
@@ -46,43 +61,49 @@ const GroupList = () => {
     setIsDeletePopupOpen(false);
   };
 
-  const handleEditClick = (product) => {
+  const handleEditClick = (group) => {
     // EDIT PRODUCT => FLOW ADD BUT HAVE DATA OF EACH PRODUCT
-    navigate("/add-group");
+    console.log("group click", group);
+    navigate("/add-group", { state: { mode: "edit", groupData: group } });
   };
 
-  const handleGroupClick = (product) => {
-    navigate("/group-menu", {
-      // CHANGE TO SEND MENU IN EACH GROUP
-      // EXAMPLE
-      state: { groupName: product, selectedMenus: ["กาแฟดำ", "ลาเต้"] },
-    });
+  const handleGroupClick = async (group) => {
+    try {
+      const categoryId = group.category_id;
+      navigate("/group-menu", {
+        state: {
+          groupName: group.category_name,
+          categoryId: categoryId,
+        },
+      });
+    } catch (error) {
+      console.error("Error handling group click:", error);
+    }
   };
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-screen bg-white">
+      <div className="flex flex-col items-center bg-[#F5F5F5] h-screen-navbar mt-[40px]">
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold mb-2">กลุ่มรายการสินค้า</h1>
-          <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+          <h1 className="text-3xl font-bold mb-2">กลุ่มรายการสินค้า</h1>
+          <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
         </div>
 
         <div className="w-full flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">กลุ่มรายการสินค้าทั้งหมด</h1>
+          <h1 className="text-2xl font-bold">กลุ่มรายการสินค้าทั้งหมด</h1>
         </div>
 
-        <div className="w-full flex justify-start text-lg mb-8">
+        <div className="w-full flex justify-start text-xl mb-8">
           <div className="relative flex items-center w-full">
             <FaSearch
-              style={{ color: "#D4B28C" }}
+              style={{ color: "#DD9F52" }}
               className="absolute left-3 top-1/2 transform -translate-y-1/2"
             />
-            <input
-              type="text"
+            <ThaiVirtualKeyboardInput
               placeholder="ค้นหาด้วยชื่อกลุ่ม..."
               value={searchTerm}
               onChange={handleSearch}
-              className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DDw-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
           </div>
         </div>
@@ -93,13 +114,13 @@ const GroupList = () => {
             filteredItems.map((item, index) => (
               <div key={index} className="w-full mb-4">
                 <div className="flex justify-between items-start">
-                  <p className="text-lg">{item}</p>
-                  <div className="flex items-center space-x-4 text-[#D4B28C] font-bold">
+                  <p className="text-2xl">{item.category_name}</p>
+                  <div className="flex items-center space-x-4 text-[#DD9F52] font-bold">
                     <button
                       className="hover:underline font-bold"
                       onClick={() => handleGroupClick(item)}
                     >
-                      เมนู
+                      รายการสินค้าในกลุ่ม
                     </button>
                     <span className="text-gray-300">|</span>
                     <button
@@ -121,19 +142,19 @@ const GroupList = () => {
               </div>
             ))
           ) : (
-            <p className="text-gray-500 text-center">ไม่กลุ่มรายการสินค้า</p>
+            <p className="text-gray-500 text-center">ไม่มีกลุ่มรายการสินค้า</p>
           )}
         </div>
 
-        <div className="flex mt-[40px] w-full space-x-8 justify-between">
+        <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
           <button
-            className="px-6 py-3 w-[250px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}
           >
-            เสร็จสิ้น
+            ย้อนกลับ
           </button>
           <button
-            className="px-6 py-3 w-[250px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold"
             onClick={handleAddGroup}
           >
             เพิ่มกลุ่ม
@@ -146,7 +167,7 @@ const GroupList = () => {
         isOpen={isDeletePopupOpen}
         onClose={handleCancelDelete}
         onConfirm={handleConfirmDelete}
-        product={productToDelete}
+        deleteCategory={deleteCategory}
       />
     </>
   );

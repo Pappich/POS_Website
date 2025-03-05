@@ -13,7 +13,8 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 ChartJS.defaults.font.family = "Noto Sans Thai";
 ChartJS.defaults.font.size = 16;
 ChartJS.defaults.color = "black";
-const BarChart = () => {
+
+const BarChart = ({ monthlyRevenue }) => {
   const data = {
     labels: [
       "ม.ค.",
@@ -32,10 +33,7 @@ const BarChart = () => {
     datasets: [
       {
         label: "รายรับทั้งหมด",
-        data: [
-          50000, 10000, 40000, 30000, 60000, 50000, 80000, 70000, 90000, 60000,
-          70000, 40000,
-        ], // Monthly data
+        data: monthlyRevenue, // Monthly data
         backgroundColor: "#A3C4DC", // Light blue color
       },
     ],
@@ -46,7 +44,6 @@ const BarChart = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        onClick: null,
         display: true,
         position: "bottom", // Move the legend to the bottom
         labels: {
