@@ -9,6 +9,7 @@ import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import { useWebSocket } from "../../../webSocketContext";
 import PhoneDetect from "../../../Components/PhoneDetect/phoneDetect";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const PaymentMethod = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -51,6 +52,7 @@ const PaymentMethod = () => {
     console.log("Socket state:", socket);
     if (socket) {
       const messageHandler = async (event) => {
+
         try {
           let messageData;
           if (event.data instanceof Blob) {
@@ -108,6 +110,7 @@ const PaymentMethod = () => {
           console.log("Sending order payload:", payload);
   
           try {
+            setLoading(true);
             const response = await fetchApi(`${URL}/employee/orders`, "POST", payload);
   
             console.log("Got response:", response);
@@ -130,6 +133,8 @@ const PaymentMethod = () => {
         } catch (error) {
           console.error("Error in WebSocket message handler:", error);
           console.error("Event data:", event.data);
+        } finally {
+          setLoading(false);
         }
       };
   
@@ -293,6 +298,7 @@ const PaymentMethod = () => {
           </div>
         </div>
       )}
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

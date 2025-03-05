@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../Config/redux/userSlice";
 import { jwtDecode } from "jwt-decode";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const CreateAccount = () => {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ const CreateAccount = () => {
   const inputContainerRef = useRef(null);
 
   const handleLogin = async (email, password) => {
+    setLoading(true);
     try {
 
       
@@ -47,6 +49,8 @@ const CreateAccount = () => {
       }
     } catch (error) {
       console.error("Error logging in:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -167,6 +171,7 @@ const CreateAccount = () => {
           />
         </div>
       )}
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

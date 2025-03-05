@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const TypeChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -153,6 +154,7 @@ const TypeChoice = () => {
 
     if (valid) {
       if (step === 4) {
+        setLoading(true);
         try {
           let endpoint = `${URL}/owner/menus/options/menu_type`;
           let method = "POST";
@@ -199,6 +201,8 @@ const TypeChoice = () => {
         } catch (error) {
           console.error("Error saving menu type options:", error);
           alert("An error occurred while saving");
+        } finally {
+          setLoading(false);
         }
       } else {
         setStep(step + 1);
@@ -581,6 +585,7 @@ const TypeChoice = () => {
           {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

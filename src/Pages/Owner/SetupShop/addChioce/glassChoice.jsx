@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const GlassChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -150,6 +151,7 @@ const GlassChoice = () => {
 
     if (valid) {
       if (step === 4) {
+        setLoading(true);
         try {
           let endpoint = `${URL}/owner/menus/options/size`;
           let method = "POST";
@@ -208,6 +210,8 @@ const GlassChoice = () => {
         } catch (error) {
           console.error("Error saving size options:", error);
           alert("An error occurred while saving");
+        } finally {
+          setLoading(false);
         }
       } else {
         setStep(step + 1);
@@ -597,6 +601,7 @@ const GlassChoice = () => {
           {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

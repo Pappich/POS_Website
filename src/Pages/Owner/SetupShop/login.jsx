@@ -8,6 +8,7 @@ import configureAPI from "../../../Config/configureAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../Config/redux/userSlice";
 import { jwtDecode } from "jwt-decode";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const Login = () => {
   const [passwordInput, setPasswordInput] = useState("");
   const [keyboardLayout, setKeyboardLayout] = useState("default");
   const [loading, setLoading] = useState(false);
-  
+
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 

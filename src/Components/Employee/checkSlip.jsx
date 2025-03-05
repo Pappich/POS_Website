@@ -3,14 +3,14 @@ import configureAPI from "../../Config/configureAPI";
 import { useWebSocket } from "../../webSocketContext";
 import fetchApi from "../../Config/fetchApi";
 import { useState } from "react";
-
+import LoadingPopup from "../General/loadingPopup";
 
 const CheckSlip = ({ imageUrl }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
   const [loading, setLoading] = useState(false);
-  
+
 
   const handleRetake = () => {
     if (socket) {
@@ -22,6 +22,7 @@ const CheckSlip = ({ imageUrl }) => {
   };
 
   const handleConfirm = async () => {
+    setLoading(true);
     try {
       // แปลง base64 เป็น blob และอัพโหลดไป backend
       const response = await fetch(imageUrl);
@@ -52,11 +53,15 @@ const CheckSlip = ({ imageUrl }) => {
       }
     } catch (error) {
       console.error("Error handling slip confirmation:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = async () => {
+    setLoading(true);
     try {
+
       // แปลง base64 เป็น blob และอัพโหลดไป backend
       const response = await fetch(imageUrl);
       const blob = await response.blob();
@@ -82,6 +87,8 @@ const CheckSlip = ({ imageUrl }) => {
       }
     } catch (error) {
       console.error("Error handling slip confirmation:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -128,6 +135,7 @@ const CheckSlip = ({ imageUrl }) => {
           </button>
         </div>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

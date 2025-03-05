@@ -9,6 +9,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
 import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const ToppingChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -173,6 +174,7 @@ const ToppingChoice = () => {
     // setErrors(newErrors);
     if (valid) {
       if (step === 4) {
+        setLoading(true);
         try {
           let endpoint = `${URL}/owner/menus/options/add-ons`;
           let method = "POST";
@@ -228,6 +230,8 @@ const ToppingChoice = () => {
         } catch (error) {
           console.error("Error saving topping options:", error);
           alert("An error occurred while saving");
+        } finally {
+          setLoading(false);
         }
       } else {
         setStep(step + 1);
@@ -675,6 +679,7 @@ const ToppingChoice = () => {
           {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

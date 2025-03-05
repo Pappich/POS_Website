@@ -8,6 +8,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const AddOwnerProduct = () => {
   const navigate = useNavigate();
@@ -93,6 +94,7 @@ const AddOwnerProduct = () => {
   };
 
   const uploadImage = async (file) => {
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -116,6 +118,7 @@ const AddOwnerProduct = () => {
   };
 
   const handleSave = async () => {
+    setLoading(true);
     try {
       let imagePath = null;
       if (imageFile) {
@@ -149,6 +152,8 @@ const AddOwnerProduct = () => {
       }
     } catch (error) {
       console.error("Error creating ingredient:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -369,6 +374,7 @@ const AddOwnerProduct = () => {
           </button>
         </div>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

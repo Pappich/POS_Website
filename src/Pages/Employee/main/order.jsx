@@ -16,6 +16,7 @@ import configureAPI from "../../../Config/configureAPI";
 import CheckSlip from "../../../Components/Employee/checkSlip";
 import PayWithCash from "../../../Components/Employee/payWithCash";
 import { useWebSocket } from "../../../webSocketContext";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const Order = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -26,7 +27,7 @@ const Order = () => {
     navigate("/pause-section");
   };
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [orderStats, setOrderStats] = useState({
     total_orders: 0,
@@ -134,6 +135,7 @@ const Order = () => {
   }, [URL]);
 
   const handlePaymentSuccess = async (paymentData) => {
+    setLoading(true);
     try {
       const orderData = {
         createOrderDto: {
@@ -175,12 +177,15 @@ const Order = () => {
     } catch (error) {
       console.error("Error creating order:", error);
       alert("เกิดข้อผิดพลาดในการสร้างออเดอร์");
+    } finally {
+      setLoading(false);
     }
 
     setShowPayWithCash(false);
   };
 
   const handlePaymentCancel = async () => {
+    setLoading(true);
     try {
       const orderData = {
         createOrderDto: {
@@ -222,6 +227,8 @@ const Order = () => {
     } catch (error) {
       console.error("Error cancelling order:", error);
       alert("เกิดข้อผิดพลาดในการยกเลิกออเดอร์");
+    } finally {
+      setLoading(false);
     }
 
     setShowPayWithCash(false);
@@ -492,6 +499,7 @@ const Order = () => {
         onConfirm={handlePaymentSuccess}
         onCancel={handlePaymentCancel}
       />
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

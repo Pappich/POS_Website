@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const AddStockForm = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const AddStockForm = () => {
   const [filterIngredientData, setFilterIngredientData] = useState([]);
   const [menuIngredientDataSet, setMenuIngredientDataSet] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // List options
   const unitOptions = [
     { value: "กรัม", label: "กรัม (g)" },
@@ -289,6 +290,7 @@ const AddStockForm = () => {
   // แก้ไข handleNext สำหรับการ POST ข้อมูล
   const handleNext = async () => {
     if (step === 3) {
+      setLoading(true);
       try {
         const requestData = {
           menuData: rows.map((row, rowIndex) => ({
@@ -322,6 +324,8 @@ const AddStockForm = () => {
         }
       } catch (error) {
         console.error("Error:", error);
+      } finally {
+        setLoading(false);
       }
     } else {
       setStep(step + 1);
@@ -627,6 +631,7 @@ const AddStockForm = () => {
           {step < 3 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

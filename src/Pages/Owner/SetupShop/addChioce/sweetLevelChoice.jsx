@@ -8,6 +8,7 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const SweetLevelChoice = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -139,6 +140,7 @@ const SweetLevelChoice = () => {
 
     if (valid) {
       if (step === 4) {
+        setLoading(true);
         try {
           let endpoint = `${URL}/owner/menus/options/sweetness`;
           let method = "POST";
@@ -188,6 +190,8 @@ const SweetLevelChoice = () => {
         } catch (error) {
           console.error("Error saving sweetness options:", error);
           alert("An error occurred while saving");
+        } finally {
+          setLoading(false);
         }
       } else {
         setStep(step + 1);
@@ -555,6 +559,7 @@ const SweetLevelChoice = () => {
           {step < 4 ? "ถัดไป" : "บันทึก"}
         </button>
       </div>
+      <LoadingPopup loading={loading} />
     </div>
   );
 };

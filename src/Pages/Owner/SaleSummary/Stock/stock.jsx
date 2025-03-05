@@ -16,6 +16,8 @@ import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 import { AiOutlineDelete } from "react-icons/ai";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
+import DeleteIngredientModal from "../../../../Components/Owner/deleteIngredient";
 
 const thLocaleWithMondayStart = {
   ...th,
@@ -196,6 +198,7 @@ const Stock = () => {
 
   // Handle form submission for update
   const handleUpdateSubmit = async () => {
+    setLoading(true);
     try {
       // ถ้าไม่มี update_id แสดงว่าเป็นการเพิ่มใหม่
       if (!selectedProduct.update_id) {
@@ -254,6 +257,8 @@ const Stock = () => {
       setModalVisible(false);
     } catch (error) {
       console.error("Error updating/creating product:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -726,41 +731,6 @@ const Stock = () => {
           onConfirm={removeIngredient}
           ingredient={ingredientToDelete}
         />
-      </div>
-    </div>
-  );
-};
-
-const DeleteIngredientModal = ({ isOpen, onClose, onConfirm, ingredient }) => {
-  if (!isOpen || !ingredient) return null;
-
-  return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg w-[700px] h-[300px] shadow-lg flex flex-col justify-center items-center text-center">
-        <h2 className="text-3xl mb-4">
-          ลบส่วนผสม{" "}
-          <span className="font-bold">{ingredient.ingredient_name}</span>{" "}
-          หรือไม่?
-        </h2>
-        <p className="text-gray-600 mb-8">
-          การลบส่วนผสมจะไม่สามารถย้อนกลับมาแก้ไขได้อีก
-        </p>
-        <div className="w-full flex justify-between space-x-8">
-          <button
-            onClick={onClose}
-            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
-          >
-            ยกเลิก
-          </button>
-          <button
-            onClick={() => {
-              onConfirm(ingredient.ingredient_id);
-            }}
-            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors"
-          >
-            ลบ
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { FaPlus } from "react-icons/fa";
 import configureAPI from "../../Config/configureAPI";
 import fetchApi from "../../Config/fetchApi";
 import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../General/loadingPopup";
 
 const AddCategoryButton = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -101,6 +102,7 @@ const AddCategoryButton = () => {
           </div>
         </div>
       )}
+      <LoadingPopup loading={loading} />
     </div>
   );
 };
