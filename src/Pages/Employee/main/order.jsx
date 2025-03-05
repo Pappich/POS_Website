@@ -331,11 +331,12 @@ const Order = () => {
                 )}
               </div>
               <div className="space-y-2 w-full py-4 mt-auto">
+              <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
                 <CancelOrderButtonEm
                   order={orders[0]}
                   onSuccess={fetchOrders}
                 />
-                <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
+  
               </div>
             </div>
           </>
