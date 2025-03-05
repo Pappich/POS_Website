@@ -254,7 +254,7 @@ const Order = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-red-500">เกิดข้อผิดพลาด: {error}</p>
+        <p className="text-xl text-[#C94C4C]">เกิดข้อผิดพลาด: {error}</p>
       </div>
     );
   }
@@ -264,7 +264,7 @@ const Order = () => {
   console.log("FIRST ORDER ITEM:", orders[0].order_items); // Check order items
 
   return (
-    <div className="grid grid-cols-3 gap-4 bg-white">
+    <div className="grid grid-cols-3 gap-4 bg-[#F5F5F5] h-screen-navbar mt-4">
       <div className="bg-white rounded-2xl shadow-md col-span-1 flex flex-col border border-gray-200">
         {!isLoading && orders && orders.length > 0 ? (
           <>
@@ -299,7 +299,7 @@ const Order = () => {
               </div>
               <div className="flex-grow">
                 {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
-                  <div className="h-[400px] overflow-y-auto mt-4">
+                  <div className="h-[150px] overflow-y-auto mt-4">
                     {orders[0].order_items.map(
                       (item, idx) => (
                         console.log("ITEM IN MAP:", item),
@@ -369,7 +369,7 @@ const Order = () => {
 
         <div className="flex justify-between space-x-4 w-full mb-4 mt-4">
           <div className="flex py-4 px-6 w-full bg-white border rounded-lg">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DCC894]">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DD9F52]">
               <MdOutlineShoppingCart color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
@@ -381,7 +381,7 @@ const Order = () => {
           </div>
 
           <div className="flex py-4 px-6 w-full bg-white border rounded-lg">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DCC894]">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DD9F52]">
               <IoMdStopwatch color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
@@ -393,7 +393,7 @@ const Order = () => {
           </div>
 
           <div className="flex py-4 px-6 w-full bg-white border rounded-l">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DCC894]">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-[#DD9F52]">
               <MdDone color="white" size={48} />
             </div>
             <div className="ml-4 flex flex-col justify-center">
@@ -439,7 +439,7 @@ const Order = () => {
                           <div>จำนวน</div>
                         </div>
 
-                        <div className="h-[620px] overflow-y-auto">
+                        <div className="h-[530px] overflow-y-auto">
                           {order?.order_items &&
                           order.order_items.length > 0 ? (
                             order.order_items.map(

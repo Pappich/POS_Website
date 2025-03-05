@@ -8,8 +8,8 @@ const IncomeOrderCancel = ({ data }) => {
     <div className="w-full">
       <div className="flex w-full justify-between gap-4">
         {/* รายรับทั้งหมด */}
-        <div className="flex flex-1 py-2 px-4 bg-white border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+        <div className="flex flex-1 py-2 px-4 bg-[#F5F5F5] border rounded-lg">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
             <FaBahtSign color="white" size={16} />
           </div>
           <div className="ml-3">
@@ -19,8 +19,8 @@ const IncomeOrderCancel = ({ data }) => {
         </div>
 
         {/* ยอดออเดอร์ทั้งหมด */}
-        <div className="flex flex-1 py-2 px-4 bg-white border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+        <div className="flex flex-1 py-2 px-4 bg-[#F5F5F5] border rounded-lg">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
             <MdOutlineShoppingCart color="white" size={16} />
           </div>
           <div className="ml-3">
@@ -30,8 +30,8 @@ const IncomeOrderCancel = ({ data }) => {
         </div>
 
         {/* จำนวนออเดอร์ที่ถูกยกเลิก */}
-        <div className="flex flex-1 py-2 px-4 bg-white border rounded-lg">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+        <div className="flex flex-1 py-2 px-4 bg-[#F5F5F5] border rounded-lg">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
             <MdOutlineRemoveShoppingCart color="white" size={16} />
           </div>
           <div className="ml-3">

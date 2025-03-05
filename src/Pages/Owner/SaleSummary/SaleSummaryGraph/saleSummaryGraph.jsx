@@ -49,7 +49,7 @@ const SaleSummaryGraph = () => {
   }, [selectedDate]);
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen-website flex flex-col">
       <SideBar menuTab={"saleSummaryGraph"} />
       <h1 className="font-bold text-xl">ภาพรวมยอดขาย</h1>
       <span className="flex justify-end">
@@ -58,7 +58,7 @@ const SaleSummaryGraph = () => {
       <IncomeOrderCancel data={data} />
       <div className="mt-3 flex-1">
         {/* Line Chart Section */}
-        <div className="bg-white p-4 border rounded-lg flex flex-col">
+        <div className="bg-[#F5F5F5] p-4 border rounded-lg flex flex-col">
           <h2 className="text-lg text-center font-semibold mb-2 ">
             กราฟสรุปรายรับประจำเดือน
           </h2>

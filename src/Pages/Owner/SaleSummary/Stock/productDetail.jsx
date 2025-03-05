@@ -70,7 +70,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"stock"} />
       <h1 className="font-bold text-xl">คลังสินค้า</h1>
       <h1 className="font-bold">รายการวัตถุดิบ</h1>
@@ -80,7 +80,7 @@ const ProductDetail = () => {
           <span className="font-bold">รูปภาพสินค้า</span>
         </div>
         <div className="w-full flex justify-center">
-          <label className="w-full border-2 border-dashed border-[#D4B28C] rounded-lg flex flex-col items-center justify-center cursor-pointer">
+          <label className="w-full border-2 border-dashed border-[#DD9F52] rounded-lg flex flex-col items-center justify-center cursor-pointer">
             {ingredientData.image_url && (
               <img
                 src={`${URL}/${ingredientData.image_url.replace(/\\/g, "/")}`}
@@ -100,13 +100,13 @@ const ProductDetail = () => {
               type="text"
               value={ingredientData.ingredient_name}
               onChange={(value) => {
-                setIngredientData(prev => ({
+                setIngredientData((prev) => ({
                   ...prev,
-                  ingredient_name: value
-                }))
+                  ingredient_name: value,
+                }));
               }}
               readOnly={true}
-              className="w-full bg-[#ECECEC] border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full bg-[#ECECEC] border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             <div className="py-2">
               <span className="font-bold">จำนวน</span>
@@ -115,7 +115,7 @@ const ProductDetail = () => {
               type="text"
               value={quantityInStock}
               readOnly
-              className="w-full bg-[#ECECEC] border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full bg-[#ECECEC] border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             <div className="py-2">
               <span className="font-bold">การตัดคลังสินค้า</span>
@@ -127,7 +127,7 @@ const ProductDetail = () => {
                 value={`${netVolume} ${ingredientData.unit}`}
                 // value="1000 กรัม"
                 readOnly
-                className="w-full bg-[#ECECEC] border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                className="w-full bg-[#ECECEC] border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
             </div>
           </div>
@@ -136,7 +136,7 @@ const ProductDetail = () => {
               <span className="font-bold">หมวดหมู่</span>
             </div>
             <div className="relative">
-              <div className="border bg-[#ECECEC] border-[#D4B28C] rounded-full p-3 text-gray-600">
+              <div className="border bg-[#ECECEC] border-[#DD9F52] rounded-full p-3 text-gray-600">
                 {ingredientData.category_name || "ไม่ระบุหมวดหมู่"}
               </div>
             </div>
@@ -212,7 +212,7 @@ const ProductDetail = () => {
         </div>
         <div className="flex mt-8 justify-between">
           <button
-            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ

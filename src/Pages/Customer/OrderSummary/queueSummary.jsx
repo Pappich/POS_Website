@@ -25,14 +25,14 @@ const QueueSummary = () => {
 
   return (
     <div className="w-full h-[800px] font-noto flex flex-col justify-center items-center">
-      <div className="w-[720px] bg-white p-12 rounded-lg shadow-xl">
+      <div className="w-[720px] bg-[#F5F5F5] p-12 rounded-lg shadow-xl">
         <h2 className="text-3xl text-black mb-2 text-left">
           ขอบคุณที่ใช้บริการ
         </h2>
         <p className="text-gray-500 mb-2 text-left">
           กรุณารอเรียกคิวเพื่อรับสินค้า
         </p>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
 
         <div className="mb-4 relative">
           <div className="justify-between items-center grid grid-cols-2 gap-6 mb-4">
@@ -41,7 +41,7 @@ const QueueSummary = () => {
             </span>
             <div
               id="order-id"
-              className="w-full py-2 px-3 bg-transparent text-black font-bold border border-[#D4B28C] rounded-full"
+              className="w-full py-2 px-3 bg-transparent text-black font-bold border border-[#DD9F52] rounded-full"
             >
               {queueSummary.order_id}
             </div>
@@ -51,7 +51,7 @@ const QueueSummary = () => {
             <span className="text-black text-left font-bold">บัตรคิวที่</span>
             <div
               id="order-id"
-              className="w-full py-2 px-3 bg-transparent text-black font-bold border border-[#D4B28C] rounded-full"
+              className="w-full py-2 px-3 bg-transparent text-black font-bold border border-[#DD9F52] rounded-full"
             >
               {queueSummary.queue_number}
             </div>

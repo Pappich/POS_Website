@@ -15,6 +15,10 @@ module.exports = {
       animation: {
         wave: "wave 1.5s infinite",
       },
+      height: {
+        "screen-navbar": "calc(100vh - 124px)",
+        "screen-website": "calc(100vh - 0px)",
+      },
     },
   },
   plugins: [],

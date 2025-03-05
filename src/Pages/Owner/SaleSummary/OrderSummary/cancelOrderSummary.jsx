@@ -122,7 +122,7 @@ const CancelOrderSummary = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"orderSummary"} />
       <div className="px-10">
         <h1 className="font-bold text-3xl mt-[40px]">ออเดอร์ทั้งหมด</h1>
@@ -188,7 +188,7 @@ const CancelOrderSummary = () => {
         {/* Order Detail Modal */}
         {selectedOrderData && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-10 rounded-lg shadow-lg w-[1024px] overflow-y-auto">
+            <div className="bg-[#F5F5F5] p-10 rounded-lg shadow-lg w-[1024px] overflow-y-auto">
               <div className="flex justify-center">
                 <h2 className="text-3lg font-bold mb-4">ออเดอร์ที่ถูกยกเลิก</h2>
               </div>
@@ -286,7 +286,7 @@ const CancelOrderSummary = () => {
               </div>
               <div className="flex justify-center mt-3">
                 <button
-                  className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                  className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={closeModal}
                 >
                   ย้อนกลับ
@@ -299,7 +299,7 @@ const CancelOrderSummary = () => {
         {/* Edit Status Modal */}
         {isEditModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-10 rounded-lg shadow-lg w-[600px]">
+            <div className="bg-[#F5F5F5] p-10 rounded-lg shadow-lg w-[600px]">
               <h2 className="text-3xl font-bold mb-4 text-center">สถานะ</h2>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
@@ -329,13 +329,13 @@ const CancelOrderSummary = () => {
               </div>
               <div className="flex justify-between mt-6">
                 <button
-                  className="w-32 py-1 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+                  className="w-32 py-1 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors"
                   onClick={() => setIsEditModalOpen(false)}
                 >
                   ย้อนกลับ
                 </button>
                 <button
-                  className="w-32 py-1 bg-[#D4B28C] text-white rounded-full hover:bg-[#c4a27c] transition-colors"
+                  className="w-32 py-1 bg-[#DD9F52] text-white rounded-full hover:bg-[#c4a27c] transition-colors"
                   onClick={handleStatusChange}
                 >
                   บันทึก

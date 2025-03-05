@@ -41,7 +41,7 @@ const AddCategoryButton = () => {
     <div>
       <button
         type="button"
-        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-3 py-1"
+        className="text-[#C6B399] bg-[#F5F5F5] border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-3 py-1"
         onClick={toggleModal}
       >
         <div className="flex items-center">
@@ -60,7 +60,7 @@ const AddCategoryButton = () => {
           onClick={handleOutsideClick}
         >
           <div
-            className="bg-white rounded-lg w-[800px] p-10 shadow-lg"
+            className="bg-[#F5F5F5] rounded-lg w-[800px] p-10 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <h1 className="text-center text-3xl font-bold mb-4">
@@ -85,7 +85,7 @@ const AddCategoryButton = () => {
             <div className="flex justify-between mt-8">
               <button
                 type="button"
-                className="text-[#C6B399] w-40 bg-white border border-[#C6B399] hover:bg-[#C6B399] hover:text-white rounded-full text-xl px-4 py-2"
+                className="text-[#C6B399] w-40 bg-[#F5F5F5] border border-[#C6B399] hover:bg-[#C6B399] hover:text-white rounded-full text-xl px-4 py-2"
                 onClick={toggleModal}
               >
                 ย้อนกลับ

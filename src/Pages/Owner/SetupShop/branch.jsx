@@ -19,7 +19,7 @@ const Branch = () => {
       <div className="text-start mb-10">
         <h1 className="mt-4 text-3xl font-bold mb-2">หน้าร้าน / สาขา</h1>
         <h1 className="text-2xl mb-2">โปรดเลือกสาขาที่ต้องการจัดการข้อมูล</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <div className="w-full h-full ml-16 mt-[120px]">
@@ -27,7 +27,7 @@ const Branch = () => {
           {branches.map(({ id, name, details }) => (
             <div
               key={id}
-              className="flex flex-col items-center cursor-pointer transition-all text-[#D4B28C] hover:text-orange-500"
+              className="flex flex-col items-center cursor-pointer transition-all text-[#DD9F52] hover:text-[#C68A47]"
               onClick={() => handleSelectBranch(id)}
             >
               <RiHomeOfficeLine size={120} className="mb-2" />

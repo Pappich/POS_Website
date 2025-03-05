@@ -120,28 +120,25 @@ const PauseMenu = () => {
   };
 
   return (
-    <>
-      {/* <div className="flex justify-end">
-        <HomeEmButton />
-      </div> */}
-      <div className="w-full flex justify-center text-lg font-bold">
+    <div className="w-full h-screen-navbar">
+      <div className="flex justify-center text-lg font-bold">
         <div className="text-center mb-10 mt-[40px]">
-          <h1 className="text-3xl font-bold mb-2">วัตถุดิบที่ต้องการพัก</h1>
-          <div className="w-20 h-1 bg-[#D4B28C]"></div>
+          <h1 className="text-3xl font-bold mb-2">เมนูที่ต้องการพัก</h1>
+          <div className="w-20 h-1 bg-[#DD9F52]"></div>
         </div>
       </div>
 
       <div className="w-full flex justify-between items-center mb-8">
         <div className="relative flex items-center w-full">
           <FaSearch
-            style={{ color: "#D4B28C" }}
+            style={{ color: "#DD9F52" }}
             className="absolute left-3 top-1/2 transform -translate-y-1/2"
           />
           <ThaiVirtualKeyboardInput
             placeholder="ค้นหาด้วยชื่อวัตถุดิบ..."
             value={searchTerm}
             onChange={handleSearch}
-            className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+            className="w-full border border-[#DDw-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
           />
         </div>
       </div>
@@ -157,8 +154,8 @@ const PauseMenu = () => {
           <button
             className={`px-4 py-2 rounded-full ${
               filter === "ทั้งหมด"
-                ? "bg-[#D4B28C] text-white"
-                : "border border-[#D4B28C] text-[#D4B28C]"
+                ? "bg-[#DD9F52] text-white"
+                : "border border-[#DD9F52] text-[#DD9F52]"
             }`}
             onClick={() => handleFilterChange("ทั้งหมด")}
           >
@@ -167,8 +164,8 @@ const PauseMenu = () => {
           <button
             className={`px-4 py-2 rounded-full ${
               filter === "วัตถุดิบที่ไม่พัก"
-                ? "bg-[#D4B28C] text-white"
-                : "border border-[#D4B28C] text-[#D4B28C]"
+                ? "bg-[#DD9F52] text-white"
+                : "border border-[#DD9F52] text-[#DD9F52]"
             }`}
             onClick={() => handleFilterChange("วัตถุดิบที่ไม่พัก")}
           >
@@ -177,8 +174,8 @@ const PauseMenu = () => {
           <button
             className={`px-4 py-2 rounded-full ${
               filter === "วัตถุดิบที่พัก"
-                ? "bg-[#D4B28C] text-white"
-                : "border border-[#D4B28C] text-[#D4B28C]"
+                ? "bg-[#DD9F52] text-white"
+                : "border border-[#DD9F52] text-[#DD9F52]"
             }`}
             onClick={() => handleFilterChange("วัตถุดิบที่พัก")}
           >
@@ -213,19 +210,19 @@ const PauseMenu = () => {
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
           onClick={handleBackButton}
-          className="px-14 py-4 w-[300px] rounded-full border text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
         >
           ย้อนกลับ
         </button>
 
         <button
           onClick={handleSaveButton}
-          className="px-14 py-4 w-[300px] rounded-full bg-[#D4B28C] text-white hover:bg-[#cda777] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold"
         >
           บันทึก
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

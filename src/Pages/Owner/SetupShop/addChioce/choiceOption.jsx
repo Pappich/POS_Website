@@ -29,12 +29,12 @@ const ChoiceOptions = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-white">
+    <div className="flex flex-col items-center bg-[#F5F5F5]">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold mb-2 mt-[40px]">
           ตัวเลือกรายการสินค้า
         </h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       {/* Options Section */}
@@ -43,7 +43,7 @@ const ChoiceOptions = () => {
           {/* glass size */}
           <div className="flex flex-col items-center">
             <CiGlass
-              className="text-[#D4B28C] mb-2"
+              className="text-[#DD9F52] mb-2"
               size={120}
               onClick={handleGlassClick}
             />
@@ -53,7 +53,7 @@ const ChoiceOptions = () => {
           {/* sweet level */}
           <div className="flex flex-col items-center">
             <CiBoxList
-              className="text-[#D4B28C] mb-2"
+              className="text-[#DD9F52] mb-2"
               size={120}
               onClick={handleSweetLevelClick}
             />
@@ -63,7 +63,7 @@ const ChoiceOptions = () => {
           {/* topping */}
           <div className="flex flex-col items-center">
             <CgMenuGridO
-              className="text-[#D4B28C] mb-2"
+              className="text-[#DD9F52] mb-2"
               size={120}
               onClick={handleToppingClick}
             />
@@ -73,7 +73,7 @@ const ChoiceOptions = () => {
           {/* type */}
           <div className="flex flex-col items-center">
             <LiaMugHotSolid
-              className="text-[#D4B28C] mb-2"
+              className="text-[#DD9F52] mb-2"
               size={120}
               onClick={handleTypeClick}
             />
@@ -85,7 +85,7 @@ const ChoiceOptions = () => {
       {/* Back Button */}
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

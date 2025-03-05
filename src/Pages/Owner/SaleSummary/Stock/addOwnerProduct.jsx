@@ -94,7 +94,6 @@ const AddOwnerProduct = () => {
   };
 
   const uploadImage = async (file) => {
-
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -167,7 +166,7 @@ const AddOwnerProduct = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"stock"} />
       <h1 className="font-bold text-xl">คลังสินค้า</h1>
       <h1 className="font-bold">เพิ่มรายการสินค้าใหม่</h1>
@@ -177,7 +176,7 @@ const AddOwnerProduct = () => {
           <span className="font-bold">รูปภาพสินค้า</span>
         </div>
         <div className="w-full flex justify-center">
-          <label className="w-full border-2 border-dashed border-[#D4B28C] rounded-lg flex flex-col items-center justify-center cursor-pointer">
+          <label className="w-full border-2 border-dashed border-[#DD9F52] rounded-lg flex flex-col items-center justify-center cursor-pointer">
             {productImage ? (
               <img
                 src={productImage}
@@ -194,7 +193,7 @@ const AddOwnerProduct = () => {
               </>
             )}
             <p className="text-center text-brown-500 mb-2 mt-2">
-              <span className="text-[#D4B28C] font-bold">คลิก</span>{" "}
+              <span className="text-[#DD9F52] font-bold">คลิก</span>{" "}
               เพื่ออัปโหลดรูปภาพ
             </p>
             <p className="text-gray-400 text-sm">
@@ -219,7 +218,7 @@ const AddOwnerProduct = () => {
               value={productName}
               onChange={setProductName}
               placeholder="ชื่อสินค้า"
-              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
 
             <div className="grid grid-cols-7 gap-4">
@@ -232,7 +231,7 @@ const AddOwnerProduct = () => {
                   value={productAmount}
                   onChange={setProductAmount}
                   placeholder="กรอกจำนวนของสินค้า"
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
               </div>
             </div>
@@ -246,7 +245,7 @@ const AddOwnerProduct = () => {
               onChange={(date) => setExpirationDate(date)}
               dateFormat="dd/MM/yyyy"
               placeholderText="เลือกวันหมดอายุ"
-              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
           </div>
 
@@ -260,7 +259,7 @@ const AddOwnerProduct = () => {
                 onClick={() =>
                   setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
                 }
-                className={`border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
+                className={`border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
                   isCategoryDropdownOpen ? "ring-2 ring-brown-400" : ""
                 }`}
               >
@@ -271,7 +270,7 @@ const AddOwnerProduct = () => {
               </div>
 
               {isCategoryDropdownOpen && (
-                <div className="absolute mt-2 w-full bg-white border border-[#D4B28C] rounded-lg shadow-lg z-10">
+                <div className="absolute mt-2 w-full bg-[#F5F5F5] border border-[#DD9F52] rounded-lg shadow-lg z-10">
                   {categories.map((category) => (
                     <div
                       key={category.category_id}
@@ -297,7 +296,7 @@ const AddOwnerProduct = () => {
                   value={netVolume}
                   onChange={setNetVolume}
                   placeholder="กรอกปริมาตรสุทธิ"
-                  className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
               </div>
               {/* หน่วย */}
@@ -308,7 +307,7 @@ const AddOwnerProduct = () => {
                 <div className="relative w-full">
                   <div
                     onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                    className={`border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
+                    className={`border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
                       isUnitDropdownOpen ? "ring-2 ring-brown-400" : ""
                     }`}
                   >
@@ -322,7 +321,7 @@ const AddOwnerProduct = () => {
                   </div>
 
                   {isUnitDropdownOpen && (
-                    <div className="absolute mt-2 w-full bg-white border border-[#D4B28C] rounded-lg shadow-lg z-10">
+                    <div className="absolute mt-2 w-full bg-[#F5F5F5] border border-[#DD9F52] rounded-lg shadow-lg z-10">
                       {unitOptions.map((option, index) => (
                         <div
                           key={index}
@@ -343,14 +342,14 @@ const AddOwnerProduct = () => {
         {/* Modal */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-[400px] text-center">
+            <div className="bg-[#F5F5F5] rounded-lg p-6 w-[400px] text-center">
               <AiOutlineCheckCircle
                 size={60}
                 className="text-green-500 mx-auto"
               />
               <h2 className="font-bold text-lg my-4">บันทึกเสร็จสิ้น</h2>
               <button
-                className="px-4 py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                className="px-4 py-2 bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
                 onClick={closeModal}
               >
                 ปิด
@@ -359,15 +358,15 @@ const AddOwnerProduct = () => {
           </div>
         )}
         {/* Save and Back buttons */}
-        <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-white">
+        <div className="flex fixed bottom-0 left-0 px-4 py-4 pb-4 w-full space-x-8 justify-between bg-[#F5F5F5]">
           <button
-            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
             onClick={handleSave}
           >
             บันทึก

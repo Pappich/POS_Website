@@ -204,10 +204,10 @@ const AddProductForm = () => {
               value={menuName}
               onChange={setMenuName}
               placeholder="กรอกชื่อสินค้า..."
-              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             {errors.menuName && (
-              <p className="text-red-500 text-sm mt-2">{errors.menuName}</p>
+              <p className="text-[#C94C4C] text-sm mt-2">{errors.menuName}</p>
             )}
           </>
         );
@@ -224,12 +224,11 @@ const AddProductForm = () => {
               รายละเอียดสินค้า
             </label>
             <ThaiVirtualKeyboardInput
-
               id="productDetails"
               value={productDetails}
               onChange={setProductDetails}
               placeholder="กรอกรายละเอียดสินค้า..."
-              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
           </>
         );
@@ -247,7 +246,7 @@ const AddProductForm = () => {
             </label>
 
             <div className="w-full flex justify-center">
-              <label className="w-full h-[400px] border-2 border-dashed border-[#D4B28C] rounded-lg flex flex-col items-center justify-center cursor-pointer">
+              <label className="w-full h-[400px] border-2 border-dashed border-[#DD9F52] rounded-lg flex flex-col items-center justify-center cursor-pointer">
                 {productImage ? (
                   <img
                     src={productImage}
@@ -264,7 +263,7 @@ const AddProductForm = () => {
                   </>
                 )}
                 <p className="text-center text-brown-500 mb-2 mt-2">
-                  <span className="text-[#D4B28C] font-bold">คลิก</span>
+                  <span className="text-[#DD9F52] font-bold">คลิก</span>
                   เพื่ออัปโหลดรูปภาพ
                 </p>
                 <p className="text-gray-400 text-sm">
@@ -280,7 +279,7 @@ const AddProductForm = () => {
               </label>
             </div>
             {fileError && (
-              <p className="text-red-500 text-sm mt-2 text-center">
+              <p className="text-[#C94C4C] text-sm mt-2 text-center">
                 {fileError}
               </p>
             )}
@@ -304,13 +303,15 @@ const AddProductForm = () => {
               onChange={handlePriceChange}
               isInvalid={!!priceError}
               placeholder="กรอกราคาสินค้า..."
-              className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+              className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             {priceError && (
-              <p className=" text-red-500 text-sm mt-2">{priceError}</p>
+              <p className=" text-[#C94C4C] text-sm mt-2">{priceError}</p>
             )}
             {errors.productPrice && (
-              <p className="text-red-500 text-sm mt-2">{errors.productPrice}</p>
+              <p className="text-[#C94C4C] text-sm mt-2">
+                {errors.productPrice}
+              </p>
             )}
           </>
         );
@@ -325,7 +326,7 @@ const AddProductForm = () => {
               <p className="font-bold">ราคาสินค้า {productPrice} บาท</p>
             </div>
             <div className="font-bold text-left mb-2 w-full">รูปภาพสินค้า</div>
-            <div className="w-full h-[400px] border border-[#D4B28C] rounded-lg flex flex-col items-center justify-center mb-4">
+            <div className="w-full h-[400px] border border-[#DD9F52] rounded-lg flex flex-col items-center justify-center mb-4">
               {productImage && (
                 <img
                   src={productImage}
@@ -336,7 +337,7 @@ const AddProductForm = () => {
             </div>
             <div className="w-full">
               <p className="font-bold">รายละเอียดสินค้า</p>
-              <div className=" h-[40px] border border-[#D4B28C] rounded-full p-3 text-gray-600 flex items-center">
+              <div className=" h-[40px] border border-[#DD9F52] rounded-full p-3 text-gray-600 flex items-center">
                 {productDetails}
               </div>
             </div>
@@ -348,12 +349,12 @@ const AddProductForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-white mt-[40px]">
+    <div className="flex flex-col items-center h-screen-navbar bg-[#F5F5F5] mt-[40px]">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold mb-2">
           {mode === "add" ? "เพิ่มรายการสินค้า" : "แก้ไขรายการสินค้า"}
         </h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <div className="w-full">
@@ -363,13 +364,13 @@ const AddProductForm = () => {
 
         <div className="fixed bottom-4 left-0 px-4 py-4 w-full flex justify-between p-4">
           <button
-            className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}
           >
             ย้อนกลับ
           </button>
           <button
-            className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+            className="px-14 py-4 w-[300px] bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
             onClick={handleNext}
           >
             {step < 5 ? "ถัดไป" : "บันทึก"}
@@ -380,7 +381,7 @@ const AddProductForm = () => {
       {/* loading popup */}
       {loading && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white h-[250px] w-[300px] rounded-md shadow-lg flex justify-center items-center flex-col">
+          <div className="bg-[#F5F5F5] h-[250px] w-[300px] rounded-md shadow-lg flex justify-center items-center flex-col">
             <svg
               aria-hidden="true"
               className="w-36 h-36 text-gray-200 animate-spin dark:text-gray-300 fill-[#485058]"

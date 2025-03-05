@@ -3,7 +3,7 @@ import React from "react";
 const NotificationBox = ({ title, description, Icon, bgColor }) => {
   return (
     <div className="flex justify-between px-5 pt-2">
-      <div className="flex py-2 px-4 w-full mr-2 bg-white border rounded-lg">
+      <div className="flex py-2 px-4 w-full mr-2 bg-[#F5F5F5] border rounded-lg">
         <div
           className={`flex items-center py-2 px-4 justify-center w-12 h-12 rounded-full ${bgColor}`}
         >

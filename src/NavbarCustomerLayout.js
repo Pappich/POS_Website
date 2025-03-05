@@ -3,9 +3,9 @@ import NavbarCustomer from "./Components/Customer/navBarCustomer";
 
 function NavbarCustomerLayout() {
   return (
-    <div className="border-white w-full">
+    <div className="border-[#F5F5F5] w-full">
       <NavbarCustomer />
-      <div className="px-10 border-white">
+      <div className="px-10 border-[#F5F5F5]">
         <Outlet />
       </div>
     </div>

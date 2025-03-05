@@ -11,7 +11,6 @@ const CheckSlip = ({ imageUrl }) => {
   const socket = useWebSocket();
   const [loading, setLoading] = useState(false);
 
-
   const handleRetake = () => {
     if (socket) {
       const message = {
@@ -61,7 +60,6 @@ const CheckSlip = ({ imageUrl }) => {
   const handleCancel = async () => {
     setLoading(true);
     try {
-
       // แปลง base64 เป็น blob และอัพโหลดไป backend
       const response = await fetch(imageUrl);
       const blob = await response.blob();
@@ -94,7 +92,7 @@ const CheckSlip = ({ imageUrl }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-      <div className="bg-white w-[500px] rounded-lg p-6 shadow-lg">
+      <div className="bg-[#F5F5F5] w-[500px] rounded-lg p-6 shadow-lg">
         <h2 className="text-lg font-bold text-center mb-2">
           ตรวจสอบสลิปโอนเงิน
         </h2>

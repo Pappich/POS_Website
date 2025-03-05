@@ -16,8 +16,8 @@ const OrderAndCancelCard = ({ total_orders, canceled_orders }) => {
   return (
     <div className="flex">
       {/* รายรับทั้งหมด */}
-      <div className="flex py-2 px-4 w-3/4 mr-2 bg-white border rounded-lg ">
-        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+      <div className="flex py-2 px-4 w-3/4 mr-2 bg-[#F5F5F5] border rounded-lg ">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
           <MdOutlineShoppingCart color="white" size={28} />
         </div>
         <div className="ml-3">
@@ -31,10 +31,10 @@ const OrderAndCancelCard = ({ total_orders, canceled_orders }) => {
       {/* สินค้าที่ใกล้จะหมดอายุ */}
       <div
         onClick={handleClick}
-        className="flex items-center justify-between py-2 px-4 w-full bg-white border rounded-lg"
+        className="flex items-center justify-between py-2 px-4 w-full bg-[#F5F5F5] border rounded-lg"
       >
         <div className="flex items-center">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
             <MdOutlineRemoveShoppingCart color="white" size={28} />
           </div>
           <div className="ml-3">

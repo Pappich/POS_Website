@@ -95,22 +95,27 @@ const MenuDetail = () => {
       menuName: menu.menu_name,
       menu_img: menu.image_url,
       selectedType: {
-        id: menu.menu_type_group.find((type) => type.type_name === selectedType)?.menu_type_id,
+        id: menu.menu_type_group.find((type) => type.type_name === selectedType)
+          ?.menu_type_id,
         name: selectedType,
       },
       selectedSweetness: {
-        id: menu.sweetness_group.find((sweetness) => sweetness.level_name === selectedSweetness)?.sweetness_id,
+        id: menu.sweetness_group.find(
+          (sweetness) => sweetness.level_name === selectedSweetness
+        )?.sweetness_id,
         name: selectedSweetness,
       },
       selectedSize: {
-        id: menu.size_group.find((size) => size.size_name === selectedSize)?.size_id,
+        id: menu.size_group.find((size) => size.size_name === selectedSize)
+          ?.size_id,
         name: selectedSize,
       },
       price: calculatePrice(),
       quantity,
       selectedAddOn: selectedAddOn.map((addOnId) => ({
         id: addOnId,
-        name: menu.add_on.find((addOn) => addOn.add_on_id === addOnId)?.ingredient_name,
+        name: menu.add_on.find((addOn) => addOn.add_on_id === addOnId)
+          ?.ingredient_name,
       })),
     };
     console.log("selectedMenuDetails:", selectedMenuDetails);
@@ -171,14 +176,14 @@ const MenuDetail = () => {
   if (!menu) return <div>Loading...</div>;
 
   return (
-    <div className="font-noto flex flex-col min-h-screen bg-white">
+    <div className="font-noto flex flex-col bg-[#F5F5F5]">
       <div className="flex justify-between items-center mb-6 relative">
         <button onClick={handleBack}>
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
         </button>
         <button onClick={handleAddToCart} className="relative">
           <PiShoppingCart className="w-[40px] h-[40px] text-[#DD9F52]" />
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+          <span className="absolute -top-2 -right-2 bg-[#C94C4C] text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
             {getCartItemCount()}
           </span>
         </button>
@@ -208,9 +213,9 @@ const MenuDetail = () => {
                   onClick={() =>
                     handleSelection(setSelectedType, type.type_name)
                   }
-                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#DD9F52] font-bold ${
                     selectedType === type.type_name
-                      ? "bg-[#D4B28C] text-white"
+                      ? "bg-[#DD9F52] text-white"
                       : ""
                   }`}
                 >
@@ -231,9 +236,9 @@ const MenuDetail = () => {
                   onClick={() =>
                     handleSelection(setSelectedSweetness, sweetness.level_name)
                   }
-                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#DD9F52] font-bold ${
                     selectedSweetness === sweetness.level_name
-                      ? "bg-[#D4B28C] text-white"
+                      ? "bg-[#DD9F52] text-white"
                       : ""
                   }`}
                 >
@@ -254,9 +259,9 @@ const MenuDetail = () => {
                   onClick={() =>
                     handleSelection(setSelectedSize, size.size_name)
                   }
-                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#DD9F52] font-bold ${
                     selectedSize === size.size_name
-                      ? "bg-[#D4B28C] text-white"
+                      ? "bg-[#DD9F52] text-white"
                       : ""
                   }`}
                 >
@@ -275,9 +280,9 @@ const MenuDetail = () => {
                 <button
                   key={addOn.add_on_id}
                   onClick={() => handleAddOnSelection(addOn.add_on_id)}
-                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#D4B28C] font-bold ${
+                  className={`px-6 py-3 flex-1 max-w-[250px] text-center rounded-full border border-[#DD9F52] font-bold ${
                     selectedAddOn.includes(addOn.add_on_id)
-                      ? "bg-[#D4B28C] text-white"
+                      ? "bg-[#DD9F52] text-white"
                       : ""
                   }`}
                 >
@@ -295,7 +300,7 @@ const MenuDetail = () => {
           <div className="flex items-center space-x-4">
             <button
               onClick={handleDelete}
-              className="w-14 h-14 font-bold text-white bg-[#DC9494] rounded-full flex items-center justify-center"
+              className="w-14 h-14 font-bold text-white bg-[#C94C4C] rounded-full flex items-center justify-center"
             >
               -
             </button>
@@ -304,7 +309,7 @@ const MenuDetail = () => {
             </div>
             <button
               onClick={handleAdd}
-              className="w-14 h-14 text-white bg-[#A2DC94] rounded-full flex items-center justify-center"
+              className="w-14 h-14 text-white bg-[#4B8455] rounded-full flex items-center justify-center"
             >
               +
             </button>
@@ -320,7 +325,7 @@ const MenuDetail = () => {
 
         <button
           onClick={handleAddToCart}
-          className="w-full py-3 bg-[#D4B28C] text-white rounded-full font-semibold"
+          className="w-full py-3 bg-[#DD9F52] text-white rounded-full font-semibold"
         >
           + เพิ่มเข้าตระกร้า
         </button>

@@ -7,8 +7,8 @@ const NavbarCustomer = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="bg-white border-b border-gray-300 mb-4 dark:bg-gray-100 shadow-md w-full">
-      <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8">
+    <nav className="border-b border-[#2C586E] mb-4 dark:bg-[#2C586E] shadow-md w-full">
+      <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8 bg-[#2C586E]">
         {/* Shop logo */}
         <a className="flex items-center space-y-2">
           <svg
@@ -33,7 +33,7 @@ const NavbarCustomer = () => {
             />
             <rect x="6" y="27" width="47" height="3" rx="1.5" fill="#2F2105" />
           </svg>
-          <span class="self-center text-3xl font-semibold whitespace-nowrap text-black">
+          <span class="self-center text-3xl font-semibold whitespace-nowrap text-white">
             สุขเสมอคาเฟ่
           </span>
         </a>
@@ -42,7 +42,7 @@ const NavbarCustomer = () => {
         <div className="flex items-center space-x-6 w-auto">
           <button
             onClick={() => navigate("/role")}
-            className="flex p-2 text-black hover:text-orange-500 transition-all duration-300"
+            className="flex p-2 text-black hover:text-[#C68A47] transition-all duration-300"
           >
             <HiOutlineHome size={24} />
             <span className="text-xl font-bold">หน้าหลัก</span>

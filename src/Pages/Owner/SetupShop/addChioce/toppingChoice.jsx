@@ -316,7 +316,7 @@ const ToppingChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               1. เพิ่มช้อยส์ในตัวเลือก:
-              <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
+              <span className="text-[#DD9F52] ml-2"> ท็อปปิ้ง</span>
             </div>
 
             <div className="flex mb-4 w-full items-center">
@@ -363,7 +363,7 @@ const ToppingChoice = () => {
                       onChange={(value) =>
                         handleChoiceChange(index, "name", value)
                       }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                      className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     />
                     {/* Unit Selection Dropdown */}
                     <select
@@ -371,7 +371,7 @@ const ToppingChoice = () => {
                       onChange={(e) =>
                         handleChoiceChange(index, "unit", e.target.value)
                       }
-                      className="border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                      className="border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     >
                       <option value="">เลือกหน่วย...</option>
                       {unitOptions.map((option) => (
@@ -389,11 +389,11 @@ const ToppingChoice = () => {
                     onChange={(value) =>
                       handleChoiceChange(index, "price", value)
                     }
-                    className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                    className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
                   <button
                     onClick={() => removeChoice(index)}
-                    className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                    className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white"
                   >
                     <AiOutlineDelete size={36} />
                   </button>
@@ -415,7 +415,7 @@ const ToppingChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               2. เพิ่มปริมาณที่ใช้ช้อยส์ในตัวเลือก:
-              <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
+              <span className="text-[#DD9F52] ml-2"> ท็อปปิ้ง</span>
             </div>
 
             <div className="grid grid-cols-2 mb-4">
@@ -433,7 +433,7 @@ const ToppingChoice = () => {
                       type="text"
                       value={choice.name}
                       disabled
-                      className="w-full border border-[#D4B28C] rounded-full p-3 bg-gray-200 text-gray-600"
+                      className="w-full border border-[#DD9F52] rounded-full p-3 bg-gray-200 text-gray-600"
                     />
                   </div>
 
@@ -445,10 +445,10 @@ const ToppingChoice = () => {
                       onChange={(e) =>
                         handleChoiceChange(index, "quantity", e.target.value)
                       }
-                      className="w-full border border-[#D4B28C] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                      className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     />
                     {errors.choiceQuantity && (
-                      <div className="text-red-500 text-sm mt-2">
+                      <div className="text-[#C94C4C] text-sm mt-2">
                         {errors.choiceQuantity}
                       </div>
                     )}
@@ -464,13 +464,13 @@ const ToppingChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               3. เลือกเมนูที่ต้องการใช้ตัวเลือก:
-              <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
+              <span className="text-[#DD9F52] ml-2"> ท็อปปิ้ง</span>
             </div>
 
             <div className="w-full flex justify-start text-xl mb-8">
               <div className="relative flex items-start w-full">
                 <FaSearch
-                  style={{ color: "#D4B28C" }}
+                  style={{ color: "#DD9F52" }}
                   className="absolute left-3 top-1/2 transform -translate-y-1/2"
                 />
                 <ThaiVirtualKeyboardInput
@@ -478,7 +478,7 @@ const ToppingChoice = () => {
                   placeholder="ค้นหาด้วยชื่อสินค้า..."
                   value={searchTerm}
                   onChange={handleSearch}
-                  className="w-full border border-[#D4B28C] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                  className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 pl-10 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                 />
               </div>
             </div>
@@ -593,7 +593,7 @@ const ToppingChoice = () => {
             )}
 
             {errors.menuSelection && (
-              <div className="text-red-500 text-sm mt-2">
+              <div className="text-[#C94C4C] text-sm mt-2">
                 {errors.menuSelection}
               </div>
             )}
@@ -604,7 +604,7 @@ const ToppingChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               4. สรุปตัวเลือก:
-              <span className="text-[#D4B28C] ml-2"> ท็อปปิ้ง</span>
+              <span className="text-[#DD9F52] ml-2"> ท็อปปิ้ง</span>
             </div>
 
             <div className="w-full ml-16">
@@ -654,11 +654,11 @@ const ToppingChoice = () => {
   };
 
   return (
-    <div className="flex flex-col items-center bg-white">
+    <div className="flex flex-col items-center bg-[#F5F5F5]">
       {/* Header */}
       <div className="text-center mb-10 mt-[40px]">
         <h1 className="text-3xl font-bold mb-2">เพิ่มตัวเลือก</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       {/* Render step content using switch */}
@@ -667,13 +667,13 @@ const ToppingChoice = () => {
       {/* Buttons */}
       <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ
         </button>
         <button
-          className="px-14 py-4 w-[300px] bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
           onClick={handleNext}
         >
           {step < 4 ? "ถัดไป" : "บันทึก"}

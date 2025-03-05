@@ -93,7 +93,7 @@ const DoneOrderButton = ({ order, onSuccess }) => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white w-[500px] h-auto rounded-lg p-6 shadow-lg">
+          <div className="bg-[#F5F5F5] w-[500px] h-auto rounded-lg p-6 shadow-lg">
             <h2 className="text-lg font-bold text-center mb-4">
               ออเดอร์เสร็จสิ้นครบทุกรายการ ใช่หรือไม่
             </h2>

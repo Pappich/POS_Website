@@ -34,11 +34,11 @@ const OwnerMenu = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-[120px]">
+    <div className="flex flex-col items-center pt-36 h-screen-navbar bg-[#F5F5F5]">
       <div className="text-start mb-10">
         <h1 className="text-3xl font-bold mb-2">เจ้าของร้าน</h1>
         <h1 className="text-2xl mb-2">โปรดเลือกเว็บไซต์ที่ต้องการเข้าใช้งาน</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <div className="w-full ml-16 mt-[120px]">
@@ -47,13 +47,13 @@ const OwnerMenu = () => {
             <div
               key={id}
               className={
-                "flex flex-col items-center cursor-pointer transition-all text-[#D4B28C] hover:text-orange-500"
+                "flex flex-col items-center cursor-pointer transition-all text-[#DD9F52] hover:text-[#C68A47]"
               }
               onClick={() => handleClick(id)}
             >
               <div
                 className={
-                  "p-3 transition-colors duration-300 mb-2 text-[#D4B28C] hover:text-orange-500"
+                  "p-3 transition-colors duration-300 mb-2 text-[#DD9F52] hover:text-[#C68A47]"
                 }
               >
                 {icon}
@@ -67,7 +67,7 @@ const OwnerMenu = () => {
 
       <div className="flex w-full fixed bottom-4 left-0 px-4 py-4">
         <button
-          className="px-14 py-4 w-[300px] border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+          className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}
         >
           ย้อนกลับ

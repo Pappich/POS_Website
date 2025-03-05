@@ -33,7 +33,7 @@ const IngredientDropdown = ({ value, onChange }) => {
     control: (provided, state) => ({
       ...provided,
       //   width: "100%",
-      border: "1px solid #D4B28C",
+      border: "1px solid #DD9F52",
       borderRadius: "30px",
       padding: "6px",
       color: "#4B5563",

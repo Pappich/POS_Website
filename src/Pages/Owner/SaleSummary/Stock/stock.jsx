@@ -287,7 +287,7 @@ const Stock = () => {
   console.log("ingredient history", ingredientHistory);
 
   return (
-    <div>
+    <div className="bg-[#F5F5F5] h-screen-website">
       <SideBar menuTab={"stock"} />
       <div className="px-10 mt-[40px]">
         <h1 className="font-bold text-3xl ">คลังสินค้า</h1>
@@ -308,7 +308,7 @@ const Stock = () => {
               className={`px-4 py-1 ${
                 selectedCategory === null
                   ? "bg-[#C6B399] text-white rounded-full border"
-                  : "bg-white border-[#C6B399]"
+                  : "bg-[#F5F5F5] border-[#C6B399]"
               }`}
             >
               ทั้งหมด
@@ -322,7 +322,7 @@ const Stock = () => {
                 className={`px-4 py-1 ${
                   selectedCategory === category.category_id
                     ? "bg-[#C6B399] text-white rounded-full border"
-                    : "bg-white border-[#C6B399]"
+                    : "bg-[#F5F5F5] border-[#C6B399]"
                 }`}
               >
                 {category.category_name}
@@ -334,8 +334,8 @@ const Stock = () => {
         <div>
           <div className="flex">
             {/* รายรับทั้งหมด */}
-            <div className="flex py-2 px-4 w-3/4 mr-2 bg-white border rounded-lg ">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DC9494]">
+            <div className="flex py-2 px-4 w-3/4 mr-2 bg-[#F5F5F5] border rounded-lg ">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#C94C4C]">
                 <div className="pb-1">
                   <IoWarningOutline color="white" size={32} />
                 </div>
@@ -350,8 +350,8 @@ const Stock = () => {
             </div>
 
             {/* สินค้าที่ใกล้จะหมดอายุ */}
-            <div className="flex py-2 px-4 w-full bg-white border rounded-lg ">
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DCC894]">
+            <div className="flex py-2 px-4 w-full bg-[#F5F5F5] border rounded-lg ">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#DD9F52]">
                 <IoMdTime color="white" size={32} />
               </div>
               <div className="ml-3">
@@ -363,7 +363,7 @@ const Stock = () => {
 
           {/* Search Bar */}
           <div className="my-4 relative flex">
-            <div className="mr-5 flex items-center bg-white border-[#C6B399] border rounded-full px-4 py-1 w-full">
+            <div className="mr-5 flex items-center bg-[#F5F5F5] border-[#C6B399] border rounded-full px-4 py-1 w-full">
               <FiSearch className="text-[#C6B399] mr-2" size={36} />
               <ThaiVirtualKeyboardInput
                 value={searchQuery}
@@ -441,7 +441,7 @@ const Stock = () => {
                           e.stopPropagation(); // Prevent the row click handler from firing
                           handleShowHistory(item.ingredient_id);
                         }}
-                        className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
+                        className="text-[#C6B399] bg-[#F5F5F5] border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
                       >
                         อัปเดต
                       </button>
@@ -453,7 +453,7 @@ const Stock = () => {
                           setIngredientToDelete(item);
                           setDeleteModalOpen(true);
                         }}
-                        className="font-bold border border-red-300 text-red-300 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white z-10"
+                        className="font-bold border border-red-300 text-red-300 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white z-10"
                       >
                         <AiOutlineDelete size={24} />
                       </button>
@@ -468,7 +468,7 @@ const Stock = () => {
         {/* Update/Create Product Modal */}
         {modalVisible && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
+            <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
               {/* Product Name */}
               <h2 className="text-lg font-bold text-center mb-4 absolute top-4 w-full">
                 {selectedProduct?.ingredient_name}
@@ -548,9 +548,9 @@ const Stock = () => {
                         type="button"
                         className={`px-4 py-2 rounded-full font-medium ${
                           isEditingNetVolume
-                            ? "bg-orange-300 text-white"
-                            : "border border-orange-300 text-orange-300"
-                        } hover:bg-orange-300 hover:text-white`}
+                            ? "bg-[#C68A47] text-white"
+                            : "border border-[#C68A47] text-[#C68A47]"
+                        } hover:bg-[#C68A47] hover:text-white`}
                         onClick={() =>
                           setIsEditingNetVolume(!isEditingNetVolume)
                         }
@@ -584,7 +584,7 @@ const Stock = () => {
                       </span>
                       <button
                         type="button"
-                        className="px-3 py-3 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                        className="px-3 py-3 bg-[#C94C4C] text-white rounded-full flex items-center justify-center hover:bg-red-600"
                         onClick={() =>
                           setUpdateFormData((prev) => ({
                             ...prev,
@@ -611,7 +611,7 @@ const Stock = () => {
                   ย้อนกลับ
                 </button>
                 <button
-                  className="px-6 py-3 w-full  bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                  className="px-6 py-3 w-full  bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
                   onClick={handleUpdateSubmit}
                 >
                   บันทึก
@@ -624,7 +624,7 @@ const Stock = () => {
         {/* Ingredient History Modal */}
         {historyModalVisible && ingredientHistory && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
+            <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[600px] w-[800px] relative">
               {/* Modal Header */}
               <h2 className="text-lg font-bold text-center mb-4">
                 ประวัติการอัปเดต {ingredientHistory.ingredient_name}
@@ -681,7 +681,7 @@ const Stock = () => {
                               setHistoryModalVisible(false);
                               handleUpdate(update.update_id);
                             }}
-                            className="text-[#C6B399] bg-white border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                            className="text-[#C6B399] bg-[#F5F5F5] border border-[#C6B399] focus:outline-none hover:bg-[#C6B399] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
                           >
                             อัปเดต
                           </button>
@@ -696,7 +696,7 @@ const Stock = () => {
               <div className="mt-4 flex justify-between">
                 <button
                   onClick={() => setHistoryModalVisible(false)}
-                  className="px-6 py-2 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors font-bold"
+                  className="px-6 py-2 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                 >
                   ปิด
                 </button>
@@ -716,7 +716,7 @@ const Stock = () => {
                     });
                     setModalVisible(true);
                   }}
-                  className="px-6 py-2 bg-[#D4B28C] text-white rounded-full hover:bg-[#cda777] transition-colors font-bold"
+                  className="px-6 py-2 bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
                 >
                   เพิ่มการอัปเดต
                 </button>

@@ -20,7 +20,7 @@ const PaymentMethodFilter = () => {
               className={`px-4 py-1  ${
                 selectedTag === tag
                   ? "bg-[#C6B399] text-white rounded-full border"
-                  : "bg-white border-[#C6B399]"
+                  : "bg-[#F5F5F5] border-[#C6B399]"
               }`}
             >
               {tag}

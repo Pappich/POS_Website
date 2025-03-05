@@ -96,7 +96,7 @@ const Summary = () => {
   };
 
   return (
-    <div className="w-full font-noto flex flex-col items-center bg-white">
+    <div className="w-full font-noto flex flex-col items-center bg-[#F5F5F5] h-screen-navbar">
       <div className="w-full flex justify-start items-center mb-6">
         <button onClick={handleBack} className="text-[#DD9F52] text-4xl">
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />
@@ -105,7 +105,7 @@ const Summary = () => {
 
       <div className="flex flex-col mb-2 mt-[40px]">
         <h1 className="text-3xl font-bold">สรุปรายการสินค้า</h1>
-        <div className="w-20 h-1 bg-[#D4B28C] my-6"></div>
+        <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
       <table className="w-full border-collapse">
@@ -168,7 +168,7 @@ const Summary = () => {
                   <td>
                     <button
                       onClick={() => handleRemove(item)}
-                      className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-red-500 hover:text-white"
+                      className="font-bold border border-red-300 text-red-300 w-16 h-10 flex items-center justify-center rounded-full hover:bg-[#C94C4C] hover:text-white"
                     >
                       <AiOutlineDelete size={36} />
                     </button>
@@ -198,7 +198,7 @@ const Summary = () => {
 
       <button
         onClick={handlePaymentClick}
-        className="fixed bottom-4 py-3 w-full px-8 bg-[#D4B28C] text-white rounded-full font-bold"
+        className="fixed bottom-4 py-3 w-full px-8 bg-[#DD9F52] text-white rounded-full font-bold"
       >
         จ่ายเงิน
       </button>
@@ -206,7 +206,7 @@ const Summary = () => {
       {/* Payment popup */}
       {showPaymentPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-10 w-[800px] relative">
+          <div className="bg-[#F5F5F5] rounded-lg p-10 w-[800px] relative">
             <h2 className="text-3xl font-bold mb-4 flex justify-center">
               วิธีการชำระเงิน
             </h2>
@@ -239,13 +239,13 @@ const Summary = () => {
             <div className="w-full flex justify-between space-x-8">
               <button
                 onClick={closePaymentPopup}
-                className="w-full py-2 mt-4 border rounded-full text-[#D4B28C] border-[#D4B28C] hover:bg-[#f5e9dc] transition-colors"
+                className="w-full py-2 mt-4 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors"
               >
                 ย้อนกลับ
               </button>
               <button
                 onClick={handleConfirmPayment}
-                className="w-full py-2 mt-4 bg-[#D4B28C] text-white rounded-full font-bold"
+                className="w-full py-2 mt-4 bg-[#DD9F52] text-white rounded-full font-bold"
               >
                 ตกลง
               </button>

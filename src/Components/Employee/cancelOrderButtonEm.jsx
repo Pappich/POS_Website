@@ -67,7 +67,7 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white w-[500px] h-auto rounded-lg p-6 shadow-lg">
+          <div className="bg-[#F5F5F5] w-[500px] h-auto rounded-lg p-6 shadow-lg">
             <h2 className="text-lg font-bold text-center mb-1">
               ยกเลิกออเดอร์
             </h2>
@@ -79,29 +79,27 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
                 type="text"
                 value={order.order_id}
                 disabled
-                className="w-full border border-[#D4B28C] rounded-full px-3 py-1.5 text-gray-600 bg-gray-100"
+                className="w-full border border-[#DD9F52] rounded-full px-3 py-1.5 text-gray-600 bg-gray-100"
               />
             </div>
 
             <div className="mt-2">
               <label>ชื่อลูกค้า</label>
               <ThaiVirtualKeyboardInput
-                
                 placeholder="กรอกชื่อของลูกค้า..."
                 value={customerName}
                 onChange={setCustomerName}
-                className="w-full border border-[#D4B28C] rounded-full px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                className="w-full border border-[#DD9F52] rounded-full px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
             </div>
 
             <div className="mt-2">
               <label>เบอร์โทรศัพท์ลูกค้า</label>
               <ThaiVirtualKeyboardInput
-                
                 placeholder="กรอกเบอร์โทรศัพท์ของลูกค้า..."
                 value={contact}
                 onChange={setContact}
-                className="w-full border border-[#D4B28C] rounded-full px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                className="w-full border border-[#DD9F52] rounded-full px-3 py-1.5 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
             </div>
 

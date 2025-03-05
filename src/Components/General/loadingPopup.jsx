@@ -9,7 +9,7 @@ const LoadingPopup = ({ loading }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white h-[250px] w-[300px] rounded-md shadow-lg flex justify-center items-center flex-col">
+      <div className="bg-[#F5F5F5] h-[250px] w-[300px] rounded-md shadow-lg flex justify-center items-center flex-col">
         <svg
           aria-hidden="true"
           className="w-36 h-36 text-gray-200 animate-spin dark:text-gray-300 fill-[#485058]"
