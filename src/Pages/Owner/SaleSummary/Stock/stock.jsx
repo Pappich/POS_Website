@@ -81,7 +81,7 @@ const Stock = () => {
       console.error("Error fetching ingredients:", error);
     }
   };
-  console.log("Ingredient: ", ingredients);
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -110,7 +110,7 @@ const Stock = () => {
     };
 
     fetchCategories();
-  }, [URL, handleCategoryChange]);
+  }, [handleCategoryChange]);
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
@@ -143,7 +143,6 @@ const Stock = () => {
     return [];
   });
 
-  console.log("Filter Ingredient", filteredIngredients);
   // Fetch ingredient history
   const handleShowHistory = async (ingredientId) => {
     try {
@@ -200,24 +199,21 @@ const Stock = () => {
   const handleUpdateSubmit = async () => {
     setLoading(true);
     try {
-      // ถ้าไม่มี update_id แสดงว่าเป็นการเพิ่มใหม่
+      // กรณีเพิ่มใหม่
       if (!selectedProduct.update_id) {
-        // ตรวจสอบว่ามีวันที่หรือไม่ ถ้าไม่มีให้ใช้วันที่ปัจจุบัน
-        const expDate =
-          updateFormData.expiration_date ||
-          new Date().toISOString().split("T")[0];
-
         const payload = {
           image_url: selectedProduct.image_url,
           ingredient_name: selectedProduct.ingredient_name,
           net_volume: parseInt(updateFormData.net_volume),
           unit: selectedProduct.unit,
           quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
-          category_name: selectedProduct.category_name,
-          expiration_date: updateFormData.expiration_date,
+          category_name: selectedProduct.category_name || "",
+          expiration_date:
+            updateFormData.expiration_date ||
+            new Date().toISOString().split("T")[0],
         };
 
-        console.log("payload POST", payload);
+        console.log("Sending POST payload:", payload);
 
         const response = await fetchApi(
           `${URL}/owner/create-stock-ingredients`,
@@ -226,12 +222,16 @@ const Stock = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to create product");
+          const errorData = await response.json();
+          throw new Error(
+            `Failed to create product: ${errorData.message || "Unknown error"}`
+          );
         }
-      } else {
-        // ถ้ามี update_id แสดงว่าเป็นการอัพเดต
-        console.log("update_id", selectedProduct.update_id);
 
+        const responseData = await response.json();
+        console.log("POST Response:", responseData);
+      } else {
+        // กรณีอัพเดต (โค้ดเดิม)
         const payload = {
           update_id: selectedProduct.update_id,
           quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
@@ -239,8 +239,6 @@ const Stock = () => {
           net_volume: parseInt(updateFormData.net_volume),
           expiration_date: updateFormData.expiration_date,
         };
-
-        console.log("payload", payload);
 
         const response = await fetchApi(
           `${URL}/owner/update-stock-ingredients/${selectedProduct.update_id}`,
@@ -257,6 +255,7 @@ const Stock = () => {
       setModalVisible(false);
     } catch (error) {
       console.error("Error updating/creating product:", error);
+      alert(`เกิดข้อผิดพลาด: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -283,8 +282,6 @@ const Stock = () => {
       setIngredientToDelete(null); // Reset the selected ingredient
     }
   };
-
-  console.log("ingredient history", ingredientHistory);
 
   return (
     <div className="bg-[#F5F5F5] h-screen-website">
