@@ -86,6 +86,10 @@ const Stock = () => {
     fetchProducts();
   }, []);
 
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
+
   // Fetch categories when component mounts
   useEffect(() => {
     const fetchCategories = async () => {
@@ -106,7 +110,7 @@ const Stock = () => {
     };
 
     fetchCategories();
-  }, [URL]);
+  }, [URL, handleCategoryChange]);
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
@@ -124,10 +128,6 @@ const Stock = () => {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProduct(null);
-  };
-
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
   };
 
   const filteredIngredients = ingredients.flatMap((category) => {

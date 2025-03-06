@@ -31,6 +31,8 @@ const OrderSummary = () => {
   const [slipModalVisible, setSlipModalVisible] = useState(false);
   const [selectedSlip, setSelectedSlip] = useState(null);
 
+  const [paymentFilter, setPaymentFilter] = useState("");
+
   const handleTimeRangeClick = (timeRange) => {
     setSelectedTimeRange(timeRange);
   };
@@ -95,6 +97,14 @@ const OrderSummary = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Filter orders based on payment method
+  const filteredOrders = orderData.order_topic
+    ? orderData.order_topic.filter((order) => {
+        if (!paymentFilter) return true;
+        return order.payment_method === paymentFilter;
+      })
+    : [];
+
   return (
     <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"orderSummary"} />
@@ -113,7 +123,9 @@ const OrderSummary = () => {
           total_orders={orderData.total_orders}
           canceled_orders={orderData.canceled_orders}
         />
-        <PaymentMethodFilter />
+        <PaymentMethodFilter
+          onFilterChange={(filter) => setPaymentFilter(filter)}
+        />
 
         {/* Table Section */}
         <div className="overflow-x-auto border rounded-lg p-5">
@@ -162,11 +174,11 @@ const OrderSummary = () => {
               </tr>
             </thead>
             <tbody>
-              {orderData.order_topic && orderData.order_topic.length > 0 ? (
-                orderData.order_topic.map((item) => (
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((item) => (
                   <tr
                     key={item.order_id}
-                    onClick={() => alert("CLICKED!!!")}
+                    // onClick={() => alert("CLICKED!!!")}
                     className="cursor-pointer hover:bg-gray-100"
                   >
                     <td className="pr-5 text-center border-b border-[#F1F4F7]">
@@ -183,14 +195,14 @@ const OrderSummary = () => {
                     </td>
                     <td className="py-2 flex justify-center text-center border-b border-[#F1F4F7]">
                       <div className="border-x px-2 border border-[#70AB8E] text-[#70AB8E] rounded-full">
-                        {item.payment_method}
+                        {item.payment_method === "cash" ? "เงินสด" : "QR Code"}
                       </div>
                     </td>
                     <td className="py-2 text-center border-b border-[#F1F4F7]">
-                      {item.payment_slip_url ? (
+                      {item.image_url ? (
                         <button
-                          onClick={() => handleViewSlip(item.payment_slip_url)}
-                          className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-4 py-1"
+                          onClick={() => handleViewSlip(item.image_url)}
+                          className="text-[#DD9F52] bg-[#F5F5F5]  focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full px-4 py-1"
                         >
                           ดูใบเสร็จโอนเงิน
                         </button>
@@ -215,45 +227,43 @@ const OrderSummary = () => {
       {/* Slip Modal */}
       {slipModalVisible && selectedSlip && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-[#F5F5F5] rounded-lg p-6 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">ใบเสร็จการโอนเงิน</h2>
-              <button
-                onClick={closeSlipModal}
-                className="text-gray-500 hover:text-gray-700"
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full shadow-lg relative">
+            {/* Close Button */}
+            <button
+              onClick={closeSlipModal}
+              className="absolute top-4 right-3 text-gray-400 hover:text-gray-600 transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Modal Header */}
+            <div className="mb-10 justify-center">
+              <h1 className="text-2xl font-bold text-left">
+                ใบเสร็จการโอนเงิน
+              </h1>
+              <div className="w-20 h-1 bg-[#DD9F52] my-4"></div>
             </div>
 
+            {/* Image Section */}
             <div className="flex justify-center">
               <img
                 src={`${URL}/${selectedSlip.replace(/\\/g, "/")}`}
                 alt="Payment Slip"
-                className="max-h-[70vh] object-contain"
+                className="max-h-[70vh] object-contain rounded-md border border-gray-200 shadow-sm"
               />
-            </div>
-
-            <div className="mt-4 flex justify-center">
-              <button
-                onClick={closeSlipModal}
-                className="px-6 py-2 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
-              >
-                ปิด
-              </button>
             </div>
           </div>
         </div>

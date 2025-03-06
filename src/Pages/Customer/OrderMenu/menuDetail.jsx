@@ -77,13 +77,13 @@ const MenuDetail = () => {
       newErrors.size = "โปรดเลือกขนาดที่ต้องการ";
     }
 
-    if (
-      menu?.add_on.length > 0 &&
-      (selectedAddOn.length === 0 ||
-        selectedAddOn.some((id) => id === null || id === undefined))
-    ) {
-      newErrors.addOn = "โปรดเลือกตัวเลือกที่ต้องการอย่างน้อย 1 ตัวเลือก";
-    }
+    // if (
+    //   menu?.add_on.length > 0 &&
+    //   (selectedAddOn.length === 0 ||
+    //     selectedAddOn.some((id) => id === null || id === undefined))
+    // ) {
+    //   newErrors.addOn = "โปรดเลือกตัวเลือกที่ต้องการอย่างน้อย 1 ตัวเลือก";
+    // }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

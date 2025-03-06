@@ -17,6 +17,7 @@ const CancelOrderSummary = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [cancelOrderData, setCancelOrderData] = useState([]);
+  const [paymentFilter, setPaymentFilter] = useState("");
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -127,6 +128,13 @@ const CancelOrderSummary = () => {
     navigate("/order-summary");
   };
 
+  // Filter orders based on payment method
+  const filteredOrders = cancelOrderData ? 
+    cancelOrderData.filter(order => {
+      if (!paymentFilter) return true;
+      return order.payment_method === paymentFilter;
+    }) : [];
+
   return (
     <div className="h-screen-website bg-[#F5F5F5]">
       <SideBar menuTab={"orderSummary"} />
@@ -139,7 +147,9 @@ const CancelOrderSummary = () => {
           <CalendarSelect />
         </div>
 
-        <PaymentMethodFilter />
+        <PaymentMethodFilter
+          onFilterChange={(filter) => setPaymentFilter(filter)}
+        />
 
         {/* Table Section */}
         <div className="overflow-x-auto border rounded-lg p-5">
@@ -162,7 +172,7 @@ const CancelOrderSummary = () => {
               </tr>
             </thead>
             <tbody>
-              {cancelOrderData.map((item) => (
+              {filteredOrders.map((item) => (
                 <tr
                   key={item.order_id}
                   onClick={() => handleRowClick(item.order_id)}
@@ -182,7 +192,7 @@ const CancelOrderSummary = () => {
                   </td>
                   <td className="py-3 flex justify-center text-center border-b border-[#F1F4F7]">
                     <div className="border-x px-2 border border-[#70AB8E] text-[#70AB8E] rounded-full">
-                      {item.payment_method}
+                      {item.payment_method === "cash" ? "เงินสด" : "QR Code"}
                     </div>
                   </td>
                 </tr>

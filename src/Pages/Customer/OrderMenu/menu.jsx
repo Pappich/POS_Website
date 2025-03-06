@@ -37,7 +37,7 @@ const Menu = () => {
       .catch((error) => {
         console.error("Error fetching menu data:", error);
       });
-  }, [URL, owner_id]);
+  }, [URL, owner_id, activeCategory]);
 
   console.log("Menu Data:", menuData);
 

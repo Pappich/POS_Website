@@ -122,7 +122,7 @@ const ThaiVirtualKeyboard = ({
   };
 
   return (
-    <div className="virtual-keyboard-wrapper">
+    <div className="virtual-keyboard-wrapper font-noto ">
       <div className="keyboard-scroll-area" />{" "}
       {/* Adds scrollable space above keyboard */}
       <div
@@ -148,6 +148,7 @@ const ThaiVirtualKeyboard = ({
             {
               class: "special-key",
               buttons: "{bksp} {enter} {shift} {caps} {tab} {language}",
+              fontFamily: "Noto Sans Thai",
             },
           ]}
         />

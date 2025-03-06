@@ -109,20 +109,16 @@ const Summary = () => {
       </div>
 
       <div className="w-full rounded-lg overflow-hidden">
-        <table className="w-full border-collapse">
-          <thead className="bg-gray-100">
-            <tr className="border-b border-gray-300 text-2xl">
-              <th className="text-left py-2 px-4">เมนู</th>
-              <th className="text-center py-2 px-4">จำนวน</th>
-              <th className="text-center py-2 px-4">ราคาทั้งหมด</th>
-              <th className="text-center py-2 px-4">ลบ</th>
-            </tr>
-          </thead>
-        </table>
-
-        {/* Scrollable tbody */}
         <div className="max-h-[400px] overflow-y-auto">
           <table className="w-full border-collapse">
+            <thead className="bg-gray-100 sticky top-0">
+              <tr className="border-b border-gray-300 text-2xl">
+                <th className="text-left py-2 px-4">เมนู</th>
+                <th className="text-center py-2 px-4">จำนวน</th>
+                <th className="text-center py-2 px-4">ราคาทั้งหมด</th>
+                <th className="text-center py-2 px-4">ลบ</th>
+              </tr>
+            </thead>
             <tbody>
               {items.length === 0 ? (
                 <tr>
@@ -167,12 +163,12 @@ const Summary = () => {
                     </td>
                     <td className="text-center px-4">{item.quantity}</td>
                     <td className="text-center px-4">{item.price} บาท</td>
-                    <td className="text-center px-4">
+                    <td className="text-center justify-center px-4">
                       <button
                         onClick={() => handleRemove(item)}
-                        className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E]"
+                        className="transition duration-200 text-[#C94C4C] hover:text-[#B03E3E]"
                       >
-                        <AiOutlineDelete size={36} />
+                        <AiOutlineDelete size={32} />
                       </button>
                     </td>
                   </tr>

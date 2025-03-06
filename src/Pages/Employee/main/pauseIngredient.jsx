@@ -161,7 +161,7 @@ const PauseIngredient = () => {
             htmlFor="productDetails"
             className="text-2xl font-bold text-start"
           >
-            เมนูทั้งหมด
+            วัตถุดิบทั้งหมด
           </label>
           <button
             className={`px-4 py-2 rounded-full ${
