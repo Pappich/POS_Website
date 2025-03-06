@@ -109,7 +109,7 @@ const GroupList = () => {
         </div>
 
         {/* RENDER MENU */}
-        <div className="w-full">
+        <div className="w-full overflow-y-auto pb-32 pr-4">
           {filteredItems.length > 0 ? (
             filteredItems.map((item, index) => (
               <div key={index} className="w-full mb-4">
@@ -146,7 +146,7 @@ const GroupList = () => {
           )}
         </div>
 
-        <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
+        <div className="flex fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md justify-between">
           <button
             className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleSuccess}

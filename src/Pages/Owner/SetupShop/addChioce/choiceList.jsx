@@ -258,7 +258,7 @@ const ChoiceList = () => {
         </div>
 
         {/* Render Groups */}
-        <div className="w-full">
+        <div className="w-full overflow-y-auto pb-32 pr-4">
           {Object.entries(groupedItems).some(
             ([_, items]) => items.length > 0
           ) ? (

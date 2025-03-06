@@ -78,33 +78,37 @@ const AddProductForm = () => {
     setLoading(true);
 
     try {
-      const imagePath = await handleUploadImage(productFile);
+      // Only handle image upload if there's a new file
+      let imagePath = null;
+      if (productFile) {
+        imagePath = await handleUploadImage(productFile);
+      }
 
-      if (imagePath) {
-        const endpoint =
-          mode === "add"
-            ? `${URL}/owner/menus`
-            : `${URL}/owner/menus/${productData.menu_id}`;
-        const method = mode === "add" ? "POST" : "PATCH";
+      const endpoint =
+        mode === "add"
+          ? `${URL}/owner/menus`
+          : `${URL}/owner/menus/${productData.menu_id}`;
+      const method = mode === "add" ? "POST" : "PATCH";
 
-        const response = await fetchApi(endpoint, method, {
-          menu_name: menuName,
-          description: productDetails,
-          price: parseInt(productPrice),
-          image_url: imagePath,
-        });
+      console.log("MODE:", mode);
 
-        console.log(
-          "DATA TO SEND:",
-          menuName,
-          productDetails,
-          parseFloat(productPrice),
-          imagePath
-        );
+      // Create payload based on whether we're updating the image
+      const payload = {
+        menu_name: menuName,
+        description: productDetails,
+        price: parseInt(productPrice),
+        ...(imagePath || mode === "add"
+          ? { image_url: imagePath }
+          : { image_url: productData.image_url }),
+      };
 
-        if (response.ok) {
-          navigate("/product-list");
-        }
+      const response = await fetchApi(endpoint, method, payload);
+
+      console.log("DATA TO SEND:", payload);
+
+      console.log("RESPONSE :", response);
+      if (response.ok) {
+        navigate("/product-list");
       }
     } catch (error) {
       console.error("Error submitting menu:", error);
@@ -362,7 +366,7 @@ const AddProductForm = () => {
           {renderStepContent()}
         </div>
 
-        <div className="fixed bottom-4 left-0 px-4 py-4 w-full flex justify-between p-4">
+        <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md">
           <button
             className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
             onClick={handleBack}

@@ -102,8 +102,7 @@ const ProductList = () => {
           </div>
         </div>
 
-        {/* RENDER MENU */}
-        <div className="w-full">
+        <div className="w-full flex-1 pr-4">
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <div key={item.menu_id} className="w-full mb-4">
@@ -133,19 +132,21 @@ const ProductList = () => {
           )}
         </div>
 
-        <div className="flex fixed bottom-4 left-0 w-full px-4 py-4 space-x-8 justify-between">
-          <button
-            className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
-            onClick={handleSuccess}
-          >
-            ย้อนกลับ
-          </button>
-          <button
-            className="px-14 py-4 w-[300px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold"
-            onClick={handleAddProduct}
-          >
-            เพิ่มรายการสินค้า
-          </button>
+        <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md">
+          <div className="flex space-x-8 justify-between">
+            <button
+              className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
+              onClick={handleSuccess}
+            >
+              ย้อนกลับ
+            </button>
+            <button
+              className="px-14 py-4 w-[300px] rounded-full bg-[#DD9F52] text-white hover:bg-[#C68A47] transition-colors font-bold"
+              onClick={handleAddProduct}
+            >
+              เพิ่มรายการสินค้า
+            </button>
+          </div>
         </div>
       </div>
 
