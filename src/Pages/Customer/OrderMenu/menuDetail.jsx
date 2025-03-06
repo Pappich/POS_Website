@@ -219,7 +219,7 @@ const MenuDetail = () => {
                       : ""
                   }`}
                 >
-                  {type.type_name}
+                  {type.type_name} +{type.price_difference} บาท
                 </button>
               ))}
             </div>
@@ -265,7 +265,7 @@ const MenuDetail = () => {
                       : ""
                   }`}
                 >
-                  {size.size_name}
+                  {size.size_name} +{size.size_price} บาท
                 </button>
               ))}
             </div>
@@ -286,7 +286,7 @@ const MenuDetail = () => {
                       : ""
                   }`}
                 >
-                  {addOn.ingredient_name}
+                  {addOn.ingredient_name} +{addOn.add_on_price} บาท
                 </button>
               ))}
             </div>

@@ -1,12 +1,17 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import configureAPI from "../../../Config/configureAPI";
 import fetchApi from "../../../Config/fetchApi";
+import { clearCart } from "../../../Config/redux/cartSlice";
+import { useDispatch } from "react-redux";
 
 const QueueSummary = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const [queueSummary, setQueueSummary] = useState([]);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchQueueSummary = async () => {
@@ -21,7 +26,16 @@ const QueueSummary = () => {
     };
 
     fetchQueueSummary();
-  }, [URL]);
+
+    // Set timeout to navigate after 5 seconds
+    const timer = setTimeout(() => {
+      navigate("/menu");
+      dispatch(clearCart());
+    }, 5000);
+
+    // Cleanup timer on component unmount
+    return () => clearTimeout(timer);
+  }, [URL, navigate]);
 
   return (
     <div className="w-full h-[800px] font-noto flex flex-col justify-center items-center">

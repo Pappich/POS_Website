@@ -176,6 +176,7 @@ const PaymentMethod = () => {
       };
       console.log("Sending WebSocket message:", message);
       socket.send(JSON.stringify(message));
+      navigate("/queue-summary");
     } else if (selectedPayment === "qr") {
       setShowPhoneDetect(true);
     }
@@ -211,10 +212,12 @@ const PaymentMethod = () => {
           })),
         },
       };
+      
       console.log("Sending WebSocket message:", message);
       socket.send(JSON.stringify(message));
+      navigate("/queue-summary");
     }
-  }, [selectedPayment, socket, total, items]);
+  }, [selectedPayment, socket, total, items, navigate]);
 
   return (
     <div className="h-screen-navbar">
