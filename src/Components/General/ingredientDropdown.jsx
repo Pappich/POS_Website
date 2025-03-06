@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Select from "react-select";
 import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
@@ -8,21 +8,22 @@ const IngredientDropdown = ({ value, onChange }) => {
   const URL = configureAPI[environment].URL;
 
   const [ingredients, setIngredients] = useState([]);
+  const [currentValue, setCurrentValue] = useState(null);
+  const [isCustomInput, setIsCustomInput] = useState(false);
 
-  console.log("Dropdown Value:", value); // For debugging
-
+  // Fetch ingredients once
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
         const response = await fetchApi(`${URL}/owner/ingredient`, "GET");
         const data = await response.json();
-        const formattedIngredients = data.map((ingredient) => ({
-          value: ingredient.ingredient_id,
-          label: ingredient.ingredient_name,
-          // Store the full ingredient data for reference
-          ingredient: ingredient
-        }));
-        setIngredients(formattedIngredients);
+        setIngredients(
+          data.map((ingredient) => ({
+            value: ingredient.ingredient_id,
+            label: ingredient.ingredient_name,
+            isFixed: true,
+          }))
+        );
       } catch (error) {
         console.error("Error fetching ingredients:", error);
       }
@@ -31,60 +32,111 @@ const IngredientDropdown = ({ value, onChange }) => {
     fetchIngredients();
   }, [URL]);
 
-  // Find the current value in ingredients array
-  const selectedValue = React.useMemo(() => {
-    if (!value) return null;
-    
-    // If value is an object with ingredient_name (from existing data)
-    if (typeof value === 'object' && value.ingredient_name) {
-      return {
-        value: value.ingredient_id,
-        label: value.ingredient_name
-      };
+  // Sync with external value
+  useEffect(() => {
+    if (value) {
+      const existingOption = ingredients.find((ing) => ing.label === value);
+      if (existingOption) {
+        setCurrentValue(existingOption);
+        setIsCustomInput(false);
+      } else {
+        setCurrentValue({
+          value: value,
+          label: value,
+          isFixed: false,
+        });
+        setIsCustomInput(true);
+      }
+    } else {
+      setCurrentValue(null);
+      setIsCustomInput(false);
     }
-    
-    // If value is an ID, find the matching ingredient
-    const found = ingredients.find(ing => ing.value === value);
-    if (found) return found;
-    
-    // If value is a string (name), create a temporary option
-    if (typeof value === 'string') {
-      return {
-        value: value,
-        label: value
-      };
-    }
-    
-    return null;
   }, [value, ingredients]);
 
+  const handleChange = useCallback(
+    (selected) => {
+      if (selected) {
+        const newValue = {
+          value: selected.isFixed ? selected.value : selected.label,
+          label: selected.label,
+          isFixed: selected.isFixed,
+        };
+        setCurrentValue(newValue);
+        setIsCustomInput(!selected.isFixed);
+        onChange(newValue.value, newValue.label);
+      } else {
+        setCurrentValue(null);
+        setIsCustomInput(false);
+        onChange("", "");
+      }
+    },
+    [onChange]
+  );
+
+  const handleInputChange = useCallback(
+    (newValue, { action }) => {
+      if (action === "input-change") {
+        // เช็คว่าค่าปัจจุบันมาจาก dropdown หรือไม่
+        const isFromDropdown = ingredients.some(
+          (ing) => ing.value === currentValue?.value && currentValue?.isFixed
+        );
+
+        // ถ้าไม่ได้มาจาก dropdown ให้แก้ไขได้
+        if (!isFromDropdown) {
+          const customValue = {
+            value: newValue,
+            label: newValue,
+            isFixed: false,
+          };
+          setCurrentValue(customValue);
+          setIsCustomInput(true);
+          onChange(newValue, newValue);
+        }
+      }
+    },
+    [onChange, ingredients, currentValue]
+  );
+
+  const options = React.useMemo(
+    () => [
+      ...ingredients,
+      // เพิ่มตัวเลือกใหม่ถ้าเป็นการพิมพ์และไม่มีในรายการ
+      ...(currentValue?.label && 
+      !ingredients.some((ing) => ing.label === currentValue.label)
+        ? [{ 
+            value: currentValue.label, 
+            label: currentValue.label, 
+            isFixed: false 
+          }]
+        : []),
+    ],
+    [ingredients, currentValue]
+  );
+
   const customStyles = {
-    control: (provided, state) => ({
+    control: (provided) => ({
       ...provided,
-      border: "1px solid #DD9F52",
+      border: "1px solid #D4B28C",
       borderRadius: "30px",
       padding: "6px",
       color: "#4B5563",
-      fontSize: "2xl",
+      fontSize: "16px",
     }),
   };
 
   return (
     <Select
-      options={ingredients}
-      onChange={(selected) => onChange(selected?.value, selected?.label)}
-      value={selectedValue
-        ? selectedValue:null}
+      options={options}
+      onChange={handleChange}
+      value={currentValue}
+      onInputChange={handleInputChange}
+      isSearchable={true}
       isClearable
-      isSearchable
       placeholder="เลือกหรือพิมพ์ชื่อวัตถุดิบ..."
       styles={customStyles}
-      noOptionsMessage={() => "ไม่มีวัตถุดิบที่กำลังหา"}
-      onInputChange={(inputValue, { action }) => {
-        if (action === "input-change") {
-          onChange(inputValue, inputValue);
-        }
-      }}
+      noOptionsMessage={() => "พิมพ์เพื่อเพิ่มวัตถุดิบใหม่"}
+      menuPortalTarget={document.body}
+      menuPosition="fixed"
     />
   );
 };

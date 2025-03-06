@@ -1,14 +1,85 @@
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import fetchApi from "../../../../Config/fetchApi";
+import configureAPI from "../../../../Config/configureAPI";
+import { useSelector } from "react-redux";
+import { useState, useEffect } from "react";
 
 const ChoiceMenu = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { groupName, selectedMenus = [] } = location.state || {
-    groupName: "",
-    selectedMenus: [],
+  const environment = process.env.NODE_ENV || "development";
+  const URL = configureAPI[environment].URL;
+  const { groupName, groupType } = location.state || {};
+
+  const [menuData, setMenuData] = useState([]);
+  const [allMenus, setAllMenus] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  console.log("groupName", groupName);
+  console.log("groupType", groupType);
+
+  const getThaiGroupType = (engType) => {
+    const typeMap = {
+      ท็อปปิ้ง: "add-on",
+      ความหวาน: "sweetness",
+      ชนิด: "menu-type",
+      ขนาดแก้ว: "size",
+    };
+    return typeMap[engType] || engType;
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (groupType === "topping") {
+          const optionsResponse = await fetchApi(
+            `${URL}/owner/menus/options/add-on`,
+            "GET"
+          );
+          const optionsData = await optionsResponse.json();
+
+          // Fetch all menus to get menu names
+          const menusResponse = await fetchApi(`${URL}/owner/menus`, "GET");
+          const menusData = await menusResponse.json();
+          setAllMenus(menusData);
+
+          // Map menu_ids to menu names
+          const menuNames = optionsData.menu_id.map((id) => {
+            const menu = menusData.find((m) => m.menu_id === id);
+            return {
+              menu_id: id,
+              menu_name: menu?.menu_name || `เมนู ${id}`,
+            };
+          });
+
+          setMenuData(menuNames);
+          console.log("menuNames", menuData);
+        }
+        // กรณีอื่นๆ
+        else {
+          const response = await fetchApi(
+            `${URL}/owner/menus/options/${getThaiGroupType(
+              groupType
+            )}/${groupName}`,
+            "GET"
+          );
+          const data = await response.json();
+          setMenuData(data.menus || []);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (groupName && groupType) {
+      fetchData();
+    }
+  }, [URL, groupName, groupType]);
 
   const handleBack = () => {
     navigate("/choice-list");
@@ -38,14 +109,14 @@ const ChoiceMenu = () => {
             เมนูทั้งหมดที่ใช้ตัวเลือก
           </label>
           <div className="w-full grid grid-cols-3 gap-4 mb-8 mt-4">
-            {selectedMenus?.map((menu, index) => (
+            {menuData?.map((menu, index) => (
               <div key={index} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
                   checked={true}
                   className="form-checkbox h-5 w-5 accent-[#DD9F52]"
                 />
-                <span>{menu}</span>
+                <span>{menu.menu_name}</span>
               </div>
             ))}
           </div>

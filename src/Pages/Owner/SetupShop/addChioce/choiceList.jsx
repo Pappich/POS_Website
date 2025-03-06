@@ -218,11 +218,21 @@ const ChoiceList = () => {
     }
   };
 
+  const translateGroupType = (thaiType) => {
+    const typeMap = {
+      'ท็อปปิ้ง': 'topping',
+      'ความหวาน': 'sweetness',
+      'ความเย็น': 'temperature',
+      'ขนาดแก้ว': 'size'
+    };
+    return typeMap[thaiType] || thaiType;
+  };
+
   const handleMenuClick = (item) => {
     navigate("/choice-menu", {
       state: {
         groupName: item.name,
-        groupType: item.type,
+        groupType: translateGroupType(item.type),
       },
     });
   };

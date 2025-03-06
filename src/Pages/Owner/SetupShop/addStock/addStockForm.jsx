@@ -394,47 +394,52 @@ const AddStockForm = () => {
           </div>
 
           {/* Conditional Rendering */}
-          {rows.map((ingredient, index) => (
-            <div
-              key={ingredient.id}
-              className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
-            >
-              <div>
-                <IngredientDropdown
-                  value={ingredient.ingredientId || ingredient.ingredient_name}
-                  onChange={(value, label) =>
-                    handleInputChange(index, "ingredientId", value, label)
-                  }
-                />
-              </div>
-
-              <div>
-                <select
-                  value={ingredient.unit}
-                  onChange={(e) => {
-                    handleInputChange(index, "unit", e.target.value);
-                  }}
-                  className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+          {rows.map(
+            (ingredient, index) => (
+              console.log("ingredient JA:", ingredient),
+              (
+                <div
+                  key={ingredient.id}
+                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4 w-full items-center"
                 >
-                  <option value="">เลือกหน่วย</option>
-                  {unitOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div>
+                    <IngredientDropdown
+                      value={ingredient.material}
+                      onChange={(value, label) =>
+                        handleInputChange(index, "ingredientId", value, label)
+                      }
+                    />
+                  </div>
 
-              <div>
-                <button
-                  onClick={() => removeChoice(ingredient.id)}
-                  className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
-                >
-                  <AiOutlineDelete size={36} />
-                </button>
-              </div>
-            </div>
-          ))}
+                  <div>
+                    <select
+                      value={ingredient.unit}
+                      onChange={(e) => {
+                        handleInputChange(index, "unit", e.target.value);
+                      }}
+                      className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
+                    >
+                      <option value="">เลือกหน่วย</option>
+                      {unitOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <button
+                      onClick={() => removeChoice(ingredient.id)}
+                      className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
+                    >
+                      <AiOutlineDelete size={36} />
+                    </button>
+                  </div>
+                </div>
+              )
+            )
+          )}
 
           {/* Button to add new row */}
           <button

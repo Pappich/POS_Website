@@ -266,7 +266,7 @@ const Order = () => {
           <>
             <div className="bg-white flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
               <h1 className="flex items-center justify-center font-bold w-full rounded-full py-2 px-4 text-3xl">
-                ออเดอร์คิวที่ {orders[0]?.order_id}
+                ออเดอร์คิวที่ {orders[0]?.queue_number}
               </h1>
 
               <div className="flex justify-between items-center mt-2">
@@ -295,7 +295,7 @@ const Order = () => {
               </div>
               <div className="flex-grow">
                 {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
-                  <div className="h-[150px] overflow-y-auto mt-4">
+                  <div className="h-[250px] overflow-y-auto mt-4">
                     {orders[0].order_items.map(
                       (item, idx) => (
                         console.log("ITEM IN MAP:", item),
@@ -415,7 +415,7 @@ const Order = () => {
                     >
                       <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
                         <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-2xl">
-                          ออเดอร์คิวที่ {order?.order_id}
+                          ออเดอร์คิวที่ {order?.queue_number}
                         </h1>
 
                         <div className="flex justify-between items-center">

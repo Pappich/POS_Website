@@ -3,11 +3,12 @@ import "react-simple-keyboard/build/css/index.css";
 import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
+import { useWebSocket } from "../../webSocketContext";
 
 const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   const [cashReceived, setCashReceived] = useState("");
   const [change, setChange] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const socket = useWebSocket();
 
   useEffect(() => {
     if (cashReceived) {
@@ -19,14 +20,19 @@ const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   }, [cashReceived, totalAmount]);
 
   const handleConfirm = () => {
-    if (parseFloat(cashReceived) < totalAmount) {
-      alert("จำนวนเงินที่รับมาไม่เพียงพอ");
-      return;
+    if (socket) {
+      // Send confirmation message through WebSocket
+      const message = {
+        type: "CONFIRM_CASH_PAYMENT",
+        data: {
+          cashReceived: parseFloat(cashReceived),
+          change: change,
+        },
+      };
+      socket.send(JSON.stringify(message));
     }
-    onConfirm({
-      cashReceived: parseFloat(cashReceived),
-      change: change,
-    });
+    onConfirm({ cashReceived: parseFloat(cashReceived), change });
+    onClose();
   };
 
   if (!isOpen) return null;

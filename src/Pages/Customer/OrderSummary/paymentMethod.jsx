@@ -176,7 +176,6 @@ const PaymentMethod = () => {
       };
       console.log("Sending WebSocket message:", message);
       socket.send(JSON.stringify(message));
-      navigate("/queue-summary");
     } else if (selectedPayment === "qr") {
       setShowPhoneDetect(true);
     }
@@ -212,12 +211,38 @@ const PaymentMethod = () => {
           })),
         },
       };
-      
+
       console.log("Sending WebSocket message:", message);
       socket.send(JSON.stringify(message));
-      navigate("/queue-summary");
     }
-  }, [selectedPayment, socket, total, items, navigate]);
+  }, [selectedPayment, socket, total, items]);
+
+  useEffect(() => {
+    if (socket) {
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+
+          console.log("PaymentMethod received message:", messageData);
+
+          if (messageData.type === "CONFIRM_CASH_PAYMENT") {
+            navigate("/queue-summary");
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
+        }
+      };
+
+      socket.addEventListener("message", messageHandler);
+      return () => socket.removeEventListener("message", messageHandler);
+    }
+  }, [socket, navigate]);
 
   return (
     <div className="h-screen-navbar">
