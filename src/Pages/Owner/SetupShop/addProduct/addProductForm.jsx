@@ -162,8 +162,7 @@ const AddProductForm = () => {
     }
   };
 
-  const handlePriceChange = (e) => {
-    const value = e.target.value;
+  const handlePriceChange = (value) => {
     if (/^\d*\.?\d*$/.test(value)) {
       setProductPrice(value);
       setPriceError("");
