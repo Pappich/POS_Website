@@ -29,9 +29,9 @@ const SideBar = ({ menuTab }) => {
   return (
     <div>
       <nav className="border-b border-[#2C586E] mb-4 dark:bg-[#2C586E] shadow-md w-full">
-        <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8 bg-[#2C586E]">
+        <div className="flex items-center justify-between mx-auto p-4 bg-[#2C586E]">
           {/* Shop logo */}
-          <a className="flex items-center space-y-2">
+          <a className="flex items-center space-y-2 ml-8">
             <svg
               width="60"
               height="48"
@@ -67,7 +67,7 @@ const SideBar = ({ menuTab }) => {
           </a>
 
           {/* menu list */}
-          <div className="flex items-center space-x-6 w-auto text-white">
+          <div className="flex items-center space-x-6 w-auto text-white mr-8">
             {/* home */}
             <button
               onClick={() => navigate("/role")}

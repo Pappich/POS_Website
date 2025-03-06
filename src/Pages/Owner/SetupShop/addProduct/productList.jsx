@@ -102,7 +102,7 @@ const ProductList = () => {
           </div>
         </div>
 
-        <div className="w-full flex-1 pr-4">
+        <div className="w-full overflow-y-auto pb-32 pr-4">
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <div key={item.menu_id} className="w-full mb-4">
@@ -132,7 +132,7 @@ const ProductList = () => {
           )}
         </div>
 
-        <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md">
+        <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md flex justify-between">
           <div className="flex space-x-8 justify-between">
             <button
               className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"

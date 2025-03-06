@@ -286,6 +286,16 @@ const GlassChoice = () => {
     setChoices((prev) => prev.filter((_, i) => i !== index));
   };
 
+  useEffect(() => {
+    if (menuData?.categories) {
+      const defaultExpanded = menuData.categories.reduce((acc, category) => {
+        acc[category.id] = true; // Set each category to expanded
+        return acc;
+      }, {});
+      setExpandedGroups(defaultExpanded);
+    }
+  }, [menuData]);
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -409,107 +419,112 @@ const GlassChoice = () => {
             </label>
 
             {/* Render categorized menus */}
-            {menuData.categories
-              .filter((category) =>
-                category.menus.some((menu) =>
-                  menu.menu_name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
+            {/* Scrollable menu categories container */}
+            <div className="w-full flex-1 overflow-y-auto pr-4 pb-32">
+              {menuData.categories
+                .filter((category) =>
+                  category.menus.some((menu) =>
+                    menu.menu_name
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase())
+                  )
                 )
-              )
-              .map((category) => (
-                <div
-                  className="w-full flex justify-start mt-2"
-                  key={category.id}
-                >
-                  <div className="w-full mb-8">
-                    <div
-                      className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
-                      onClick={() => toggleGroup(category.id)}
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={category.menus.every((menu) =>
-                            selectedMenus.includes(menu.menu_id)
-                          )}
-                          onChange={() => handleSelectAllInGroup(category)}
-                          className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        <span className="font-bold text-2xl">
-                          {category.name}
-                        </span>
-                      </div>
-                      <button className="ml-auto focus:outline-none">
-                        {expandedGroups[category.id] ? (
-                          <FaChevronUp className="text-[#DD9F52]" />
-                        ) : (
-                          <FaChevronDown className="text-[#DD9F52]" />
-                        )}
-                      </button>
-                    </div>
-
-                    {expandedGroups[category.id] && (
-                      <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                        {category.menus
-                          .filter((menu) =>
-                            menu.menu_name
-                              .toLowerCase()
-                              .includes(searchTerm.toLowerCase())
-                          )
-                          .map((menu) => (
-                            <label
-                              key={menu.menu_id}
-                              className="flex items-center space-x-2"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={selectedMenus.includes(menu.menu_id)}
-                                onChange={() => handleSelectMenu(menu.menu_id)}
-                                className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                              />
-                              <span>{menu.menu_name}</span>
-                            </label>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-            {/* Render uncategorized menus */}
-            {menuData.menus.length > 0 && (
-              <div className="w-full flex justify-start mt-2">
-                <div className="w-full mb-8">
-                  <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full">
-                    <span className="font-bold text-2xl">เมนูอื่นๆ</span>
-                  </div>
-                  <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                    {menuData.menus
-                      .filter((menu) =>
-                        menu.menu_name
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase())
-                      )
-                      .map((menu) => (
-                        <label
-                          key={menu.menu_id}
-                          className="flex items-center space-x-2"
-                        >
+                .map((category) => (
+                  <div
+                    className="w-full flex justify-start mt-2"
+                    key={category.id}
+                  >
+                    <div className="w-full mb-4">
+                      <div
+                        className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-full cursor-pointer"
+                        onClick={() => toggleGroup(category.id)}
+                      >
+                        <div className="flex items-center">
                           <input
                             type="checkbox"
-                            checked={selectedMenus.includes(menu.menu_id)}
-                            onChange={() => handleSelectMenu(menu.menu_id)}
-                            className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                            checked={category.menus.every((menu) =>
+                              selectedMenus.includes(menu.menu_id)
+                            )}
+                            onChange={() => handleSelectAllInGroup(category)}
+                            className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
+                            onClick={(e) => e.stopPropagation()}
                           />
-                          <span>{menu.menu_name}</span>
-                        </label>
-                      ))}
+                          <span className="font-bold text-2xl">
+                            {category.name}
+                          </span>
+                        </div>
+                        <button className="ml-auto focus:outline-none">
+                          {expandedGroups[category.id] ? (
+                            <FaChevronUp className="text-[#DD9F52]" />
+                          ) : (
+                            <FaChevronDown className="text-[#DD9F52]" />
+                          )}
+                        </button>
+                      </div>
+
+                      {expandedGroups[category.id] && (
+                        <div className="ml-8 grid grid-cols-4 gap-4 mt-2 max-h-[200px] overflow-y-auto">
+                          {category.menus
+                            .filter((menu) =>
+                              menu.menu_name
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase())
+                            )
+                            .map((menu) => (
+                              <label
+                                key={menu.menu_id}
+                                className="flex items-center space-x-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedMenus.includes(menu.menu_id)}
+                                  onChange={() =>
+                                    handleSelectMenu(menu.menu_id)
+                                  }
+                                  className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                                />
+                                <span>{menu.menu_name}</span>
+                              </label>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+              {/* Uncategorized menus section */}
+              {menuData.menus.length > 0 && (
+                <div className="w-full flex justify-start mt-2">
+                  <div className="w-full mb-4">
+                    <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-full">
+                      <span className="font-bold text-2xl">เมนูอื่นๆ</span>
+                    </div>
+                    <div className="ml-8 grid grid-cols-4 gap-4 mt-2 max-h-[200px] overflow-y-auto">
+                      {menuData.menus
+                        .filter((menu) =>
+                          menu.menu_name
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                        )
+                        .map((menu) => (
+                          <label
+                            key={menu.menu_id}
+                            className="flex items-center space-x-2"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedMenus.includes(menu.menu_id)}
+                              onChange={() => handleSelectMenu(menu.menu_id)}
+                              className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                            />
+                            <span>{menu.menu_name}</span>
+                          </label>
+                        ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {errors.menuSelection && (
               <div className="text-[#C94C4C] text-sm mt-2">
@@ -587,7 +602,7 @@ const GlassChoice = () => {
       {renderStepContent()}
 
       {/* Buttons */}
-      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md">
+      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md flex justify-between">
         <button
           className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}

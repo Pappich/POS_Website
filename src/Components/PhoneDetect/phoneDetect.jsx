@@ -137,20 +137,22 @@ function PhoneDetect({ onCapture, socket }) {
                 frameRate: 12,
               }}
               style={{
+                transform: "rotate(90deg)",
                 marginLeft: "auto",
                 marginRight: "auto",
                 left: 0,
                 right: 0,
                 textAlign: "center",
                 zindex: 9,
-                width: 640,
-                height: 480,
+                width: 480,
+                height: 640,
               }}
             />
           )}
           <canvas
             ref={canvasRef}
             style={{
+              transform: "rotate(90deg)",
               position: "absolute",
               marginLeft: "auto",
               marginRight: "auto",
@@ -158,7 +160,6 @@ function PhoneDetect({ onCapture, socket }) {
               right: 0,
               textAlign: "center",
               zindex: 8,
-              width: 640,
               height: 480,
             }}
           />
@@ -190,8 +191,9 @@ function PhoneDetect({ onCapture, socket }) {
             src={capturedImage}
             alt="Captured phone"
             style={{
-              width: "640px",
-              height: "480px",
+              transform: "rotate(90deg)",
+              width: 480,
+              height: 640,
               objectFit: "contain",
             }}
           />

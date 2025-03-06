@@ -106,8 +106,8 @@ const StockList = () => {
         <h1 className="text-2xl font-bold">เมนูทั้งหมด</h1>
       </div>
 
-      <div className="w-full mb-8">
-        <div className="relative w-full">
+      <div className="w-full mb-8 bg-[#F5F5F5]">
+        <div className="relative w-full bg-[#F5F5F5]">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#DD9F52]" />
           <ThaiVirtualKeyboardInput
             placeholder="ค้นหาด้วยชื่อสินค้า..."
@@ -168,7 +168,7 @@ const StockList = () => {
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md">
+      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md flex justify-between">
         <button
           onClick={handleBack}
           className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"

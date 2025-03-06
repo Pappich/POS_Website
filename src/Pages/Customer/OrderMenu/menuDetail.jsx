@@ -121,7 +121,7 @@ const MenuDetail = () => {
     console.log("selectedMenuDetails:", selectedMenuDetails);
 
     dispatch(addToCart(selectedMenuDetails));
-    navigate("/summary");
+    navigate("/menu");
   };
 
   const handleSelection = (setter, value) => {

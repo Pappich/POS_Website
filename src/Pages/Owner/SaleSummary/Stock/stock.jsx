@@ -362,14 +362,14 @@ const Stock = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="my-4 relative flex">
+          <div className="my-4 relative flex bg-[#F5F5F5]">
             <div className="mr-5 flex items-center bg-[#F5F5F5] border-[#DD9F52] border rounded-full px-4 py-1 w-full">
               <FiSearch className="text-[#DD9F52] mr-2" size={36} />
               <ThaiVirtualKeyboardInput
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="ค้นหาสินค้า..."
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none bg-[#F5F5F5]"
               />
             </div>
             {/* เพิมรายการสินค้า */}

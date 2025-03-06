@@ -105,7 +105,7 @@ const CancelOrderButtonEm = ({ order, onSuccess }) => {
 
             <div className="flex justify-between space-x-4 mt-10">
               <button
-                className="w-full text-[#DD9F52] border border-[#DD9F52]   hover:bg-[#afafaf] hover:text-white font-bold py-2 px-4 rounded-full"
+                className="w-full rounded-full text-[#DD9F52] border border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                 onClick={closeModal}
               >
                 ยกเลิก

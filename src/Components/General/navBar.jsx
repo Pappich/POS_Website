@@ -16,7 +16,7 @@ const Navbar = () => {
 
   return (
     <nav className="border-b border-[#2C586E] mb-4 dark:bg-[#2C586E] shadow-md w-full">
-      <div className="flex items-center justify-between mx-auto p-4 mr-8 ml-8 bg-[#2C586E]">
+      <div className="flex items-center justify-between mx-auto p-4 bg-[#2C586E] ml-8">
         {/* Shop logo */}
         <a className="flex items-center space-y-2">
           <svg
@@ -47,7 +47,7 @@ const Navbar = () => {
         </a>
 
         {/* menu list */}
-        <div className="flex items-center space-x-6 w-auto">
+        <div className="flex items-center space-x-6 w-auto mr-8">
           <button
             onClick={() => navigate("/role")}
             className="flex p-2 text-white hover:text-[#C68A47] transition-all duration-300"

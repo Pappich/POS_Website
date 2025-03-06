@@ -217,7 +217,7 @@ const PaymentMethod = () => {
   }, [selectedPayment, socket, total, items]);
 
   return (
-    <div>
+    <div className="h-screen-navbar">
       <div className="flex justify-start items-center mb-6">
         <button onClick={handleBack}>
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />

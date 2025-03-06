@@ -298,45 +298,38 @@ const Order = () => {
                 <div>จำนวน</div>
               </div>
               <div className="flex-grow">
-                {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
+                {orders[0]?.order_items?.length > 0 ? (
                   <div className="h-[150px] overflow-y-auto mt-4">
-                    {orders[0].order_items.map(
-                      (item, idx) => (
-                        console.log("ITEM IN MAP:", item),
-                        (
-                          <div key={idx} className="mb-4">
-                            <div className="flex justify-between text-2xl">
-                              <div>
-                                {item?.menu_name?.menu_name ||
-                                  "ไม่ระบุชื่อเมนู"}
-                              </div>
-                              <div>{item?.menu_name?.quantity || 0}</div>
-                            </div>
-                            <span className="text-[#5B5B5B] text-xl">
-                              {item.details.length > 0 && (
-                                <>
-                                  ชนิด: {item.details[2]?.type_name || "-"} |
-                                  หวาน: {item.details[0]?.level_name || "-"} |
-                                  ขนาด: {item.details[1]?.size_name || "-"}
-                                </>
-                              )}
-                            </span>
+                    {orders[0].order_items.map((item, idx) => (
+                      <div key={idx} className="mb-4">
+                        <div className="flex justify-between text-2xl">
+                          <div>
+                            {item?.menu_name?.menu_name || "ไม่ระบุชื่อเมนู"}
                           </div>
-                        )
-                      )
-                    )}
+                          <div>{item?.menu_name?.quantity || 0}</div>
+                        </div>
+                        <span className="text-[#5B5B5B] text-xl">
+                          {item.details?.length > 0 && (
+                            <>
+                              ชนิด: {item.details[2]?.type_name || "-"} | หวาน:{" "}
+                              {item.details[0]?.level_name || "-"} | ขนาด:{" "}
+                              {item.details[1]?.size_name || "-"}
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <p className="text-center mt-4">ไม่มีสินค้าในคำสั่งซื้อ</p>
                 )}
               </div>
               <div className="space-y-2 w-full py-4 mt-auto">
-              <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
+                <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
                 <CancelOrderButtonEm
                   order={orders[0]}
                   onSuccess={fetchOrders}
                 />
-  
               </div>
             </div>
           </>
@@ -409,86 +402,85 @@ const Order = () => {
         {/* Order Cards */}
         <div className="overflow-x-auto">
           <div className="flex space-x-8">
-            {!isLoading && orders && orders.length > 1
-              ? orders
-                  .sort((a, b) => a.order_id - b.order_id)
-                  .slice(1)
-                  .map((order, index) => (
-                    <div
-                      key={index}
-                      className="min-w-[560px] bg-[#FFFFFF] rounded-2xl shadow-md ml-0.5 border border-gray-200"
-                    >
-                      <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
-                        <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-2xl">
-                          ออเดอร์คิวที่ {order?.order_id}
-                        </h1>
+            {!isLoading && orders && orders.length > 0 ? (
+              orders
+                .sort((a, b) => a.order_id - b.order_id)
+                .slice(1)
+                .map((order, index) => (
+                  <div
+                    key={index}
+                    className="min-w-[560px] bg-[#FFFFFF] rounded-2xl shadow-md ml-0.5 border border-gray-200"
+                  >
+                    <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
+                      <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-2xl">
+                        ออเดอร์คิวที่ {order?.order_id}
+                      </h1>
 
-                        <div className="flex justify-between items-center">
-                          <span>
-                            <FaRegClock className="text-[#DD9F52]" />
-                          </span>
-                          <span className="pl-1">{order.order_date} น.</span>
-                        </div>
-                      </div>
-                      <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
-                      <div className="pl-4 pr-4 pt-2">
-                        <span className="font-bold flex justify-center text-2xl">
-                          รายการคำสั่งซื้อ
+                      <div className="flex justify-between items-center">
+                        <span>
+                          <FaRegClock className="text-[#DD9F52]" />
                         </span>
-                        <div className="flex justify-between font-bold text-2xl">
-                          <div>รายการสินค้า</div>
-                          <div>จำนวน</div>
-                        </div>
-
-                        <div className="h-[530px] overflow-y-auto">
-                          {order?.order_items &&
-                          order.order_items.length > 0 ? (
-                            order.order_items.map(
-                              (item, idx) => (
-                                console.log("ITEM DATA IN MAP:", item),
-                                (
-                                  <div key={idx} className="mb-2">
-                                    <div className="flex justify-between text-2xl">
-                                      <div>
-                                        {item?.menu_name?.menu_name ||
-                                          "ไม่ระบุชื่อเมนู"}
-                                      </div>
-                                      <div>
-                                        {item?.menu_name?.quantity || 0}
-                                      </div>
-                                    </div>
-                                    <span className="text-[#5B5B5B] text-xl">
-                                      {item.details.length > 0 && (
-                                        <>
-                                          ชนิด:{" "}
-                                          {item.details[2]?.type_name || "-"} |
-                                          หวาน:{" "}
-                                          {item.details[0]?.level_name || "-"} |
-                                          ขนาด:{" "}
-                                          {item.details[1]?.size_name || "-"}
-                                        </>
-                                      )}
-                                    </span>
-                                  </div>
-                                )
-                              )
-                            )
-                          ) : (
-                            <p className="text-center mt-4">
-                              ไม่มีสินค้าในคำสั่งซื้อ
-                            </p>
-                          )}
-                        </div>
-                        <div className="space-y-2 w-full pt-2 pb-2">
-                          <CancelOrderButtonEm
-                            order={order}
-                            onSuccess={fetchOrders}
-                          />
-                        </div>
+                        <span className="pl-1">{order.order_date} น.</span>
                       </div>
                     </div>
-                  ))
-              : null}
+                    <hr className="mt-2 h-0.5 mx-4 bg-[#DD9F52] border-0" />
+                    <div className="pl-4 pr-4 pt-2">
+                      <span className="font-bold flex justify-center text-2xl">
+                        รายการคำสั่งซื้อ
+                      </span>
+                      <div className="flex justify-between font-bold text-2xl">
+                        <div>รายการสินค้า</div>
+                        <div>จำนวน</div>
+                      </div>
+
+                      <div className="h-[530px] overflow-y-auto">
+                        {order?.order_items && order.order_items.length > 0 ? (
+                          order.order_items.map(
+                            (item, idx) => (
+                              console.log("ITEM DATA IN MAP:", item),
+                              (
+                                <div key={idx} className="mb-2">
+                                  <div className="flex justify-between text-2xl">
+                                    <div>
+                                      {item?.menu_name?.menu_name ||
+                                        "ไม่ระบุชื่อเมนู"}
+                                    </div>
+                                    <div>{item?.menu_name?.quantity || 0}</div>
+                                  </div>
+                                  <span className="text-[#5B5B5B] text-xl">
+                                    {item.details.length > 0 && (
+                                      <>
+                                        ชนิด:{" "}
+                                        {item.details[2]?.type_name || "-"} |
+                                        หวาน:{" "}
+                                        {item.details[0]?.level_name || "-"} |
+                                        ขนาด:{" "}
+                                        {item.details[1]?.size_name || "-"}
+                                      </>
+                                    )}
+                                  </span>
+                                </div>
+                              )
+                            )
+                          )
+                        ) : (
+                          <p className="text-center mt-4">
+                            ไม่มีสินค้าในคำสั่งซื้อ
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2 w-full pt-2 pb-2">
+                        <CancelOrderButtonEm
+                          order={order}
+                          onSuccess={fetchOrders}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))
+            ) : (
+              <p className="text-center mt-4">ไม่มีสินค้าในคำสั่งซื้อ</p>
+            )}
           </div>
         </div>
       </div>

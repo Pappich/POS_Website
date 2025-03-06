@@ -182,14 +182,14 @@ const Summary = () => {
 
       {/* Order summary */}
       <div className="w-full fixed bottom-32 border-t border-gray-300 pt-4 text-2xl px-12">
-        <div className="flex justify-between mb-2 font-bold">
+        {/* <div className="flex justify-between mb-2 font-bold">
           <span>รวมเป็นเงิน</span>
           <span>{subtotal} บาท</span>
-        </div>
-        <div className="flex font-bold justify-between mb-2">
+        </div> */}
+        {/* <div className="flex font-bold justify-between mb-2">
           <span>ภาษีมูลค่าเพิ่ม 7%</span>
           <span>{tax} บาท</span>
-        </div>
+        </div> */}
         <div className="flex justify-between text-3xl font-bold">
           <span>รวมทั้งหมด</span>
           <span className="text-[#DD9F52]">{total} บาท</span>
