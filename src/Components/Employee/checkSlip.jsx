@@ -5,7 +5,7 @@ import fetchApi from "../../Config/fetchApi";
 import { useState } from "react";
 import LoadingPopup from "../General/loadingPopup";
 
-const CheckSlip = ({ imageUrl }) => {
+const CheckSlip = ({ imageUrl, onConfirm }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
@@ -23,7 +23,7 @@ const CheckSlip = ({ imageUrl }) => {
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      // แปลง base64 เป็น blob และอัพโหลดไป backend
+      // Convert base64 to blob and upload to backend
       const response = await fetch(imageUrl);
       const blob = await response.blob();
 
@@ -42,7 +42,7 @@ const CheckSlip = ({ imageUrl }) => {
 
       const uploadData = await uploadResponse.json();
 
-      // ส่ง path ที่ได้จาก backend กลับไป
+      // Send path back to backend
       if (socket) {
         const message = {
           type: "CONFIRM_SLIP",
@@ -50,6 +50,9 @@ const CheckSlip = ({ imageUrl }) => {
         };
         socket.send(JSON.stringify(message));
       }
+
+      // Call the onConfirm function passed from the parent
+      onConfirm(); // Trigger the fetch operation in order
     } catch (error) {
       console.error("Error handling slip confirmation:", error);
     } finally {

@@ -57,7 +57,10 @@ const Summary = () => {
     fetchMenuData();
   }, []);
 
-  const subtotal = items.reduce((acc, item) => acc + item.price, 0);
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
   const tax = 0;
   const total = subtotal + parseFloat(tax);
 
@@ -74,25 +77,42 @@ const Summary = () => {
     const orderDetails = {
       total,
       items,
-      selectedPayment, // Pass the items array if needed
+      selectedPayment,
     };
     console.log("orderDetails: ", orderDetails);
-
-    // Navigate to the payment method page with order details
     navigate("/payment-method", { state: { orderDetails } });
   };
 
   const handleRemove = (item) => {
-    console.log("ITEM TO DELETE:", item);
-    dispatch(
-      removeFromCart({
+    dispatch(removeFromCart(item));
+  };
+
+  const handleIncreaseQuantity = (item) => {
+    dispatch({
+      type: "cart/increaseQuantity",
+      payload: {
         menuId: item.menuId,
         selectedSize: item.selectedSize,
         selectedSweetness: item.selectedSweetness,
         selectedType: item.selectedType,
         selectedAddOn: item.selectedAddOn,
-      })
-    );
+      },
+    });
+  };
+
+  const handleDecreaseQuantity = (item) => {
+    if (item.quantity > 1) {
+      dispatch({
+        type: "cart/decreaseQuantity",
+        payload: {
+          menuId: item.menuId,
+          selectedSize: item.selectedSize,
+          selectedSweetness: item.selectedSweetness,
+          selectedType: item.selectedType,
+          selectedAddOn: item.selectedAddOn,
+        },
+      });
+    }
   };
 
   return (
@@ -161,8 +181,26 @@ const Summary = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="text-center px-4">{item.quantity}</td>
-                    <td className="text-center px-4">{item.price} บาท</td>
+                    <td className="text-center px-4">
+                      <div className="flex items-center justify-center space-x-4">
+                        <button
+                          onClick={() => handleDecreaseQuantity(item)}
+                          className="w-8 h-8 font-bold text-white bg-[#C94C4C] rounded-full flex items-center justify-center"
+                        >
+                          -
+                        </button>
+                        <div>{item.quantity}</div>
+                        <button
+                          onClick={() => handleIncreaseQuantity(item)}
+                          className="w-8 h-8 text-white bg-[#4B8455] rounded-full flex items-center justify-center"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                    <td className="text-center px-4">
+                      {item.price * item.quantity} บาท
+                    </td>
                     <td className="text-center justify-center px-4">
                       <button
                         onClick={() => handleRemove(item)}

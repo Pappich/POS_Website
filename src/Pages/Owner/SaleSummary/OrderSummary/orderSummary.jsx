@@ -6,6 +6,7 @@ import CalendarSelect from "../../../../Components/Owner/calendarSelect";
 import OrderAndCancelCard from "../../../../Components/Owner/orderAndCancelCard";
 import PaymentMethodFilter from "../../../../Components/Owner/paymentMethodFilter";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import CheckSlip from "../../../../Components/Employee/checkSlip";
 
 const OrderSummary = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -87,6 +88,11 @@ const OrderSummary = () => {
   const handleViewSlip = (slipUrl) => {
     setSelectedSlip(slipUrl);
     setSlipModalVisible(true);
+  };
+
+  const handleConfirmSlip = () => {
+    // Fetch order data again after confirming the slip
+    fetchOrderData();
   };
 
   // Add this function to close the slip modal
@@ -178,7 +184,6 @@ const OrderSummary = () => {
                 filteredOrders.map((item) => (
                   <tr
                     key={item.order_id}
-                    // onClick={() => alert("CLICKED!!!")}
                     className="cursor-pointer hover:bg-gray-100"
                   >
                     <td className="pr-5 text-center border-b border-[#F1F4F7]">

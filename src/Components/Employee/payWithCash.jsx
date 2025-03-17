@@ -8,6 +8,7 @@ import { useWebSocket } from "../../webSocketContext";
 const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   const [cashReceived, setCashReceived] = useState("");
   const [change, setChange] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
   const socket = useWebSocket();
 
   useEffect(() => {
@@ -20,6 +21,20 @@ const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   }, [cashReceived, totalAmount]);
 
   const handleConfirm = () => {
+    // Reset error message
+    setErrorMessage("");
+
+    // Validate cash received
+    if (!cashReceived) {
+      setErrorMessage("กรุณากรอกจำนวนเงินที่รับมา");
+      return;
+    }
+
+    if (parseFloat(cashReceived) < totalAmount) {
+      setErrorMessage("จำนวนเงินที่รับมาน้อยกว่าจำนวนเงินที่ลูกค้าต้องจ่าย");
+      return;
+    }
+
     if (socket) {
       // Send confirmation message through WebSocket
       const message = {
@@ -63,6 +78,11 @@ const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
             onChange={setCashReceived}
             className="w-full border border-[#DD9F52] rounded-full px-3 py-1.5 text-black focus:outline-none focus:ring-2 focus:ring-brown-400"
           />
+          {errorMessage && (
+            <p className="text-red-500 text-center text-sm mt-1">
+              {errorMessage}
+            </p>
+          )}
         </div>
 
         <div className="mb-6">

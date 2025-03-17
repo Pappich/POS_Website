@@ -39,55 +39,11 @@ const Order = () => {
   const [showPayWithCash, setShowPayWithCash] = useState(false);
   const [cashPaymentData, setCashPaymentData] = useState(null);
   const socket = useWebSocket();
-
-  useEffect(() => {
-    if (socket) {
-      console.log("Setting up WebSocket listener in Order page");
-
-      const messageHandler = async (event) => {
-        try {
-          let messageData;
-          if (event.data instanceof Blob) {
-            const text = await event.data.text();
-            messageData = JSON.parse(text);
-          } else {
-            messageData = JSON.parse(event.data);
-          }
-
-          console.log("Order page received message:", messageData);
-
-          switch (messageData.type) {
-            case "NEW_SLIP":
-              console.log("New slip received:", messageData.data);
-              if (messageData.data.startsWith("data:image")) {
-                setCheckSlipData(messageData.data);
-              }
-              break;
-
-            case "CONFIRM_SLIP":
-              setCheckSlipData(null);
-              break;
-
-            case "CASH_PAYMENT":
-              console.log("Cash payment received:", messageData.data);
-              setCashPaymentData(messageData.data);
-              setShowPayWithCash(true);
-              break;
-
-            default:
-              break;
-          }
-        } catch (error) {
-          console.error("Error in WebSocket message handler:", error);
-        }
-      };
-
-      socket.addEventListener("message", messageHandler);
-      return () => socket.removeEventListener("message", messageHandler);
-    }
-  }, [socket]);
+  const [slipModalVisible, setSlipModalVisible] = useState(false);
+  const [selectedSlip, setSelectedSlip] = useState(null);
 
   const fetchOrders = async () => {
+    setLoading(false);
     try {
       setIsLoading(true);
       const response = await fetchApi(`${URL}/employee/orders`, "GET");
@@ -131,8 +87,55 @@ const Order = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, [URL]);
+    if (socket) {
+      console.log("Setting up WebSocket listener in Order page");
+
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+
+          console.log("Order page received message:", messageData);
+
+          switch (messageData.type) {
+            case "NEW_SLIP":
+              console.log("New slip received:", messageData.data);
+              if (messageData.data.startsWith("data:image")) {
+                setCheckSlipData(messageData.data);
+              }
+              break;
+
+            case "CONFIRM_SLIP":
+              console.log("Slip confirmed, fetching orders again...");
+              setCheckSlipData(null);
+              setTimeout(() => {
+                fetchOrders();
+              }, 2000);
+              break;
+
+            case "CASH_PAYMENT":
+              console.log("Cash payment received:", messageData.data);
+              setCashPaymentData(messageData.data);
+              setShowPayWithCash(true);
+              break;
+
+            default:
+              break;
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
+        }
+      };
+
+      socket.addEventListener("message", messageHandler);
+      return () => socket.removeEventListener("message", messageHandler);
+    }
+  }, [socket]);
 
   const handlePaymentSuccess = async (paymentData) => {
     setLoading(true);
@@ -183,6 +186,9 @@ const Order = () => {
 
     setShowPayWithCash(false);
   };
+  useEffect(() => {
+    fetchOrders();
+  }, [URL, socket]);
 
   const handlePaymentCancel = async () => {
     setLoading(true);
@@ -241,6 +247,16 @@ const Order = () => {
       day: "numeric",
       timeZone: "Asia/Bangkok",
     });
+  };
+
+  const handleViewSlip = (slipUrl) => {
+    setSelectedSlip(slipUrl);
+    setSlipModalVisible(true);
+  };
+
+  const handleConfirmSlip = () => {
+    console.log("Confirm slip button clicked");
+    fetchOrders();
   };
 
   if (isLoading) {
@@ -487,7 +503,9 @@ const Order = () => {
           </div>
         </div>
       </div>
-      {checkSlipData && <CheckSlip imageUrl={checkSlipData} />}
+      {checkSlipData && (
+        <CheckSlip imageUrl={checkSlipData} onConfirm={handleConfirmSlip} />
+      )}
       <PayWithCash
         isOpen={showPayWithCash}
         onClose={() => setShowPayWithCash(false)}
