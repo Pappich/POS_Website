@@ -125,8 +125,8 @@ const PaymentMethod = () => {
             }
 
             const responseData = await response.json();
-            console.log("Order submitted successfully:", responseData);
-
+            // console.log("Order submitted successfully:", responseData);
+            socket.send(JSON.stringify({ type: "ORDER_SUBMITTED" })); //send to fetch order
             navigate("/queue-summary", {
               state: { orderData: responseData },
             });

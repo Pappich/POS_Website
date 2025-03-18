@@ -144,6 +144,7 @@ const EditOwnerProduct = () => {
           setCategoryOption(data.category_name || "");
         } else {
           console.error("No stock data available");
+          setProductData(data);
         }
       } catch (error) {
         console.error("Error fetching product data:", error);

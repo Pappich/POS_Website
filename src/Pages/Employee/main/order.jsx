@@ -117,17 +117,19 @@ const Order = () => {
               break;
 
             case "CONFIRM_SLIP":
-              console.log("Slip confirmed, fetching orders again...");
+              console.log("Slip confirmed, sending order...");
               setCheckSlipData(null);
-              setTimeout(() => {
-                fetchOrders();
-              }, 2000);
               break;
 
             case "CASH_PAYMENT":
               console.log("Cash payment received:", messageData.data);
               setCashPaymentData(messageData.data);
               setShowPayWithCash(true);
+              break;
+
+            case "ORDER_SUBMITTED":
+              console.log("Order submitted, fetching updated orders...");
+              await fetchOrders();
               break;
 
             default:

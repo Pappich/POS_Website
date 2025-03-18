@@ -4,10 +4,13 @@ import { PiShoppingCart } from "react-icons/pi";
 import { useSelector } from "react-redux";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
+import { useWebSocket } from "../../../webSocketContext";
 
 const Menu = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
+
+  const socket = useWebSocket();
 
   const userData = useSelector((state) => state.user.userData);
   const { owner_id } = userData || {};
@@ -25,21 +28,59 @@ const Menu = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
-  useEffect(() => {
-    fetchApi(`${URL}/customer/menus`, "GET")
-      .then((response) => response.json())
-      .then((data) => {
-        // Set categories from the fetched data
-        setMenuData({
-          categories: data.categories || [],
-        });
-      })
-      .catch((error) => {
-        console.error("Error fetching menu data:", error);
+  const fetchMenu = async () => {
+    try {
+      const response = await fetchApi(`${URL}/customer/menus`, "GET");
+      const data = await response.json();
+      setMenuData({
+        categories: data.categories || [],
       });
+    } catch (error) {
+      console.error("Error fetching menu data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMenu();
   }, [URL, owner_id, activeCategory]);
 
   console.log("Menu Data:", menuData);
+
+  useEffect(() => {
+    if (socket) {
+      console.log("Setting up WebSocket listener in Menu page");
+
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+
+          console.log("Menu page received message:", messageData);
+
+          switch (messageData.type) {
+            case "PAUSE_MENU":
+              await fetchMenu();
+              break;
+            default:
+              break;
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
+        }
+      };
+
+      socket.addEventListener("message", messageHandler);
+
+      return () => {
+        socket.removeEventListener("message", messageHandler);
+      };
+    }
+  }, [socket]);
 
   // Group menus by category, filtering out null or empty categories
   const groupedMenus = (categories || [])

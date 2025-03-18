@@ -10,12 +10,15 @@ import {
   FailPopup,
 } from "../../../Components/General/statusPopup";
 import LoadingPopup from "../../../Components/General/loadingPopup";
+import { useWebSocket } from "../../../webSocketContext";
 
 const PauseIngredient = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
   const navigate = useNavigate();
+  const socket = useWebSocket();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIngredientItems, setSelectedIngredientItems] = useState([]);
   const [filter, setFilter] = useState("ทั้งหมด");
@@ -114,6 +117,9 @@ const PauseIngredient = () => {
       setFailMessage("");
       setShowLoading(false);
       navigate("/pause-section");
+      if (socket) {
+        socket.send(JSON.stringify({ type: "PAUSE_MENU" }));
+      }
     } catch (error) {
       console.error("Error updating ingredients:", error);
       setShowLoading(true);

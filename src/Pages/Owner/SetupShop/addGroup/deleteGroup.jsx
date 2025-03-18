@@ -1,15 +1,20 @@
 import React from "react";
 import configureAPI from "../../../../Config/configureAPI";
 import fetchApi from "../../../../Config/fetchApi";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
+import { useState } from "react";
 
 const DeleteGroup = ({ isOpen, onClose, onConfirm, deleteCategory }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
+  const [loading, setLoading] = useState(false);
+
   if (!isOpen) return null;
 
   const handleDelete = async () => {
     try {
+      setLoading(true);
       const response = await fetchApi(
         `${URL}/owner/categories/${deleteCategory.category_id}`,
         "DELETE"
@@ -23,6 +28,8 @@ const DeleteGroup = ({ isOpen, onClose, onConfirm, deleteCategory }) => {
       }
     } catch (error) {
       console.error("An error occurred while deleting the category:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,6 +59,7 @@ const DeleteGroup = ({ isOpen, onClose, onConfirm, deleteCategory }) => {
           </button>
         </div>
       </div>
+      <LoadingPopup loadingStatus={loading} />
     </div>
   );
 };

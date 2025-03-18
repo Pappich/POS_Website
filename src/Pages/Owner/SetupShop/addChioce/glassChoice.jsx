@@ -115,6 +115,7 @@ const GlassChoice = () => {
 
     // case group name
     if (!groupName) {
+      valid = false;
       newErrors.groupName = "กรุณากรอกชื่อกลุ่ม";
     }
 
@@ -146,7 +147,6 @@ const GlassChoice = () => {
       newErrors.menuSelection = "";
     }
     console.log("ERROR:", errors);
-
     setErrors(newErrors);
 
     if (valid) {
@@ -318,7 +318,7 @@ const GlassChoice = () => {
               className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
             />
             {errors.groupName && (
-              <p className="text-[#C94C4C] text-sm mt-2">{errors.groupName}</p>
+              <p className="text-[#C94C4C] text-xl mt-2">{errors.groupName}</p>
             )}
           </>
         );
