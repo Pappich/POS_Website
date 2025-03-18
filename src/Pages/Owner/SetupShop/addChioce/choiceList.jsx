@@ -29,9 +29,9 @@ const ChoiceList = () => {
         `${URL}/owner/menus/options/groups`,
         "GET"
       );
-            const data = await response.json();
+      const data = await response.json();
       setGroupsData(data);
-      } catch (error) {
+    } catch (error) {
       console.error("Error fetching groups data:", error);
     }
   };
@@ -79,38 +79,38 @@ const ChoiceList = () => {
     const filteredItems = getFilteredItems(items, title);
     if (filteredItems.length === 0) return null;
 
-  return (
+    return (
       <div key={title} className="mb-8">
         <h2 className="text-2xl font-bold mb-4 text-[#DD9F52]">{title}</h2>
         {filteredItems.map((item, index) => (
-              <div key={index} className="w-full mb-4">
+          <div key={index} className="w-full mb-4">
             <div className="flex justify-between items-center">
               <p className="text-xl">{item.name}</p>
               <div className="flex items-center space-x-4 text-[#DD9F52] font-bold">
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleMenuClick(item)}
-                    >
-                      สินค้าที่ใช้ตัวเลือก
-                    </button>
-                    <span className="text-gray-300">|</span>
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleEditClick(item)}
-                    >
-                      แก้ไข
-                    </button>
-                    <span className="text-gray-300">|</span>
-                    <button
-                      className="hover:underline font-bold"
-                      onClick={() => handleDeleteClick(item)}
-                    >
-                      ลบ
-                    </button>
-                  </div>
-                </div>
-                <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
+                <button
+                  className="hover:underline font-bold"
+                  onClick={() => handleMenuClick(item)}
+                >
+                  สินค้าที่ใช้ตัวเลือก
+                </button>
+                <span className="text-gray-300">|</span>
+                <button
+                  className="hover:underline font-bold"
+                  onClick={() => handleEditClick(item)}
+                >
+                  แก้ไข
+                </button>
+                <span className="text-gray-300">|</span>
+                <button
+                  className="hover:underline font-bold"
+                  onClick={() => handleDeleteClick(item)}
+                >
+                  ลบ
+                </button>
               </div>
+            </div>
+            <div className="w-full h-[1px] bg-gray-300 mt-2"></div>
+          </div>
         ))}
       </div>
     );
@@ -220,10 +220,10 @@ const ChoiceList = () => {
 
   const translateGroupType = (thaiType) => {
     const typeMap = {
-      'ท็อปปิ้ง': 'topping',
-      'ความหวาน': 'sweetness',
-      'ความเย็น': 'temperature',
-      'ขนาดแก้ว': 'size'
+      ท็อปปิ้ง: "topping",
+      ความหวาน: "sweetness",
+      ความเย็น: "temperature",
+      ขนาดแก้ว: "size",
     };
     return typeMap[thaiType] || thaiType;
   };

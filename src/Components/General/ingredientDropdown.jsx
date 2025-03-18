@@ -101,13 +101,15 @@ const IngredientDropdown = ({ value, onChange }) => {
     () => [
       ...ingredients,
       // เพิ่มตัวเลือกใหม่ถ้าเป็นการพิมพ์และไม่มีในรายการ
-      ...(currentValue?.label && 
+      ...(currentValue?.label &&
       !ingredients.some((ing) => ing.label === currentValue.label)
-        ? [{ 
-            value: currentValue.label, 
-            label: currentValue.label, 
-            isFixed: false 
-          }]
+        ? [
+            {
+              value: currentValue.label,
+              label: currentValue.label,
+              isFixed: false,
+            },
+          ]
         : []),
     ],
     [ingredients, currentValue]

@@ -129,11 +129,12 @@ const CancelOrderSummary = () => {
   };
 
   // Filter orders based on payment method
-  const filteredOrders = cancelOrderData ? 
-    cancelOrderData.filter(order => {
-      if (!paymentFilter) return true;
-      return order.payment_method === paymentFilter;
-    }) : [];
+  const filteredOrders = cancelOrderData
+    ? cancelOrderData.filter((order) => {
+        if (!paymentFilter) return true;
+        return order.payment_method === paymentFilter;
+      })
+    : [];
 
   return (
     <div className="h-screen-website bg-[#F5F5F5]">

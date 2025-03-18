@@ -158,6 +158,10 @@ const Stock = () => {
     }
   };
 
+  const handleEditIngredient = (ingredientId) => {
+    navigate(`/edit-owner-product?id=${ingredientId}`);
+  };
+
   // Fetch product details when clicking อัปเดต button
   const handleUpdate = async (updateId) => {
     console.log("Update ID", updateId);
@@ -404,6 +408,9 @@ const Stock = () => {
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
                     อัปเดต
                   </th>
+                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
+                    แก้ไข
+                  </th>
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]"></th>
                 </tr>
               </thead>
@@ -441,10 +448,21 @@ const Stock = () => {
                         อัปเดต
                       </button>
                     </td>
+                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditIngredient(item.ingredient_id);
+                        }}
+                        className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
+                      >
+                        แก้ไข
+                      </button>
+                    </td>
                     <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7] flex justify-center">
                       <button
                         onClick={(event) => {
-                          event.stopPropagation(); // Prevent the row click event
+                          event.stopPropagation();
                           setIngredientToDelete(item);
                           setDeleteModalOpen(true);
                         }}

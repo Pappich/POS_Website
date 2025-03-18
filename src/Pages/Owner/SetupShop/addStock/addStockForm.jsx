@@ -32,6 +32,11 @@ const AddStockForm = () => {
   const [filterIngredientData, setFilterIngredientData] = useState([]);
   const [menuIngredientDataSet, setMenuIngredientDataSet] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    material: "",
+    unit: "",
+    quantity: "",
+  });
 
   // List options
   const unitOptions = [
@@ -287,9 +292,66 @@ const AddStockForm = () => {
     }
   }, [URL, menu_id]);
 
-  // แก้ไข handleNext สำหรับการ POST ข้อมูล
+  // Validate inputs for Step 1
+  const validateStep1 = () => {
+    let valid = true;
+    const newErrors = { material: "", unit: "", quantity: "" };
+
+    rows.forEach((row, index) => {
+      if (!row.material) {
+        newErrors.material = "กรุณากรอกข้อมูลวัตถุดิบ";
+        valid = false;
+      }
+      if (!row.unit) {
+        newErrors.unit = "กรุณาเลือกหน่วย";
+        valid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return valid;
+  };
+
   const handleNext = async () => {
-    if (step === 3) {
+    if (step === 1) {
+      if (validateStep1()) {
+        setStep(step + 1);
+      }
+    } else if (step === 2) {
+      let allQuantitiesValid = true;
+      const newErrors = {}; // Initialize the newErrors object
+
+      rows.forEach((row, rowIndex) => {
+        sizeItems.forEach((size) => {
+          typeItems.forEach((type) => {
+            const quantity_used = parseFloat(
+              typeData[selectedType]?.[rowIndex]?.[size.size_id] || 0
+            );
+
+            // Ensure the structure of newErrors[selectedType][rowIndex]
+            if (!newErrors[selectedType]) {
+              newErrors[selectedType] = {}; // Initialize selectedType if not exists
+            }
+            if (!newErrors[selectedType][rowIndex]) {
+              newErrors[selectedType][rowIndex] = {}; // Initialize rowIndex if not exists
+            }
+
+            // Validate quantity_used
+            if (isNaN(quantity_used) || quantity_used < 0) {
+              newErrors[selectedType][rowIndex][size.size_id] =
+                "กรุณากรอกข้อมูลเป็นตัวเลข";
+              allQuantitiesValid = false;
+            }
+          });
+        });
+      });
+
+      setErrors(newErrors); // Update errors state with new errors
+
+      if (allQuantitiesValid) {
+        setStep(step + 1);
+      }
+    } else if (step === 3) {
       setLoading(true);
       try {
         const requestData = {
@@ -327,8 +389,6 @@ const AddStockForm = () => {
       } finally {
         setLoading(false);
       }
-    } else {
-      setStep(step + 1);
     }
   };
 
@@ -409,6 +469,9 @@ const AddStockForm = () => {
                         handleInputChange(index, "ingredientId", value, label)
                       }
                     />
+                    {errors.material && (
+                      <p className="text-red-500">{errors.material}</p>
+                    )}
                   </div>
 
                   <div>
@@ -426,6 +489,9 @@ const AddStockForm = () => {
                         </option>
                       ))}
                     </select>
+                    {errors.unit && (
+                      <p className="text-red-500">{errors.unit}</p>
+                    )}
                   </div>
 
                   <div>
@@ -535,6 +601,11 @@ const AddStockForm = () => {
                           className="w-full border rounded p-2"
                           placeholder="กรอกข้อมูล"
                         />
+                        {errors[selectedType]?.[index]?.[size.size_id] && (
+                          <p className="text-red-500">
+                            {errors[selectedType][index][size.size_id]}
+                          </p>
+                        )}
                       </td>
                     );
                   })}
