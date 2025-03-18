@@ -19,8 +19,18 @@ const CancelOrderSummary = () => {
   const [cancelOrderData, setCancelOrderData] = useState([]);
   const [paymentFilter, setPaymentFilter] = useState("");
 
+
+  const today = new Date();
+  const options = {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  const formattedDate = today.toLocaleDateString("en-CA", options);
+  const [selectedDate, setSelectedDate] = useState(formattedDate);
   useEffect(() => {
-    const fetchOrderData = async () => {
+    const fetchOrderData = async (selectedDate) => {
       try {
         const response = await fetchApi(
           `${URL}/owner/stock-cancel-orders`,
@@ -52,8 +62,8 @@ const CancelOrderSummary = () => {
       }
     };
 
-    fetchOrderData();
-  }, []);
+    fetchOrderData(selectedDate);
+  }, [selectedDate]);
 
   // fetch select order
   useEffect(() => {

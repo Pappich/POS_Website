@@ -25,13 +25,11 @@ const OrderSummary = () => {
     day: "2-digit",
   };
   const formattedDate = today.toLocaleDateString("en-CA", options); // Format as YYYY-MM-DD
-
   const [selectedDate, setSelectedDate] = useState(formattedDate);
 
   // Add these state variables
   const [slipModalVisible, setSlipModalVisible] = useState(false);
   const [selectedSlip, setSelectedSlip] = useState(null);
-
   const [paymentFilter, setPaymentFilter] = useState("");
 
   const handleTimeRangeClick = (timeRange) => {
@@ -39,7 +37,7 @@ const OrderSummary = () => {
   };
 
   // Function to fetch order data based on the selected date
-  const fetchOrderData = async () => {
+  const fetchOrderData = async (selectedDate) => {
     try {
       const response = await fetchApi(
         `${URL}/owner/stock-orders/${selectedDate}`
@@ -81,7 +79,7 @@ const OrderSummary = () => {
 
   // Fetch data when the component mounts or when the selected date changes
   useEffect(() => {
-    fetchOrderData();
+    fetchOrderData(selectedDate);
   }, [selectedDate]);
 
   // Add this function to handle viewing the slip

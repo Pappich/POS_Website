@@ -5,6 +5,11 @@ import HomeEmButton from "../../../Components/Employee/homeEmButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../../../Components/Common/ThaiVirtualKeyboardInput";
+import {
+  SuccessPopup,
+  FailPopup,
+} from "../../../Components/General/statusPopup";
+import LoadingPopup from "../../../Components/General/loadingPopup";
 
 const PauseIngredient = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -15,6 +20,10 @@ const PauseIngredient = () => {
   const [selectedIngredientItems, setSelectedIngredientItems] = useState([]);
   const [filter, setFilter] = useState("ทั้งหมด");
   const [ingredientItems, setIngredientItems] = useState([]);
+
+  const [showLoading, setShowLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [failMessage, setFailMessage] = useState("");
 
   useEffect(() => {
     const fetchIngredient = async () => {
@@ -86,6 +95,7 @@ const PauseIngredient = () => {
     console.log("payload", payload);
 
     try {
+      setShowLoading(true);
       const response = await fetchApi(
         `${URL}/employee/pause/ingredients`,
         "PATCH",
@@ -98,9 +108,18 @@ const PauseIngredient = () => {
 
       const data = await response.json();
       console.log("Ingredients updated successfully:", data);
+      setShowLoading(true);
       setSelectedIngredientItems([]);
+      setSuccessMessage("บันทึกข้อมูลเสร็จสิ้น");
+      setFailMessage("");
+      setShowLoading(false);
+      navigate("/pause-section");
     } catch (error) {
       console.error("Error updating ingredients:", error);
+      setShowLoading(true);
+      setFailMessage("ไม่สามารถบันทึกได้ กรุณาลองอีกครั้ง");
+      setSuccessMessage("");
+      setShowLoading(false);
     }
   };
 
@@ -237,6 +256,17 @@ const PauseIngredient = () => {
           บันทึก
         </button>
       </div>
+
+      {showLoading && <LoadingPopup loading={showLoading} />}
+      {successMessage && (
+        <SuccessPopup
+          message={successMessage}
+          onClose={() => setSuccessMessage("")}
+        />
+      )}
+      {failMessage && (
+        <FailPopup message={failMessage} onClose={() => setFailMessage("")} />
+      )}
     </div>
   );
 };
