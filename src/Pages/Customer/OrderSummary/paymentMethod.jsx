@@ -188,6 +188,7 @@ const PaymentMethod = () => {
       const message = {
         type: "NEW_SLIP",
         data: imageData,
+        total: total,
       };
       socket.send(JSON.stringify(message));
     }

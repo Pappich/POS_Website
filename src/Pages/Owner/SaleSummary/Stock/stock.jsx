@@ -399,6 +399,9 @@ const Stock = () => {
                   <th className="py-2 text-left border-b border-[#000000]">
                     รายการสินค้า
                   </th>
+                  <th className="py-2 text-center border-b border-[#000000]">
+                    ปริมาตรสุทธิต่อหน่วย
+                  </th>
                   <th className="px-1 py-2 border-b border-[#000000]">
                     จำนวนคงเหลือ
                   </th>
@@ -428,6 +431,9 @@ const Stock = () => {
                     </td>
                     <td className="py-2 break-words border-b border-[#F1F4F7]">
                       {item.ingredient_name}
+                    </td>
+                    <td className="py-2 border-b border-[#F1F4F7] text-center">
+                      {item.net_volume} {item.unit}
                     </td>
                     <td className="py-2 text-center border-b border-[#F1F4F7]">
                       {item.total_volume && item.net_volume

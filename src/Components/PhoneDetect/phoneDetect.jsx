@@ -75,6 +75,7 @@ function PhoneDetect({ onCapture, socket }) {
 
       // Make Detections
       const obj = await net.detect(video);
+      console.log("Detected objects:", obj);
       const cellPhoneDetections = obj.filter(
         (detection) => detection.class === "cell phone"
       );
@@ -117,6 +118,7 @@ function PhoneDetect({ onCapture, socket }) {
   useEffect(() => {
     const runCoco = async () => {
       const net = await cocossd.load();
+      console.log("Model loaded:", net);
       setInterval(() => {
         detect(net);
       }, 10);

@@ -5,11 +5,13 @@ import fetchApi from "../../Config/fetchApi";
 import { useState } from "react";
 import LoadingPopup from "../General/loadingPopup";
 
-const CheckSlip = ({ imageUrl, onConfirm }) => {
+const CheckSlip = ({ imageUrl, onConfirm, total }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
   const [loading, setLoading] = useState(false);
+
+  console.log("TOTAL:", total);
 
   const handleRetake = () => {
     if (socket) {
@@ -100,6 +102,18 @@ const CheckSlip = ({ imageUrl, onConfirm }) => {
           ตรวจสอบสลิปโอนเงิน
         </h2>
         <hr className="h-0.5 bg-[#DD9F52] border-0 mb-4" />
+
+        <div className="justify-between items-center grid grid-cols-2 gap-6 mb-4">
+          <span className="text-black text-left font-bold">
+            จำนวนเงินที่ลูกค้าต้องจ่าย
+          </span>
+          <div
+            id="order-id"
+            className="w-full py-2 px-3 bg-transparent text-black border border-[#DD9F52] rounded-full"
+          >
+            {total} บาท
+          </div>
+        </div>
 
         {/* แสดงรูป base64 โดยตรง */}
         {imageUrl ? (

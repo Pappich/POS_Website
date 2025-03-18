@@ -35,6 +35,7 @@ const Order = () => {
     completed_orders: 0,
   });
   const [checkSlipData, setCheckSlipData] = useState(null);
+  const [totalAmountSlipData, setTotalAmountSlipData] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showPayWithCash, setShowPayWithCash] = useState(false);
   const [cashPaymentData, setCashPaymentData] = useState(null);
@@ -101,10 +102,15 @@ const Order = () => {
           }
 
           console.log("Order page received message:", messageData);
+          //set total
+          if (messageData.total !== undefined) {
+            console.log("Setting total amount:", messageData.total);
+            setTotalAmountSlipData(messageData.total);
+          }
 
           switch (messageData.type) {
             case "NEW_SLIP":
-              console.log("New slip received:", messageData.data);
+              console.log("New slip received:", messageData);
               if (messageData.data.startsWith("data:image")) {
                 setCheckSlipData(messageData.data);
               }
@@ -504,7 +510,11 @@ const Order = () => {
         </div>
       </div>
       {checkSlipData && (
-        <CheckSlip imageUrl={checkSlipData} onConfirm={handleConfirmSlip} />
+        <CheckSlip
+          imageUrl={checkSlipData}
+          onConfirm={handleConfirmSlip}
+          total={totalAmountSlipData}
+        />
       )}
       <PayWithCash
         isOpen={showPayWithCash}
