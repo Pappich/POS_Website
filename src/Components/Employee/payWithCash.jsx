@@ -3,11 +3,13 @@ import "react-simple-keyboard/build/css/index.css";
 import fetchApi from "../../Config/fetchApi";
 import configureAPI from "../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
+import { useWebSocket } from "../../webSocketContext";
 
 const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   const [cashReceived, setCashReceived] = useState("");
   const [change, setChange] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const socket = useWebSocket();
 
   useEffect(() => {
     if (cashReceived) {
@@ -19,14 +21,33 @@ const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
   }, [cashReceived, totalAmount]);
 
   const handleConfirm = () => {
-    if (parseFloat(cashReceived) < totalAmount) {
-      alert("จำนวนเงินที่รับมาไม่เพียงพอ");
+    // Reset error message
+    setErrorMessage("");
+
+    // Validate cash received
+    if (!cashReceived) {
+      setErrorMessage("กรุณากรอกจำนวนเงินที่รับมา");
       return;
     }
-    onConfirm({
-      cashReceived: parseFloat(cashReceived),
-      change: change,
-    });
+
+    if (parseFloat(cashReceived) < totalAmount) {
+      setErrorMessage("จำนวนเงินที่รับมาน้อยกว่าจำนวนเงินที่ลูกค้าต้องจ่าย");
+      return;
+    }
+
+    if (socket) {
+      // Send confirmation message through WebSocket
+      const message = {
+        type: "CONFIRM_CASH_PAYMENT",
+        data: {
+          cashReceived: parseFloat(cashReceived),
+          change: change,
+        },
+      };
+      socket.send(JSON.stringify(message));
+    }
+    onConfirm({ cashReceived: parseFloat(cashReceived), change });
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -57,6 +78,11 @@ const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
             onChange={setCashReceived}
             className="w-full border border-[#DD9F52] rounded-full px-3 py-1.5 text-black focus:outline-none focus:ring-2 focus:ring-brown-400"
           />
+          {errorMessage && (
+            <p className="text-red-500 text-center text-sm mt-1">
+              {errorMessage}
+            </p>
+          )}
         </div>
 
         <div className="mb-6">
@@ -69,13 +95,13 @@ const PayWithCash = ({ isOpen, onClose, totalAmount, onConfirm, onCancel }) => {
           />
         </div>
 
-        <div className="flex justify-between">
-          <button
+        <div className="flex justify-end">
+          {/* <button
             onClick={onCancel}
             className="text-[#DD9F52] w-40 bg-[#F5F5F5] border border-[#DD9F52] hover:bg-[#DD9F52] hover:text-white rounded-full text-xl px-4 py-2"
           >
             ยกเลิก
-          </button>
+          </button> */}
           <button
             onClick={handleConfirm}
             className="w-40 bg-[#DD9F52] hover:bg-[#C68A47] text-white font-bold py-2 px-4 rounded-full"

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -48,10 +48,11 @@ import CreateAccount from "./Pages/Owner/SetupShop/createAccount";
 import Branch from "./Pages/Owner/SetupShop/branch";
 import WebSocket from "ws";
 import { WebSocketProvider } from "./webSocketContext";
+import EditOwnerProduct from "./Pages/Owner/SaleSummary/Stock/editOwnerProduct";
 
 function App() {
   return (
-    <div style={{ backgroundColor: '#F5F5F5' }}>
+    <div style={{ backgroundColor: "#F5F5F5" }}>
       <WebSocketProvider>
         <Router>
           <Routes>
@@ -78,6 +79,7 @@ function App() {
               path="/cancel-order-summary"
               element={<CancelOrderSummary />}
             />
+            <Route path="/edit-owner-product" element={<EditOwnerProduct />} />
 
             {/* Customer flow */}
             <Route element={<NavbarCustomerLayout />}>
@@ -118,7 +120,10 @@ function App() {
               <Route path="/glass-choice" element={<GlassChoice />} />
               <Route path="/topping-choice" element={<ToppingChoice />} />
               <Route path="/type-choice" element={<TypeChoice />} />
-              <Route path="/sweet-level-choice" element={<SweetLevelChoice />} />
+              <Route
+                path="/sweet-level-choice"
+                element={<SweetLevelChoice />}
+              />
               <Route path="/choice-menu" element={<ChoiceMenu />} />
 
               {/* Add stock flow */}

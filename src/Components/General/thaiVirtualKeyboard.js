@@ -18,10 +18,11 @@ const ThaiVirtualKeyboard = ({
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Check if click is outside both keyboard and input
-      const isClickOutsideKeyboard = keyboardContainerRef.current && 
+      const isClickOutsideKeyboard =
+        keyboardContainerRef.current &&
         !keyboardContainerRef.current.contains(event.target);
-      
-      const isClickOutsideInput = !event.target.closest('input');
+
+      const isClickOutsideInput = !event.target.closest("input");
 
       if (isClickOutsideKeyboard && isClickOutsideInput) {
         onClose();
@@ -59,18 +60,20 @@ const ThaiVirtualKeyboard = ({
 
   const thaiLayout = {
     default: [
-      "ๅ 1 2 3 4 5 6 7 8 9 0 - ภ {bksp}",
-      "{tab} ๆ ไ ำ พ ะ ั ี ร น ย บ ล {enter}",
-      "{shift} ฟ ห ก ด เ ้ ่ า ส ว ง {shift}",
-      "{alt} ผ ป แ อ ิ ื ท ม ใ ฝ {alt}",
-      "{space} {language}",
+      "_ ๅ / - ภ ถ ุ ึ ค ต จ ข ช {bksp}",
+      "{tab} ๆ ไ ำ พ ะ ั ี ร น ย บ ล ฃ",
+      "ฟ ห ก ด เ ้ ่ า ส ว ง {enter}",
+      "{shift} ผ ป แ อ ิ ื ท ม ใ ฝ {shift}",
+      "ฅ ฉ ฮ ษ ์ ศ ซ . , ผ {space}",
+      "{language}",
     ],
     shift: [
-      "+ ๑ ๒ ๓ ๔ ๕ ๖ ๗ ๘ ๙ ๐ ๊ ฎ {bksp}",
-      '{tab} ๐ " ฎ ฑ ธ ํ ๊ ณ ฯ ญ ฐ , {enter}',
-      "{shift} ฤ ฆ ฏ โ ฌ ็ ๋ ษ ศ ซ . {shift}",
-      "{alt} ( ) ฉ ฮ ฺ ์ ? ฒ ฬ ฦ {alt}",
-      "{space} {language}",
+      "% + ๑ ๒ ๓ ๔ ู ฿ ๕ ๖ ๗ ๘ ๙ {bksp}",
+      '{tab} ๐ " ฎ ฑ ธ ํ ๊ ณ ฯ ญ ฐ , ฅ',
+      "ฤ ฆ ฏ โ ฌ ็ ๋ ษ ศ ซ . {enter}",
+      "{shift} ( ) ฉ ฮ ฺ ์ ? ฒ ฬ ฦ {shift}",
+      "ฃ ฅ ฆ ฐ ? ฎ ฑ ฒ ณ ญ {space}",
+      "{language}",
     ],
   };
 
@@ -119,11 +122,11 @@ const ThaiVirtualKeyboard = ({
   };
 
   return (
-    <div className="virtual-keyboard-wrapper">
+    <div className="virtual-keyboard-wrapper font-noto ">
       <div className="keyboard-scroll-area" />{" "}
       {/* Adds scrollable space above keyboard */}
-      <div 
-        ref={keyboardContainerRef} 
+      <div
+        ref={keyboardContainerRef}
         className="virtual-keyboard-container"
         onMouseDown={(e) => e.stopPropagation()} // Prevent click from bubbling
       >
@@ -145,6 +148,7 @@ const ThaiVirtualKeyboard = ({
             {
               class: "special-key",
               buttons: "{bksp} {enter} {shift} {caps} {tab} {language}",
+              fontFamily: "Noto Sans Thai",
             },
           ]}
         />

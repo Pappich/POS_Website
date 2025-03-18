@@ -7,7 +7,6 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useLocation } from "react-router-dom";
-import IngredientDropdown from "../../../../Components/General/ingredientDropdown";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
 import LoadingPopup from "../../../../Components/General/loadingPopup";
 
@@ -124,6 +123,16 @@ const ToppingChoice = () => {
       setChoices([{ id: "", name: "", price: "", quantity: "", unit: "" }]);
     }
   }, [mode]);
+
+  useEffect(() => {
+    if (menuData?.categories) {
+      const defaultExpanded = menuData.categories.reduce((acc, category) => {
+        acc[category.id] = true; // Set each category to expanded
+        return acc;
+      }, {});
+      setExpandedGroups(defaultExpanded);
+    }
+  }, [menuData]);
 
   const handleNext = async () => {
     let valid = true;
@@ -354,7 +363,7 @@ const ToppingChoice = () => {
               {choices.map((choice, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-8 w-full items-center"
+                  className="grid grid-cols-[1fr_1fr_auto] gap-4 w-full items-center"
                 >
                   <div className="grid grid-cols-2 gap-4 w-full items-center">
                     <ThaiVirtualKeyboardInput
@@ -391,12 +400,12 @@ const ToppingChoice = () => {
                     }
                     className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                   />
-                 <button
-                  onClick={() => removeChoice(index)}
-                  className="flex items-center justify-center w-10 h-10 border border-[#C94C4C] text-[#C94C4C] rounded-full transition duration-200 hover:bg-[#C94C4C] hover:text-white"
-                >
-                  <span className="text-2xl">−</span>
-                </button>
+                  <button
+                    onClick={() => removeChoice(index)}
+                    className="flex items-center justify-center w-10 h-10 border border-[#C94C4C] text-[#C94C4C] rounded-full transition duration-200 hover:bg-[#C94C4C] hover:text-white"
+                  >
+                    <span className="text-2xl">−</span>
+                  </button>
                 </div>
               ))}
             </div>
@@ -442,8 +451,8 @@ const ToppingChoice = () => {
                     <ThaiVirtualKeyboardInput
                       placeholder="ยังไม่มีข้อมูล..."
                       value={choice.quantity}
-                      onChange={(e) =>
-                        handleChoiceChange(index, "quantity", e.target.value)
+                      onChange={(value) =>
+                        handleChoiceChange(index, "quantity", value)
                       }
                       className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     />
@@ -490,107 +499,112 @@ const ToppingChoice = () => {
               เมนูทั้งหมด
             </label>
 
-            {menuData.categories
-              .filter((category) =>
-                category.menus.some((menu) =>
-                  menu.menu_name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
+            {/* Scrollable menu categories container */}
+            <div className="w-full flex-1 overflow-y-auto pr-4 pb-32">
+              {menuData.categories
+                .filter((category) =>
+                  category.menus.some((menu) =>
+                    menu.menu_name
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase())
+                  )
                 )
-              )
-              .map((category) => (
-                <div
-                  className="w-full flex justify-start mt-2"
-                  key={category.id}
-                >
-                  <div className="w-full mb-8">
-                    <div
-                      className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full cursor-pointer"
-                      onClick={() => toggleGroup(category.id)}
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={category.menus.every((menu) =>
-                            selectedMenus.includes(menu.menu_id)
-                          )}
-                          onChange={() => handleSelectAllInGroup(category)}
-                          className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        <span className="font-bold text-2xl">
-                          {category.name}
-                        </span>
-                      </div>
-                      <button className="ml-auto focus:outline-none">
-                        {expandedGroups[category.id] ? (
-                          <FaChevronUp className="text-[#DD9F52]" />
-                        ) : (
-                          <FaChevronDown className="text-[#DD9F52]" />
-                        )}
-                      </button>
-                    </div>
-
-                    {expandedGroups[category.id] && (
-                      <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                        {category.menus
-                          .filter((menu) =>
-                            menu.menu_name
-                              .toLowerCase()
-                              .includes(searchTerm.toLowerCase())
-                          )
-                          .map((menu) => (
-                            <label
-                              key={menu.menu_id}
-                              className="flex items-center space-x-2"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={selectedMenus.includes(menu.menu_id)}
-                                onChange={() => handleSelectMenu(menu.menu_id)}
-                                className="form-checkbox h-5 w-5 accent-[#DD9F52]"
-                              />
-                              <span>{menu.menu_name}</span>
-                            </label>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-            {/* Render uncategorized menus */}
-            {menuData.menus.length > 0 && (
-              <div className="w-full flex justify-start mt-2">
-                <div className="w-full mb-8">
-                  <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-100 rounded-full">
-                    <span className="font-bold text-2xl">เมนูอื่นๆ</span>
-                  </div>
-                  <div className="ml-8 grid grid-cols-4 gap-4 mt-2">
-                    {menuData.menus
-                      .filter((menu) =>
-                        menu.menu_name
-                          .toLowerCase()
-                          .includes(searchTerm.toLowerCase())
-                      )
-                      .map((menu) => (
-                        <label
-                          key={menu.menu_id}
-                          className="flex items-center space-x-2"
-                        >
+                .map((category) => (
+                  <div
+                    className="w-full flex justify-start mt-2"
+                    key={category.id}
+                  >
+                    <div className="w-full mb-4">
+                      <div
+                        className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-full cursor-pointer"
+                        onClick={() => toggleGroup(category.id)}
+                      >
+                        <div className="flex items-center">
                           <input
                             type="checkbox"
-                            checked={selectedMenus.includes(menu.menu_id)}
-                            onChange={() => handleSelectMenu(menu.menu_id)}
-                            className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                            checked={category.menus.every((menu) =>
+                              selectedMenus.includes(menu.menu_id)
+                            )}
+                            onChange={() => handleSelectAllInGroup(category)}
+                            className="form-checkbox h-5 w-5 accent-[#DD9F52] mr-3"
+                            onClick={(e) => e.stopPropagation()}
                           />
-                          <span>{menu.menu_name}</span>
-                        </label>
-                      ))}
+                          <span className="font-bold text-2xl">
+                            {category.name}
+                          </span>
+                        </div>
+                        <button className="ml-auto focus:outline-none">
+                          {expandedGroups[category.id] ? (
+                            <FaChevronUp className="text-[#DD9F52]" />
+                          ) : (
+                            <FaChevronDown className="text-[#DD9F52]" />
+                          )}
+                        </button>
+                      </div>
+
+                      {expandedGroups[category.id] && (
+                        <div className="ml-8 grid grid-cols-4 gap-4 mt-2 max-h-[200px] overflow-y-auto">
+                          {category.menus
+                            .filter((menu) =>
+                              menu.menu_name
+                                .toLowerCase()
+                                .includes(searchTerm.toLowerCase())
+                            )
+                            .map((menu) => (
+                              <label
+                                key={menu.menu_id}
+                                className="flex items-center space-x-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedMenus.includes(menu.menu_id)}
+                                  onChange={() =>
+                                    handleSelectMenu(menu.menu_id)
+                                  }
+                                  className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                                />
+                                <span>{menu.menu_name}</span>
+                              </label>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+              {/* Uncategorized menus section */}
+              {menuData.menus.length > 0 && (
+                <div className="w-full flex justify-start mt-2">
+                  <div className="w-full mb-4">
+                    <div className="flex items-center justify-between w-full px-3 py-2 border border-gray-300 rounded-full">
+                      <span className="font-bold text-2xl">เมนูอื่นๆ</span>
+                    </div>
+                    <div className="ml-8 grid grid-cols-4 gap-4 mt-2 max-h-[200px] overflow-y-auto">
+                      {menuData.menus
+                        .filter((menu) =>
+                          menu.menu_name
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                        )
+                        .map((menu) => (
+                          <label
+                            key={menu.menu_id}
+                            className="flex items-center space-x-2"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedMenus.includes(menu.menu_id)}
+                              onChange={() => handleSelectMenu(menu.menu_id)}
+                              className="form-checkbox h-5 w-5 accent-[#DD9F52]"
+                            />
+                            <span>{menu.menu_name}</span>
+                          </label>
+                        ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {errors.menuSelection && (
               <div className="text-[#C94C4C] text-sm mt-2">
@@ -607,10 +621,61 @@ const ToppingChoice = () => {
               <span className="text-[#DD9F52] ml-2"> ท็อปปิ้ง</span>
             </div>
 
+            {/* GROUP DETAIL */}
+            <div className="w-full ml-16 mb-4">
+              <div className="w-full flex justify-start text-2xl font-bold">
+                ช้อยส์ในตัวเลือก
+              </div>
+
+              <div className="mb-4 w-full">
+                {/* Table Header */}
+                <div className="overflow-x-auto mr-16">
+                  <table className="w-full border-collapse border border-gray-200">
+                    <thead>
+                      <tr className="bg-[#DD9F52] bg-opacity-40">
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          ชื่อช้อยส์
+                        </th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          ส่วนต่างของราคาที่คิดเพิ่ม
+                        </th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          ปริมาณที่ใช้
+                        </th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          หน่วย
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Displaying all choices and their price differences */}
+                      {choices.map((choice, index) => (
+                        <tr key={index}>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            {choice.name}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            {choice.price} บาท
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            {choice.quantity}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            {choice.unit}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* select menu */}
             <div className="w-full ml-16">
               <label
                 htmlFor="selectedMenus"
-                className="text-xl w-full text-start font-bold"
+                className="text-2xl w-full text-start font-bold"
               >
                 เมนูทั้งหมดที่ใช้ในตัวเลือก
               </label>
@@ -665,7 +730,7 @@ const ToppingChoice = () => {
       {renderStepContent()}
 
       {/* Buttons */}
-      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
+      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md flex justify-between">
         <button
           className="px-14 py-4 w-[300px] border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
           onClick={handleBack}

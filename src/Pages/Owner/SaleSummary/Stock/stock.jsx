@@ -81,10 +81,14 @@ const Stock = () => {
       console.error("Error fetching ingredients:", error);
     }
   };
-  console.log("Ingredient: ", ingredients);
+
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+  };
 
   // Fetch categories when component mounts
   useEffect(() => {
@@ -106,7 +110,7 @@ const Stock = () => {
     };
 
     fetchCategories();
-  }, [URL]);
+  }, [handleCategoryChange]);
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
@@ -126,10 +130,6 @@ const Stock = () => {
     setSelectedProduct(null);
   };
 
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
-  };
-
   const filteredIngredients = ingredients.flatMap((category) => {
     if (
       selectedCategory === null ||
@@ -143,7 +143,6 @@ const Stock = () => {
     return [];
   });
 
-  console.log("Filter Ingredient", filteredIngredients);
   // Fetch ingredient history
   const handleShowHistory = async (ingredientId) => {
     try {
@@ -157,6 +156,10 @@ const Stock = () => {
     } catch (error) {
       console.error("Error fetching ingredient history:", error);
     }
+  };
+
+  const handleEditIngredient = (ingredientId) => {
+    navigate(`/edit-owner-product?id=${ingredientId}`);
   };
 
   // Fetch product details when clicking อัปเดต button
@@ -200,24 +203,21 @@ const Stock = () => {
   const handleUpdateSubmit = async () => {
     setLoading(true);
     try {
-      // ถ้าไม่มี update_id แสดงว่าเป็นการเพิ่มใหม่
+      // กรณีเพิ่มใหม่
       if (!selectedProduct.update_id) {
-        // ตรวจสอบว่ามีวันที่หรือไม่ ถ้าไม่มีให้ใช้วันที่ปัจจุบัน
-        const expDate =
-          updateFormData.expiration_date ||
-          new Date().toISOString().split("T")[0];
-
         const payload = {
           image_url: selectedProduct.image_url,
           ingredient_name: selectedProduct.ingredient_name,
           net_volume: parseInt(updateFormData.net_volume),
           unit: selectedProduct.unit,
           quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
-          category_name: selectedProduct.category_name,
-          expiration_date: updateFormData.expiration_date,
+          category_name: selectedProduct.category_name || "",
+          expiration_date:
+            updateFormData.expiration_date ||
+            new Date().toISOString().split("T")[0],
         };
 
-        console.log("payload POST", payload);
+        console.log("Sending POST payload:", payload);
 
         const response = await fetchApi(
           `${URL}/owner/create-stock-ingredients`,
@@ -226,12 +226,16 @@ const Stock = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to create product");
+          const errorData = await response.json();
+          throw new Error(
+            `Failed to create product: ${errorData.message || "Unknown error"}`
+          );
         }
-      } else {
-        // ถ้ามี update_id แสดงว่าเป็นการอัพเดต
-        console.log("update_id", selectedProduct.update_id);
 
+        const responseData = await response.json();
+        console.log("POST Response:", responseData);
+      } else {
+        // กรณีอัพเดต (โค้ดเดิม)
         const payload = {
           update_id: selectedProduct.update_id,
           quantity_in_stock: parseInt(updateFormData.quantity_in_stock),
@@ -239,8 +243,6 @@ const Stock = () => {
           net_volume: parseInt(updateFormData.net_volume),
           expiration_date: updateFormData.expiration_date,
         };
-
-        console.log("payload", payload);
 
         const response = await fetchApi(
           `${URL}/owner/update-stock-ingredients/${selectedProduct.update_id}`,
@@ -257,6 +259,7 @@ const Stock = () => {
       setModalVisible(false);
     } catch (error) {
       console.error("Error updating/creating product:", error);
+      alert(`เกิดข้อผิดพลาด: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -283,8 +286,6 @@ const Stock = () => {
       setIngredientToDelete(null); // Reset the selected ingredient
     }
   };
-
-  console.log("ingredient history", ingredientHistory);
 
   return (
     <div className="bg-[#F5F5F5] h-screen-website">
@@ -362,14 +363,14 @@ const Stock = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="my-4 relative flex">
+          <div className="my-4 relative flex bg-[#F5F5F5]">
             <div className="mr-5 flex items-center bg-[#F5F5F5] border-[#DD9F52] border rounded-full px-4 py-1 w-full">
               <FiSearch className="text-[#DD9F52] mr-2" size={36} />
               <ThaiVirtualKeyboardInput
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="ค้นหาสินค้า..."
-                className="w-full focus:outline-none"
+                className="w-full focus:outline-none bg-[#F5F5F5]"
               />
             </div>
             {/* เพิมรายการสินค้า */}
@@ -398,6 +399,9 @@ const Stock = () => {
                   <th className="py-2 text-left border-b border-[#000000]">
                     รายการสินค้า
                   </th>
+                  <th className="py-2 text-center border-b border-[#000000]">
+                    ปริมาตรสุทธิต่อหน่วย
+                  </th>
                   <th className="px-1 py-2 border-b border-[#000000]">
                     จำนวนคงเหลือ
                   </th>
@@ -406,6 +410,9 @@ const Stock = () => {
                   </th>
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
                     อัปเดต
+                  </th>
+                  <th className="pl-16 pr-5 py-2 border-b border-[#000000]">
+                    แก้ไข
                   </th>
                   <th className="pl-16 pr-5 py-2 border-b border-[#000000]"></th>
                 </tr>
@@ -424,6 +431,9 @@ const Stock = () => {
                     </td>
                     <td className="py-2 break-words border-b border-[#F1F4F7]">
                       {item.ingredient_name}
+                    </td>
+                    <td className="py-2 border-b border-[#F1F4F7] text-center">
+                      {item.net_volume} {item.unit}
                     </td>
                     <td className="py-2 text-center border-b border-[#F1F4F7]">
                       {item.total_volume && item.net_volume
@@ -444,10 +454,21 @@ const Stock = () => {
                         อัปเดต
                       </button>
                     </td>
+                    <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7]">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditIngredient(item.ingredient_id);
+                        }}
+                        className="text-[#DD9F52] bg-[#F5F5F5] border border-[#DD9F52] focus:outline-none hover:bg-[#DD9F52] hover:text-white focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-xl px-2 py-0"
+                      >
+                        แก้ไข
+                      </button>
+                    </td>
                     <td className="py-2 pl-16 pr-5 text-center border-b border-[#F1F4F7] flex justify-center">
                       <button
                         onClick={(event) => {
-                          event.stopPropagation(); // Prevent the row click event
+                          event.stopPropagation();
                           setIngredientToDelete(item);
                           setDeleteModalOpen(true);
                         }}

@@ -6,16 +6,28 @@ import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import { useEffect } from "react";
 import ThaiVirtualKeyboardInput from "../../../Components/Common/ThaiVirtualKeyboardInput";
+import {
+  SuccessPopup,
+  FailPopup,
+} from "../../../Components/General/statusPopup";
+import LoadingPopup from "../../../Components/General/loadingPopup";
+import { useWebSocket } from "../../../webSocketContext";
 
 const PauseMenu = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
   const navigate = useNavigate();
+  const socket = useWebSocket();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMenuItems, setSelectedMenuItems] = useState([]);
   const [filter, setFilter] = useState("ทั้งหมด");
   const [menuItems, setMenuItems] = useState([]);
+
+  const [showLoading, setShowLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [failMessage, setFailMessage] = useState("");
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -41,13 +53,13 @@ const PauseMenu = () => {
   const getFilteredMenuItems = () => {
     if (filter === "ทั้งหมด") return menuItems;
 
-    if (filter === "วัตถุดิบที่พัก") {
+    if (filter === "เมนูที่พัก") {
       return menuItems.filter(
         (menu) => menu.paused || selectedMenuItems.includes(menu)
       );
     }
 
-    if (filter === "วัตถุดิบที่ไม่พัก") {
+    if (filter === "เมนูที่ไม่พัก") {
       return menuItems.filter(
         (menu) => !menu.paused && !selectedMenuItems.includes(menu)
       );
@@ -67,6 +79,7 @@ const PauseMenu = () => {
   const handleBackButton = () => navigate("/pause-section");
 
   const handleSaveButton = async () => {
+    setShowLoading(true);
     if (menuItems.length === 0) {
       console.warn("No menus available.");
       return;
@@ -92,9 +105,19 @@ const PauseMenu = () => {
 
       const data = await response.json();
       console.log("Menus updated successfully:", data);
+      setShowLoading(false);
+      setSuccessMessage("บันทึกข้อมูลเสร็จสิ้น");
+      setFailMessage("");
       setSelectedMenuItems([]);
+      navigate("/pause-section");
+      if (socket) {
+        socket.send(JSON.stringify({ type: "PAUSE_MENU" }));
+      }
     } catch (error) {
       console.error("Error updating Menus:", error);
+      setShowLoading(false);
+      setFailMessage("ไม่สามารถบันทึกได้ กรุณาลองอีกครั้ง");
+      setSuccessMessage("");
     }
   };
 
@@ -163,23 +186,23 @@ const PauseMenu = () => {
           </button>
           <button
             className={`px-4 py-2 rounded-full ${
-              filter === "วัตถุดิบที่ไม่พัก"
+              filter === "เมนูที่ไม่พัก"
                 ? "bg-[#DD9F52] text-white"
                 : "border border-[#DD9F52] text-[#DD9F52]"
             }`}
-            onClick={() => handleFilterChange("วัตถุดิบที่ไม่พัก")}
+            onClick={() => handleFilterChange("เมนูที่ไม่พัก")}
           >
-            วัตถุดิบที่ไม่พัก
+            เมนูที่ไม่พัก
           </button>
           <button
             className={`px-4 py-2 rounded-full ${
-              filter === "วัตถุดิบที่พัก"
+              filter === "เมนูที่พัก"
                 ? "bg-[#DD9F52] text-white"
                 : "border border-[#DD9F52] text-[#DD9F52]"
             }`}
-            onClick={() => handleFilterChange("วัตถุดิบที่พัก")}
+            onClick={() => handleFilterChange("เมนูที่พัก")}
           >
-            วัตถุดิบที่พัก
+            เมนูที่พัก
           </button>
         </div>
       </div>
@@ -202,12 +225,12 @@ const PauseMenu = () => {
       <div className="p-4 flex justify-center">
         {selectedMenuItems.length === 0 &&
         menuItems.filter((item) => item.paused).length === 0 &&
-        filter === "วัตถุดิบที่พัก"
-          ? "ไม่มีวัตถุดิบที่พักในขณะนี้"
+        filter === "เมนูที่พัก"
+          ? "ไม่มีเมนูที่พักในขณะนี้"
           : null}
       </div>
 
-      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
+      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md flex justify-between">
         <button
           onClick={handleBackButton}
           className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
@@ -222,6 +245,17 @@ const PauseMenu = () => {
           บันทึก
         </button>
       </div>
+
+      {showLoading && <LoadingPopup loading={showLoading} />}
+      {successMessage && (
+        <SuccessPopup
+          message={successMessage}
+          onClose={() => setSuccessMessage("")}
+        />
+      )}
+      {failMessage && (
+        <FailPopup message={failMessage} onClose={() => setFailMessage("")} />
+      )}
     </div>
   );
 };

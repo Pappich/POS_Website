@@ -35,59 +35,16 @@ const Order = () => {
     completed_orders: 0,
   });
   const [checkSlipData, setCheckSlipData] = useState(null);
+  const [totalAmountSlipData, setTotalAmountSlipData] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showPayWithCash, setShowPayWithCash] = useState(false);
   const [cashPaymentData, setCashPaymentData] = useState(null);
   const socket = useWebSocket();
-
-  useEffect(() => {
-    if (socket) {
-      console.log("Setting up WebSocket listener in Order page");
-
-      const messageHandler = async (event) => {
-        try {
-          let messageData;
-          if (event.data instanceof Blob) {
-            const text = await event.data.text();
-            messageData = JSON.parse(text);
-          } else {
-            messageData = JSON.parse(event.data);
-          }
-
-          console.log("Order page received message:", messageData);
-
-          switch (messageData.type) {
-            case "NEW_SLIP":
-              console.log("New slip received:", messageData.data);
-              if (messageData.data.startsWith("data:image")) {
-                setCheckSlipData(messageData.data);
-              }
-              break;
-
-            case "CONFIRM_SLIP":
-              setCheckSlipData(null);
-              break;
-
-            case "CASH_PAYMENT":
-              console.log("Cash payment received:", messageData.data);
-              setCashPaymentData(messageData.data);
-              setShowPayWithCash(true);
-              break;
-
-            default:
-              break;
-          }
-        } catch (error) {
-          console.error("Error in WebSocket message handler:", error);
-        }
-      };
-
-      socket.addEventListener("message", messageHandler);
-      return () => socket.removeEventListener("message", messageHandler);
-    }
-  }, [socket]);
+  const [slipModalVisible, setSlipModalVisible] = useState(false);
+  const [selectedSlip, setSelectedSlip] = useState(null);
 
   const fetchOrders = async () => {
+    setLoading(false);
     try {
       setIsLoading(true);
       const response = await fetchApi(`${URL}/employee/orders`, "GET");
@@ -131,8 +88,62 @@ const Order = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, [URL]);
+    if (socket) {
+      console.log("Setting up WebSocket listener in Order page");
+
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+
+          console.log("Order page received message:", messageData);
+          //set total
+          if (messageData.total !== undefined) {
+            console.log("Setting total amount:", messageData.total);
+            setTotalAmountSlipData(messageData.total);
+          }
+
+          switch (messageData.type) {
+            case "NEW_SLIP":
+              console.log("New slip received:", messageData);
+              if (messageData.data.startsWith("data:image")) {
+                setCheckSlipData(messageData.data);
+              }
+              break;
+
+            case "CONFIRM_SLIP":
+              console.log("Slip confirmed, sending order...");
+              setCheckSlipData(null);
+              break;
+
+            case "CASH_PAYMENT":
+              console.log("Cash payment received:", messageData.data);
+              setCashPaymentData(messageData.data);
+              setShowPayWithCash(true);
+              break;
+
+            case "ORDER_SUBMITTED":
+              console.log("Order submitted, fetching updated orders...");
+              await fetchOrders();
+              break;
+
+            default:
+              break;
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
+        }
+      };
+
+      socket.addEventListener("message", messageHandler);
+      return () => socket.removeEventListener("message", messageHandler);
+    }
+  }, [socket]);
 
   const handlePaymentSuccess = async (paymentData) => {
     setLoading(true);
@@ -183,6 +194,9 @@ const Order = () => {
 
     setShowPayWithCash(false);
   };
+  useEffect(() => {
+    fetchOrders();
+  }, [URL, socket]);
 
   const handlePaymentCancel = async () => {
     setLoading(true);
@@ -243,6 +257,16 @@ const Order = () => {
     });
   };
 
+  const handleViewSlip = (slipUrl) => {
+    setSelectedSlip(slipUrl);
+    setSlipModalVisible(true);
+  };
+
+  const handleConfirmSlip = () => {
+    console.log("Confirm slip button clicked");
+    fetchOrders();
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -259,10 +283,6 @@ const Order = () => {
     );
   }
 
-  console.log("ORDER DATA:", orders);
-  console.log("FIRST ORDER:", orders[0]); // Check the first order
-  console.log("FIRST ORDER ITEM:", orders[0].order_items); // Check order items
-
   return (
     <div className="grid grid-cols-3 gap-4 bg-[#F5F5F5] h-screen-navbar mt-4">
       <div className="bg-white rounded-2xl shadow-md col-span-1 flex flex-col border border-gray-200">
@@ -270,7 +290,7 @@ const Order = () => {
           <>
             <div className="bg-white flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
               <h1 className="flex items-center justify-center font-bold w-full rounded-full py-2 px-4 text-3xl">
-                ออเดอร์คิวที่ {orders[0]?.order_id}
+                ออเดอร์คิวที่ {orders[0]?.queue_number}
               </h1>
 
               <div className="flex justify-between items-center mt-2">
@@ -299,7 +319,7 @@ const Order = () => {
               </div>
               <div className="flex-grow">
                 {orders[0]?.order_items && orders[0].order_items.length > 0 ? (
-                  <div className="h-[150px] overflow-y-auto mt-4">
+                  <div className="h-[250px] overflow-y-auto mt-4">
                     {orders[0].order_items.map(
                       (item, idx) => (
                         console.log("ITEM IN MAP:", item),
@@ -331,12 +351,11 @@ const Order = () => {
                 )}
               </div>
               <div className="space-y-2 w-full py-4 mt-auto">
-              <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
+                <DoneOrderButton order={orders[0]} onSuccess={fetchOrders} />
                 <CancelOrderButtonEm
                   order={orders[0]}
                   onSuccess={fetchOrders}
                 />
-  
               </div>
             </div>
           </>
@@ -420,7 +439,7 @@ const Order = () => {
                     >
                       <div className="bg-[#FFFFFF] flex flex-col items-center justify-center rounded-2xl pt-2 px-4">
                         <h1 className="flex items-center justify-center font-bold w-full py-2 px-4 text-2xl">
-                          ออเดอร์คิวที่ {order?.order_id}
+                          ออเดอร์คิวที่ {order?.queue_number}
                         </h1>
 
                         <div className="flex justify-between items-center">
@@ -492,7 +511,13 @@ const Order = () => {
           </div>
         </div>
       </div>
-      {checkSlipData && <CheckSlip imageUrl={checkSlipData} />}
+      {checkSlipData && (
+        <CheckSlip
+          imageUrl={checkSlipData}
+          onConfirm={handleConfirmSlip}
+          total={totalAmountSlipData}
+        />
+      )}
       <PayWithCash
         isOpen={showPayWithCash}
         onClose={() => setShowPayWithCash(false)}

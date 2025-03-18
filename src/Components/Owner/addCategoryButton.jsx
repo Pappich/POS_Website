@@ -5,7 +5,7 @@ import fetchApi from "../../Config/fetchApi";
 import ThaiVirtualKeyboardInput from "../Common/ThaiVirtualKeyboardInput";
 import LoadingPopup from "../General/loadingPopup";
 
-const AddCategoryButton = () => {
+const AddCategoryButton = ({ onAdd }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
@@ -29,6 +29,8 @@ const AddCategoryButton = () => {
 
       if (response.ok) {
         toggleModal();
+        onAdd(categoryName);
+        setCategoryName("");
       }
     } catch (error) {
       console.error("Error create ingredient category:", error);
@@ -77,7 +79,8 @@ const AddCategoryButton = () => {
               <ThaiVirtualKeyboardInput
                 id="categoryName"
                 placeholder="กรอกชื่อหมวดหมู่..."
-                onChange={setCategoryName}
+                value={categoryName}
+                onChange={(value) => setCategoryName(value)}
                 className="w-full border border-[#DD9F52] rounded-full p-2 focus:outline-none focus:ring-1 focus:ring-[#DD9F52]"
               />
             </div>

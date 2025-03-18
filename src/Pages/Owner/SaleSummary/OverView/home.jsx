@@ -20,7 +20,6 @@ const Home = () => {
     day: "2-digit",
   };
   const formattedDate = today.toLocaleDateString("en-CA", options);
-
   const [selectedDate, setSelectedDate] = useState(formattedDate); // Default date
   const [data, setData] = useState(null); // State to hold fetched data
 
@@ -50,7 +49,7 @@ const Home = () => {
   // Fetch data when the component mounts or when the selected date changes
   useEffect(() => {
     fetchData(selectedDate);
-  }, [selectedDate]);
+  }, [selectedDate]); // Refetch data when selectedDate changes
 
   return (
     <div className="h-screen-website bg-[#F5F5F5]">

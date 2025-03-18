@@ -7,6 +7,7 @@ import configureAPI from "../../../../Config/configureAPI";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import ThaiVirtualKeyboardInput from "../../../../Components/Common/ThaiVirtualKeyboardInput";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
 
 const ChoiceList = () => {
   const environment = process.env.NODE_ENV || "development";
@@ -16,6 +17,7 @@ const ChoiceList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [groupsData, setGroupsData] = useState({
     sweetness_groups: [],
     size_groups: [],
@@ -159,6 +161,7 @@ const ChoiceList = () => {
     }
 
     try {
+      setLoading(true);
       const response = await fetchApi(endpoint, "DELETE");
 
       if (response.ok) {
@@ -173,6 +176,8 @@ const ChoiceList = () => {
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while deleting");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -218,11 +223,21 @@ const ChoiceList = () => {
     }
   };
 
+  const translateGroupType = (thaiType) => {
+    const typeMap = {
+      ท็อปปิ้ง: "topping",
+      ความหวาน: "sweetness",
+      ความเย็น: "temperature",
+      ขนาดแก้ว: "size",
+    };
+    return typeMap[thaiType] || thaiType;
+  };
+
   const handleMenuClick = (item) => {
     navigate("/choice-menu", {
       state: {
         groupName: item.name,
-        groupType: item.type,
+        groupType: translateGroupType(item.type),
       },
     });
   };
@@ -258,7 +273,7 @@ const ChoiceList = () => {
         </div>
 
         {/* Render Groups */}
-        <div className="w-full">
+        <div className="w-full overflow-y-auto pb-32 pr-4">
           {Object.entries(groupedItems).some(
             ([_, items]) => items.length > 0
           ) ? (
@@ -293,6 +308,8 @@ const ChoiceList = () => {
         onConfirm={handleConfirmDelete}
         product={productToDelete}
       />
+
+      <LoadingPopup loading={loading} />
     </>
   );
 };

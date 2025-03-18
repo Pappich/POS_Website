@@ -32,7 +32,7 @@ const PieChart = ({ topThree }) => {
       tooltip: {
         callbacks: {
           label: (tooltipItem) => {
-            return `${tooltipItem.label}: ${tooltipItem.raw} จาน`;
+            return `${tooltipItem.label}: ${tooltipItem.raw} แก้ว`;
           },
         },
       },

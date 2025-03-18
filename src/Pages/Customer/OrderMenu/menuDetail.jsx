@@ -77,13 +77,13 @@ const MenuDetail = () => {
       newErrors.size = "โปรดเลือกขนาดที่ต้องการ";
     }
 
-    if (
-      menu?.add_on.length > 0 &&
-      (selectedAddOn.length === 0 ||
-        selectedAddOn.some((id) => id === null || id === undefined))
-    ) {
-      newErrors.addOn = "โปรดเลือกตัวเลือกที่ต้องการอย่างน้อย 1 ตัวเลือก";
-    }
+    // if (
+    //   menu?.add_on.length > 0 &&
+    //   (selectedAddOn.length === 0 ||
+    //     selectedAddOn.some((id) => id === null || id === undefined))
+    // ) {
+    //   newErrors.addOn = "โปรดเลือกตัวเลือกที่ต้องการอย่างน้อย 1 ตัวเลือก";
+    // }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -121,7 +121,7 @@ const MenuDetail = () => {
     console.log("selectedMenuDetails:", selectedMenuDetails);
 
     dispatch(addToCart(selectedMenuDetails));
-    navigate("/summary");
+    navigate("/menu");
   };
 
   const handleSelection = (setter, value) => {
@@ -219,7 +219,7 @@ const MenuDetail = () => {
                       : ""
                   }`}
                 >
-                  {type.type_name}
+                  {type.type_name} +{type.price_difference} บาท
                 </button>
               ))}
             </div>
@@ -265,7 +265,7 @@ const MenuDetail = () => {
                       : ""
                   }`}
                 >
-                  {size.size_name}
+                  {size.size_name} +{size.size_price} บาท
                 </button>
               ))}
             </div>
@@ -286,7 +286,7 @@ const MenuDetail = () => {
                       : ""
                   }`}
                 >
-                  {addOn.ingredient_name}
+                  {addOn.ingredient_name} +{addOn.add_on_price} บาท
                 </button>
               ))}
             </div>

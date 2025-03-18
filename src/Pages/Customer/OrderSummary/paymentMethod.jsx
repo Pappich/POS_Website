@@ -125,8 +125,8 @@ const PaymentMethod = () => {
             }
 
             const responseData = await response.json();
-            console.log("Order submitted successfully:", responseData);
-
+            // console.log("Order submitted successfully:", responseData);
+            socket.send(JSON.stringify({ type: "ORDER_SUBMITTED" })); //send to fetch order
             navigate("/queue-summary", {
               state: { orderData: responseData },
             });
@@ -188,6 +188,7 @@ const PaymentMethod = () => {
       const message = {
         type: "NEW_SLIP",
         data: imageData,
+        total: total,
       };
       socket.send(JSON.stringify(message));
     }
@@ -211,13 +212,41 @@ const PaymentMethod = () => {
           })),
         },
       };
+
       console.log("Sending WebSocket message:", message);
       socket.send(JSON.stringify(message));
     }
   }, [selectedPayment, socket, total, items]);
 
+  useEffect(() => {
+    if (socket) {
+      const messageHandler = async (event) => {
+        try {
+          let messageData;
+          if (event.data instanceof Blob) {
+            const text = await event.data.text();
+            messageData = JSON.parse(text);
+          } else {
+            messageData = JSON.parse(event.data);
+          }
+
+          console.log("PaymentMethod received message:", messageData);
+
+          if (messageData.type === "CONFIRM_CASH_PAYMENT") {
+            navigate("/queue-summary");
+          }
+        } catch (error) {
+          console.error("Error in WebSocket message handler:", error);
+        }
+      };
+
+      socket.addEventListener("message", messageHandler);
+      return () => socket.removeEventListener("message", messageHandler);
+    }
+  }, [socket, navigate]);
+
   return (
-    <div>
+    <div className="h-screen-navbar">
       <div className="flex justify-start items-center mb-6">
         <button onClick={handleBack}>
           <IoChevronBack className="w-[40px] h-[40px] text-[#DD9F52]" />

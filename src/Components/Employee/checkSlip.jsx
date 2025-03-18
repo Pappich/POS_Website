@@ -5,11 +5,13 @@ import fetchApi from "../../Config/fetchApi";
 import { useState } from "react";
 import LoadingPopup from "../General/loadingPopup";
 
-const CheckSlip = ({ imageUrl }) => {
+const CheckSlip = ({ imageUrl, onConfirm, total }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
   const socket = useWebSocket();
   const [loading, setLoading] = useState(false);
+
+  console.log("TOTAL:", total);
 
   const handleRetake = () => {
     if (socket) {
@@ -23,7 +25,7 @@ const CheckSlip = ({ imageUrl }) => {
   const handleConfirm = async () => {
     setLoading(true);
     try {
-      // แปลง base64 เป็น blob และอัพโหลดไป backend
+      // Convert base64 to blob and upload to backend
       const response = await fetch(imageUrl);
       const blob = await response.blob();
 
@@ -42,7 +44,7 @@ const CheckSlip = ({ imageUrl }) => {
 
       const uploadData = await uploadResponse.json();
 
-      // ส่ง path ที่ได้จาก backend กลับไป
+      // Send path back to backend
       if (socket) {
         const message = {
           type: "CONFIRM_SLIP",
@@ -50,6 +52,9 @@ const CheckSlip = ({ imageUrl }) => {
         };
         socket.send(JSON.stringify(message));
       }
+
+      // Call the onConfirm function passed from the parent
+      onConfirm(); // Trigger the fetch operation in order
     } catch (error) {
       console.error("Error handling slip confirmation:", error);
     } finally {
@@ -98,6 +103,18 @@ const CheckSlip = ({ imageUrl }) => {
         </h2>
         <hr className="h-0.5 bg-[#DD9F52] border-0 mb-4" />
 
+        <div className="justify-between items-center grid grid-cols-2 gap-6 mb-4">
+          <span className="text-black text-left font-bold">
+            จำนวนเงินที่ลูกค้าต้องจ่าย
+          </span>
+          <div
+            id="order-id"
+            className="w-full py-2 px-3 bg-transparent text-black border border-[#DD9F52] rounded-full"
+          >
+            {total} บาท
+          </div>
+        </div>
+
         {/* แสดงรูป base64 โดยตรง */}
         {imageUrl ? (
           <img
@@ -113,12 +130,12 @@ const CheckSlip = ({ imageUrl }) => {
         )}
 
         <div className="flex gap-2 mt-6">
-          <button
+          {/* <button
             className="w-full border border-gray-300 text-gray-600 hover:bg-gray-100 transition-all duration-300 py-2 rounded-full"
             onClick={handleCancel}
           >
             ยกเลิก
-          </button>
+          </button> */}
           <button
             className="w-full border border-[#DD9F52] text-[#DD9F52] bg-transparent hover:bg-[#DD9F52] hover:text-white font-bold py-2 rounded-full transition-all"
             onClick={handleRetake}

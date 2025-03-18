@@ -57,7 +57,10 @@ const Summary = () => {
     fetchMenuData();
   }, []);
 
-  const subtotal = items.reduce((acc, item) => acc + item.price, 0);
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
   const tax = 0;
   const total = subtotal + parseFloat(tax);
 
@@ -74,25 +77,42 @@ const Summary = () => {
     const orderDetails = {
       total,
       items,
-      selectedPayment, // Pass the items array if needed
+      selectedPayment,
     };
     console.log("orderDetails: ", orderDetails);
-
-    // Navigate to the payment method page with order details
     navigate("/payment-method", { state: { orderDetails } });
   };
 
   const handleRemove = (item) => {
-    console.log("ITEM TO DELETE:", item);
-    dispatch(
-      removeFromCart({
+    dispatch(removeFromCart(item));
+  };
+
+  const handleIncreaseQuantity = (item) => {
+    dispatch({
+      type: "cart/increaseQuantity",
+      payload: {
         menuId: item.menuId,
         selectedSize: item.selectedSize,
         selectedSweetness: item.selectedSweetness,
         selectedType: item.selectedType,
         selectedAddOn: item.selectedAddOn,
-      })
-    );
+      },
+    });
+  };
+
+  const handleDecreaseQuantity = (item) => {
+    if (item.quantity > 1) {
+      dispatch({
+        type: "cart/decreaseQuantity",
+        payload: {
+          menuId: item.menuId,
+          selectedSize: item.selectedSize,
+          selectedSweetness: item.selectedSweetness,
+          selectedType: item.selectedType,
+          selectedAddOn: item.selectedAddOn,
+        },
+      });
+    }
   };
 
   return (
@@ -108,88 +128,105 @@ const Summary = () => {
         <div className="w-20 h-1 bg-[#DD9F52] my-6"></div>
       </div>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b border-gray-300 text-2xl">
-            <th className="text-left py-2">เมนู</th>
-            <th className="text-center py-2">จำนวน</th>
-            <th className="text-center py-2">ราคาทั้งหมด</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.length === 0 ? (
-            <tr>
-              <td
-                colSpan="4"
-                className="text-center py-4 text-gray-500 text-2xl"
-              >
-                ยังไม่มีสินค้าในตระกร้าขณะนี้
-              </td>
-            </tr>
-          ) : (
-            items.map((item, index) => {
-              const selectedMenu = menuData.find(
-                (menu) => menu.menu_id === item.menuId
-              );
-
-              return (
-                <tr key={index} className="border-b border-gray-200">
-                  <td className="flex items-center py-2">
-                    <img
-                      src={`${URL}/${item.menu_img.replace(/\\/g, "/")}`}
-                      alt={item.menuName}
-                      className="mr-2 rounded flex items-center h-[72px] w-[72px] mb-2"
-                    />
-                    <div>
-                      <p className="font-semibold text-xl">{item.menuName}</p>
-                      <div className="text-xl text-gray-500">
-                        {item.selectedSize && (
-                          <span>ขนาด: {item.selectedSize.name} </span>
-                        )}
-                        {item.selectedSweetness && (
-                          <span>| หวาน: {item.selectedSweetness.name} </span>
-                        )}
-                        {item.selectedType && (
-                          <span>| ชนิด: {item.selectedType.name} </span>
-                        )}
-                        {item.selectedAddOn.length > 0 && (
-                          <span>
-                            | ท็อปปิ้ง:{" "}
-                            {item.selectedAddOn
-                              .map((addOn) => addOn.name)
-                              .join(", ")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="text-center">{item.quantity}</td>
-                  <td className="text-center">{item.price} บาท</td>
-                  <td>
-                    <button
-                      onClick={() => handleRemove(item)}
-                      className="flex items-center justify-center rounded-full p-2 transition duration-200 text-[#C94C4C] hover:text-[#B03E3E] hover:opacity-100"
-                    >
-                      <AiOutlineDelete size={36} />
-                    </button>
+      <div className="w-full rounded-lg overflow-hidden">
+        <div className="max-h-[400px] overflow-y-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-gray-100 sticky top-0">
+              <tr className="border-b border-gray-300 text-2xl">
+                <th className="text-left py-2 px-4">เมนู</th>
+                <th className="text-center py-2 px-4">จำนวน</th>
+                <th className="text-center py-2 px-4">ราคาทั้งหมด</th>
+                <th className="text-center py-2 px-4">ลบ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="text-center py-4 text-gray-500 text-2xl"
+                  >
+                    ยังไม่มีสินค้าในตระกร้าขณะนี้
                   </td>
                 </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
+              ) : (
+                items.map((item, index) => (
+                  <tr key={index} className="border-b border-gray-200">
+                    <td className="flex items-center py-2 px-4">
+                      <img
+                        src={`${URL}/${item.menu_img.replace(/\\/g, "/")}`}
+                        alt={item.menuName}
+                        className="mr-2 rounded h-[72px] w-[72px]"
+                      />
+                      <div>
+                        <p className="font-semibold text-xl">{item.menuName}</p>
+                        <div className="text-xl text-gray-500">
+                          {item.selectedSize && (
+                            <span>ขนาด: {item.selectedSize.name} </span>
+                          )}
+                          {item.selectedSweetness && (
+                            <span>| หวาน: {item.selectedSweetness.name} </span>
+                          )}
+                          {item.selectedType && (
+                            <span>| ชนิด: {item.selectedType.name} </span>
+                          )}
+                          {item.selectedAddOn.length > 0 && (
+                            <span>
+                              | ท็อปปิ้ง:{" "}
+                              {item.selectedAddOn
+                                .map((addOn) => addOn.name)
+                                .join(", ")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="text-center px-4">
+                      <div className="flex items-center justify-center space-x-4">
+                        <button
+                          onClick={() => handleDecreaseQuantity(item)}
+                          className="w-8 h-8 font-bold text-white bg-[#C94C4C] rounded-full flex items-center justify-center"
+                        >
+                          -
+                        </button>
+                        <div>{item.quantity}</div>
+                        <button
+                          onClick={() => handleIncreaseQuantity(item)}
+                          className="w-8 h-8 text-white bg-[#4B8455] rounded-full flex items-center justify-center"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </td>
+                    <td className="text-center px-4">
+                      {item.price * item.quantity} บาท
+                    </td>
+                    <td className="text-center justify-center px-4">
+                      <button
+                        onClick={() => handleRemove(item)}
+                        className="transition duration-200 text-[#C94C4C] hover:text-[#B03E3E]"
+                      >
+                        <AiOutlineDelete size={32} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Order summary */}
-      <div className="w-full fixed bottom-32 border-t border-gray-300 pt-4 text-2xl px-12">
-        <div className="flex justify-between mb-2 font-bold">
+      <div className="w-full fixed bottom-32 border-t border-gray-300 pt-4 text-2xl px-12 bg-[#F5F5F5]">
+        {/* <div className="flex justify-between mb-2 font-bold">
           <span>รวมเป็นเงิน</span>
           <span>{subtotal} บาท</span>
-        </div>
-        <div className="flex font-bold justify-between mb-2">
+        </div> */}
+        {/* <div className="flex font-bold justify-between mb-2">
           <span>ภาษีมูลค่าเพิ่ม 7%</span>
           <span>{tax} บาท</span>
-        </div>
+        </div> */}
         <div className="flex justify-between text-3xl font-bold">
           <span>รวมทั้งหมด</span>
           <span className="text-[#DD9F52]">{total} บาท</span>

@@ -1,14 +1,19 @@
 import React from "react";
 import fetchApi from "../../../../Config/fetchApi";
 import configureAPI from "../../../../Config/configureAPI";
+import LoadingPopup from "../../../../Components/General/loadingPopup";
+import { useState } from "react";
 
 const DeleteProduct = ({ isOpen, onClose, onConfirm, product }) => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
+  const [loading, setLoading] = useState(false);
+
   if (!isOpen) return null;
 
   const handleDelete = async () => {
+    setLoading(true);
     try {
       const response = await fetchApi(
         `${URL}/owner/menus/${product.menu_id}`,
@@ -23,6 +28,8 @@ const DeleteProduct = ({ isOpen, onClose, onConfirm, product }) => {
       }
     } catch (error) {
       console.error("An error occurred while deleting the product:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +58,7 @@ const DeleteProduct = ({ isOpen, onClose, onConfirm, product }) => {
           </button>
         </div>
       </div>
+      <LoadingPopup loadingStatus={loading} />
     </div>
   );
 };

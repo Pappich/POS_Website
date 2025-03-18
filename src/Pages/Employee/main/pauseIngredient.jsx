@@ -5,16 +5,28 @@ import HomeEmButton from "../../../Components/Employee/homeEmButton";
 import fetchApi from "../../../Config/fetchApi";
 import configureAPI from "../../../Config/configureAPI";
 import ThaiVirtualKeyboardInput from "../../../Components/Common/ThaiVirtualKeyboardInput";
+import {
+  SuccessPopup,
+  FailPopup,
+} from "../../../Components/General/statusPopup";
+import LoadingPopup from "../../../Components/General/loadingPopup";
+import { useWebSocket } from "../../../webSocketContext";
 
 const PauseIngredient = () => {
   const environment = process.env.NODE_ENV || "development";
   const URL = configureAPI[environment].URL;
 
   const navigate = useNavigate();
+  const socket = useWebSocket();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIngredientItems, setSelectedIngredientItems] = useState([]);
   const [filter, setFilter] = useState("ทั้งหมด");
   const [ingredientItems, setIngredientItems] = useState([]);
+
+  const [showLoading, setShowLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [failMessage, setFailMessage] = useState("");
 
   useEffect(() => {
     const fetchIngredient = async () => {
@@ -86,6 +98,7 @@ const PauseIngredient = () => {
     console.log("payload", payload);
 
     try {
+      setShowLoading(true);
       const response = await fetchApi(
         `${URL}/employee/pause/ingredients`,
         "PATCH",
@@ -98,9 +111,21 @@ const PauseIngredient = () => {
 
       const data = await response.json();
       console.log("Ingredients updated successfully:", data);
+      setShowLoading(true);
       setSelectedIngredientItems([]);
+      setSuccessMessage("บันทึกข้อมูลเสร็จสิ้น");
+      setFailMessage("");
+      setShowLoading(false);
+      navigate("/pause-section");
+      if (socket) {
+        socket.send(JSON.stringify({ type: "PAUSE_MENU" }));
+      }
     } catch (error) {
       console.error("Error updating ingredients:", error);
+      setShowLoading(true);
+      setFailMessage("ไม่สามารถบันทึกได้ กรุณาลองอีกครั้ง");
+      setSuccessMessage("");
+      setShowLoading(false);
     }
   };
 
@@ -161,7 +186,7 @@ const PauseIngredient = () => {
             htmlFor="productDetails"
             className="text-2xl font-bold text-start"
           >
-            เมนูทั้งหมด
+            วัตถุดิบทั้งหมด
           </label>
           <button
             className={`px-4 py-2 rounded-full ${
@@ -222,7 +247,7 @@ const PauseIngredient = () => {
           : null}
       </div>
 
-      <div className="flex fixed bottom-4 left-0 px-4 py-4 w-full space-x-8 justify-between">
+      <div className="fixed bottom-0 left-0 w-full bg-[#F5F5F5] px-4 py-4 shadow-md flex justify-between">
         <button
           onClick={handleBackButton}
           className="px-14 py-4 w-[300px] rounded-full border text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
@@ -237,6 +262,17 @@ const PauseIngredient = () => {
           บันทึก
         </button>
       </div>
+
+      {showLoading && <LoadingPopup loading={showLoading} />}
+      {successMessage && (
+        <SuccessPopup
+          message={successMessage}
+          onClose={() => setSuccessMessage("")}
+        />
+      )}
+      {failMessage && (
+        <FailPopup message={failMessage} onClose={() => setFailMessage("")} />
+      )}
     </div>
   );
 };
