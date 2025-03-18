@@ -270,7 +270,6 @@ const SweetLevelChoice = () => {
     }
   }, [menuData]);
 
-
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -377,8 +376,8 @@ const SweetLevelChoice = () => {
             </label>
 
             {/* Render categorized menus */}
-             {/* Scrollable menu categories container */}
-             <div className="w-full flex-1 overflow-y-auto pr-4 pb-32">
+            {/* Scrollable menu categories container */}
+            <div className="w-full flex-1 overflow-y-auto pr-4 pb-32">
               {menuData.categories
                 .filter((category) =>
                   category.menus.some((menu) =>
@@ -496,9 +495,60 @@ const SweetLevelChoice = () => {
           <>
             <div className="w-full flex justify-start text-2xl mb-5 font-bold">
               4. สรุปตัวเลือก:
-              <span className="text-[#DD9F52] ml-2">ความหวาน</span>
+              <span className="text-[#DD9F52] ml-2">ระดับความหวาน</span>
             </div>
 
+            <div className="w-full ml-16 mb-4">
+              {/* GROUP NAME */}
+              <div className="flex flex-row gap-6 mb-4 items-center">
+                <label
+                  htmlFor="selectedMenus"
+                  className="w-1/6 text-2xl font-bold text-start"
+                >
+                  ชื่อกลุ่มตัวเลือก
+                </label>
+                <div
+                  id="order-id"
+                  className="w-5/6 mr-16 py-2 px-3 bg-transparent text-black border border-[#DD9F52] rounded-full"
+                >
+                  {groupName}
+                </div>
+              </div>
+            </div>
+
+            {/* GROUP DETAIL */}
+            <div className="w-full ml-16 mb-4">
+              <div className="w-full flex justify-start text-2xl font-bold">
+                ช้อยส์ในตัวเลือก
+              </div>
+
+              <div className="mb-4 w-full">
+                {/* Table Header */}
+                <div className="overflow-x-auto mr-16">
+                  <table className="w-full border-collapse border border-gray-200">
+                    <thead>
+                      <tr className="bg-[#DD9F52] bg-opacity-40">
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          ชื่อช้อยส์
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Displaying all choices and their price differences */}
+                      {choices.map((choice, index) => (
+                        <tr key={index}>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            {choice.name}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Select menu */}
             <div className="w-full ml-16">
               <label
                 htmlFor="selectedMenus"
@@ -522,8 +572,7 @@ const SweetLevelChoice = () => {
                   };
 
                   const menu = findMenu(menuId);
-
-                  if (!menu) return null; // Skip if menu not found
+                  if (!menu) return null;
 
                   return (
                     <div
