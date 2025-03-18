@@ -21,6 +21,7 @@ const IngredientDropdown = ({ value, onChange }) => {
           data.map((ingredient) => ({
             value: ingredient.ingredient_id,
             label: ingredient.ingredient_name,
+            unit: ingredient.unit,
             isFixed: true,
           }))
         );
@@ -31,6 +32,8 @@ const IngredientDropdown = ({ value, onChange }) => {
 
     fetchIngredients();
   }, [URL]);
+
+  console.log("ingredients in dropdown:", ingredients);
 
   // Sync with external value
   useEffect(() => {
@@ -59,15 +62,16 @@ const IngredientDropdown = ({ value, onChange }) => {
         const newValue = {
           value: selected.isFixed ? selected.value : selected.label,
           label: selected.label,
+          unit: selected.unit,
           isFixed: selected.isFixed,
         };
         setCurrentValue(newValue);
         setIsCustomInput(!selected.isFixed);
-        onChange(newValue.value, newValue.label);
+        onChange(newValue.value, newValue.label, newValue.unit);
       } else {
         setCurrentValue(null);
         setIsCustomInput(false);
-        onChange("", "");
+        onChange("", "", "");
       }
     },
     [onChange]
@@ -76,12 +80,12 @@ const IngredientDropdown = ({ value, onChange }) => {
   const handleInputChange = useCallback(
     (newValue, { action }) => {
       if (action === "input-change") {
-        // เช็คว่าค่าปัจจุบันมาจาก dropdown หรือไม่
+        // Check if the current value is from the dropdown
         const isFromDropdown = ingredients.some(
           (ing) => ing.value === currentValue?.value && currentValue?.isFixed
         );
 
-        // ถ้าไม่ได้มาจาก dropdown ให้แก้ไขได้
+        // If it's not from the dropdown, allow editing
         if (!isFromDropdown) {
           const customValue = {
             value: newValue,
@@ -90,7 +94,7 @@ const IngredientDropdown = ({ value, onChange }) => {
           };
           setCurrentValue(customValue);
           setIsCustomInput(true);
-          onChange(newValue, newValue);
+          onChange(newValue, newValue, ""); // Pass empty unit for custom input
         }
       }
     },

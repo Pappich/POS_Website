@@ -31,6 +31,7 @@ const AddStockForm = () => {
   const [menuIngredientData, setMenuIngredientData] = useState([]);
   const [filterIngredientData, setFilterIngredientData] = useState([]);
   const [menuIngredientDataSet, setMenuIngredientDataSet] = useState([]);
+  const [ingredients, setIngredients] = useState([]); // Add this line
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
     material: "",
@@ -74,6 +75,20 @@ const AddStockForm = () => {
   }, []);
 
   console.log("ingredient data:", ingredientData);
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      try {
+        const response = await fetchApi(`${URL}/owner/ingredient`, "GET");
+        const data = await response.json();
+        setIngredients(data); // Set the ingredients state
+      } catch (error) {
+        console.error("Error fetching ingredients:", error);
+      }
+    };
+
+    fetchIngredients();
+  }, [URL]);
 
   // Update the fetch for size and type data
   useEffect(() => {
@@ -161,10 +176,6 @@ const AddStockForm = () => {
       });
   }, []);
 
-  console.log("typeItems:", typeItems);
-  console.log("sizeItems:", sizeItems);
-  console.log("AddOnItems:", addOnItems);
-
   // filter add on out of ingredient
   useEffect(() => {
     const addOnNames = addOnItems.map((item) => item.add_on_name);
@@ -193,18 +204,19 @@ const AddStockForm = () => {
   //   );
   // };
 
-  const handleInputChange = (index, field, value, label = "") => {
+  const handleInputChange = (index, field, value, label = "", unit) => {
     setRows((prevRows) =>
-      prevRows.map((row, idx) =>
-        idx === index
-          ? {
-              ...row,
-              [field]: value,
-              material:
-                field === "ingredientId" ? label || value : row.material,
-            }
-          : row
-      )
+      prevRows.map((row, idx) => {
+        if (idx === index) {
+          return {
+            ...row,
+            [field]: value,
+            material: field === "ingredientId" ? label || value : row.material,
+            unit: field === "ingredientId" ? unit || "" : value, 
+          };
+        }
+        return row;
+      })
     );
   };
 
@@ -465,8 +477,18 @@ const AddStockForm = () => {
                   <div>
                     <IngredientDropdown
                       value={ingredient.material}
-                      onChange={(value, label) =>
-                        handleInputChange(index, "ingredientId", value, label)
+                      onChange={(
+                        value,
+                        label,
+                        unit // Accept the unit
+                      ) =>
+                        handleInputChange(
+                          index,
+                          "ingredientId",
+                          value,
+                          label,
+                          unit // Pass the unit
+                        )
                       }
                     />
                     {errors.material && (
@@ -476,9 +498,9 @@ const AddStockForm = () => {
 
                   <div>
                     <select
-                      value={ingredient.unit}
+                      value={ingredient.unit} // This reflects the current unit
                       onChange={(e) => {
-                        handleInputChange(index, "unit", e.target.value);
+                        handleInputChange(index, "unit", e.target.value); // Allow changing the unit
                       }}
                       className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
                     >
