@@ -19,7 +19,6 @@ const CancelOrderSummary = () => {
   const [cancelOrderData, setCancelOrderData] = useState([]);
   const [paymentFilter, setPaymentFilter] = useState("");
 
-
   const today = new Date();
   const options = {
     timeZone: "Asia/Bangkok",
@@ -155,7 +154,6 @@ const CancelOrderSummary = () => {
           <span className="flex items-center">
             <span className="font-bold mt-4">ออเดอร์ที่ถูกยกเลิก</span>
           </span>
-          <CalendarSelect />
         </div>
 
         <PaymentMethodFilter

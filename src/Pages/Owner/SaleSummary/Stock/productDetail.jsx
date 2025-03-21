@@ -92,7 +92,7 @@ const ProductDetail = () => {
             </label>
           </div>
           {/* Product Details */}
-          <div className="grid grid-cols-2 gap-20">
+          <div className="grid grid-cols-2 gap-20 mb-4">
             <div className="w-full">
               <div className="py-2">
                 <span className="font-bold">ชื่อสินค้า</span>
@@ -109,28 +109,6 @@ const ProductDetail = () => {
                 readOnly={true}
                 className="w-full bg-[#ECECEC] border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
-              <div className="py-2">
-                <span className="font-bold">จำนวน</span>
-              </div>
-              <input
-                type="text"
-                value={quantityInStock}
-                readOnly
-                className="w-full bg-[#ECECEC] border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-              />
-              <div className="py-2">
-                <span className="font-bold">การตัดคลังสินค้า</span>
-              </div>
-              <div className="flex items-center">
-                <div className="text-nowrap pr-5">ปริมาณสุทธิต่อหน่วย</div>
-                <input
-                  type="text"
-                  value={`${netVolume} ${ingredientData.unit}`}
-                  // value="1000 กรัม"
-                  readOnly
-                  className="w-full bg-[#ECECEC] border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                />
-              </div>
             </div>
             <div className="w-full">
               <div className="py-2">
@@ -143,7 +121,9 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
-
+          <div className="py-2">
+            <span className="font-bold text-xl">การตัดคลังสินค้า</span>
+          </div>
           <div className="py-2">
             <span className="font-bold">อัตราส่วนในแต่ละเมนู</span>
           </div>

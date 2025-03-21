@@ -54,6 +54,14 @@ const Stock = () => {
   const [ingredientToDelete, setIngredientToDelete] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [currentStockQuantity, setCurrentStockQuantity] = useState(
+    updateFormData?.quantity_in_stock || 0
+  );
+  console.log("currentStockQuantity", currentStockQuantity);
+  const [currentTotalVolume, setCurrentTotalVolume] = useState(
+    updateFormData?.net_volume || 0
+  );
+
   // Fetch products
   const fetchProducts = async () => {
     try {
@@ -128,6 +136,8 @@ const Stock = () => {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProduct(null);
+    setCurrentStockQuantity(0);
+    setCurrentTotalVolume(0);
   };
 
   const filteredIngredients = ingredients.flatMap((category) => {
@@ -192,6 +202,8 @@ const Stock = () => {
       });
       setIsUpdateMode(true);
       setModalVisible(true);
+      setCurrentStockQuantity(updateFormData.quantity_in_stock || 0);
+      setCurrentTotalVolume(updateFormData.total_volume || 0);
 
       console.log("Update Form Data", updateFormData);
     } catch (error) {
@@ -284,6 +296,22 @@ const Stock = () => {
     } finally {
       setDeleteModalOpen(false); // Close the modal
       setIngredientToDelete(null); // Reset the selected ingredient
+    }
+  };
+
+  const handleIncrease = () => {
+    const newQuantity = currentStockQuantity + 1;
+    setCurrentStockQuantity(newQuantity);
+    const volumeChange = 1 * selectedProduct.net_volume;
+    setCurrentTotalVolume((prev) => prev + volumeChange);
+  };
+
+  const handleDecrease = () => {
+    if (currentStockQuantity > 0) {
+      const newQuantity = currentStockQuantity - 1;
+      setCurrentStockQuantity(newQuantity);
+      const volumeChange = 1 * selectedProduct.net_volume;
+      setCurrentTotalVolume((prev) => prev - volumeChange);
     }
   };
 
@@ -400,10 +428,7 @@ const Stock = () => {
                     รายการสินค้า
                   </th>
                   <th className="py-2 text-center border-b border-[#000000]">
-                    ปริมาตรสุทธิต่อหน่วย
-                  </th>
-                  <th className="px-1 py-2 border-b border-[#000000]">
-                    จำนวนคงเหลือ
+                    ปริมาณคงเหลือ
                   </th>
                   <th className="pl-10 py-2 border-b border-[#000000]">
                     หมวดหมู่
@@ -434,11 +459,6 @@ const Stock = () => {
                     </td>
                     <td className="py-2 border-b border-[#F1F4F7] text-center">
                       {item.net_volume} {item.unit}
-                    </td>
-                    <td className="py-2 text-center border-b border-[#F1F4F7]">
-                      {item.total_volume && item.net_volume
-                        ? `${item.total_volume / item.net_volume} ชิ้น`
-                        : "-"}
                     </td>
                     <td className="py-2 pl-10 text-center border-b border-[#F1F4F7]">
                       {item.category_name}
@@ -487,7 +507,7 @@ const Stock = () => {
         {/* Update/Create Product Modal */}
         {modalVisible && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-[500px] w-[700px] relative">
+            <div className="bg-[#F5F5F5] rounded-lg p-8 flex flex-col h-auto w-auto relative">
               {/* Product Name */}
               <h2 className="text-xl font-bold text-center mb-4 absolute top-4 w-full">
                 {selectedProduct?.ingredient_name}
@@ -495,7 +515,7 @@ const Stock = () => {
 
               {/* Modal Content */}
               <div className="flex mt-10">
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 mr-8">
                   {selectedProduct?.image_url && (
                     <img
                       src={`${URL}/${selectedProduct?.image_url.replace(
@@ -503,7 +523,7 @@ const Stock = () => {
                         "/"
                       )}`}
                       alt={selectedProduct?.image_url}
-                      className="w-[240px] h-[240px] object-cover rounded-lg border border-gray-300 shadow-md"
+                      className="w-[240px] h-[360px] object-cover rounded-lg border border-gray-300"
                     />
                   )}
                 </div>
@@ -548,7 +568,7 @@ const Stock = () => {
                   {/* Net Volume */}
                   <div>
                     <div className="font-bold text-gray-800 mb-1">
-                      ปริมาตรสุทธิต่อหน่วย
+                      ปริมาณสุทธิต่อหน่วย
                     </div>
                     <div className="flex items-center">
                       <ThaiVirtualKeyboardInput
@@ -579,6 +599,40 @@ const Stock = () => {
                     </div>
                   </div>
 
+                  {/* total volumn */}
+                  <div>
+                    <div className="font-bold text-gray-800 mb-1">
+                      ปริมาณรวมทั้งหมด
+                    </div>
+                    <div className="flex items-center">
+                      <ThaiVirtualKeyboardInput
+                        value={currentTotalVolume}
+                        onChange={(value) =>
+                          setUpdateFormData((prev) => ({
+                            ...prev,
+                            total_volume: value,
+                          }))
+                        }
+                        type="number"
+                        readOnly={!isEditingTotalVolume}
+                        className="border border-gray-300 rounded-full p-2 text-gray-600 focus:outline-none w-full mr-3"
+                      />
+                      <button
+                        type="button"
+                        className={`px-4 py-2 rounded-full font-medium ${
+                          isEditingNetVolume
+                            ? "bg-[#C68A47] text-white"
+                            : "border border-[#C68A47] text-[#C68A47]"
+                        } hover:bg-[#C68A47] hover:text-white`}
+                        onClick={() =>
+                          setIsEditingTotalVolume(!isEditingTotalVolume)
+                        }
+                      >
+                        {isEditingTotalVolume ? "บันทึก" : "แก้ไข"}
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Stock Quantity */}
                   <div>
                     <div className="font-bold text-gray-800 mb-1">
@@ -588,31 +642,17 @@ const Stock = () => {
                       <button
                         type="button"
                         className="px-3 py-3 bg-green-500 text-white rounded-full flex items-center justify-center hover:bg-green-600"
-                        onClick={() =>
-                          setUpdateFormData((prev) => ({
-                            ...prev,
-                            quantity_in_stock:
-                              parseInt(prev.quantity_in_stock || 0) + 1,
-                          }))
-                        }
+                        onClick={handleIncrease}
                       >
                         <FaPlus />
                       </button>
                       <span className="px-6 font-bold text-gray-800">
-                        {updateFormData.quantity_in_stock || 0}
+                        {currentStockQuantity}
                       </span>
                       <button
                         type="button"
                         className="px-3 py-3 bg-[#C94C4C] text-white rounded-full flex items-center justify-center hover:bg-red-600"
-                        onClick={() =>
-                          setUpdateFormData((prev) => ({
-                            ...prev,
-                            quantity_in_stock: Math.max(
-                              0,
-                              parseInt(prev.quantity_in_stock || 0) - 1
-                            ),
-                          }))
-                        }
+                        onClick={handleDecrease}
                       >
                         <FaMinus />
                       </button>
@@ -624,13 +664,13 @@ const Stock = () => {
               {/* Buttons */}
               <div className="flex justify-between mt-6">
                 <button
-                  className="px-6 py-3 w-full border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
+                  className="px-6 py-3 border rounded-full text-[#DD9F52] border-[#DD9F52] hover:bg-[#f5e9dc] transition-colors font-bold"
                   onClick={closeModal}
                 >
                   ย้อนกลับ
                 </button>
                 <button
-                  className="px-6 py-3 w-full  bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
+                  className="px-6 py-3 bg-[#DD9F52] text-white rounded-full hover:bg-[#C68A47] transition-colors font-bold"
                   onClick={handleUpdateSubmit}
                 >
                   บันทึก

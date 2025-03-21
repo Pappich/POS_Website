@@ -234,7 +234,8 @@ const EditOwnerProduct = () => {
               />
             </label>
           </div>
-          <div className="grid grid-cols-2 gap-20">
+
+          <div className="grid grid-cols-2 gap-2">
             {/* ชื่อสินค้า */}
             <div className="w-full">
               <div className="py-2">
@@ -246,47 +247,6 @@ const EditOwnerProduct = () => {
                   setProductData({ ...productData, ingredient_name: value })
                 }
                 placeholder="ชื่อสินค้า"
-                className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-              />
-
-              <div className="grid grid-cols-7 gap-4">
-                {/* จำนวน */}
-                <div className="col-span-7">
-                  <div className="py-2">
-                    <span className="font-bold">จำนวน</span>
-                  </div>
-                  <ThaiVirtualKeyboardInput
-                    value={updateFormData.quantity_in_stock}
-                    onChange={(value) =>
-                      setUpdateFormData({
-                        ...updateFormData,
-                        quantity_in_stock: value,
-                      })
-                    }
-                    placeholder="จำนวนคงเหลือ"
-                    className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  />
-                </div>
-              </div>
-
-              {/* Expiration Date */}
-              <div className="py-2">
-                <span className="font-bold">วันหมดอายุ</span>
-              </div>
-              <DatePicker
-                selected={
-                  updateFormData.expiration_date
-                    ? new Date(updateFormData.expiration_date)
-                    : null
-                }
-                onChange={(date) =>
-                  setUpdateFormData({
-                    ...updateFormData,
-                    expiration_date: date,
-                  })
-                }
-                dateFormat="dd/MM/yyyy"
-                placeholderText="เลือกวันหมดอายุ"
                 className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
               />
             </div>
@@ -327,61 +287,42 @@ const EditOwnerProduct = () => {
                   </div>
                 )}
               </div>
+            </div>
 
-              <div className="grid grid-cols-7 gap-4">
-                {/* ปริมาตรสุทธิต่อหน่วย */}
-                <div className="col-span-4">
-                  <div className="py-2">
-                    <span className="font-bold">ปริมาตรสุทธิต่อหน่วย</span>
-                  </div>
-                  <ThaiVirtualKeyboardInput
-                    value={updateFormData.net_volume}
-                    onChange={(value) =>
-                      setUpdateFormData({
-                        ...updateFormData,
-                        net_volume: value,
-                      })
-                    }
-                    placeholder="กรอกปริมาตรสุทธิ"
-                    className="w-full border border-[#DD9F52] bg-[#F5F5F5] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400"
-                  />
-                </div>
-                {/* หน่วย */}
-                <div className="col-span-3">
-                  <div className="py-2">
-                    <span className="font-bold">หน่วย</span>
-                  </div>
-                  <div className="relative w-full">
-                    <div
-                      onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                      className={`border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
-                        isUnitDropdownOpen ? "ring-2 ring-brown-400" : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        {unitOption
-                          ? unitOptions.find((opt) => opt.value === unitOption)
-                              ?.label
-                          : "เลือกหน่วย"}
-                        <IoIosArrowDown size={16} />
-                      </div>
-                    </div>
-
-                    {isUnitDropdownOpen && (
-                      <div className="absolute mt-2 w-full bg-[#F5F5F5] border border-[#DD9F52] rounded-lg shadow-lg z-10">
-                        {unitOptions.map((option, index) => (
-                          <div
-                            key={index}
-                            onClick={() => handleSelectUnit(option)}
-                            className="p-3 hover:bg-[#F3E5D8] cursor-pointer text-gray-600"
-                          >
-                            {option.label}{" "}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+            {/* unit */}
+            <div className="col-span-3">
+              <div className="py-2">
+                <span className="font-bold">หน่วย</span>
+              </div>
+              <div className="relative w-full">
+                <div
+                  onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
+                  className={`border border-[#DD9F52] rounded-full p-3 text-gray-600 focus:outline-none focus:ring-2 focus:ring-brown-400 cursor-pointer ${
+                    isUnitDropdownOpen ? "ring-2 ring-brown-400" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    {unitOption
+                      ? unitOptions.find((opt) => opt.value === unitOption)
+                          ?.label
+                      : "เลือกหน่วย"}
+                    <IoIosArrowDown size={16} />
                   </div>
                 </div>
+
+                {isUnitDropdownOpen && (
+                  <div className="absolute mt-2 w-full bg-[#F5F5F5] border border-[#DD9F52] rounded-lg shadow-lg z-10">
+                    {unitOptions.map((option, index) => (
+                      <div
+                        key={index}
+                        onClick={() => handleSelectUnit(option)}
+                        className="p-3 hover:bg-[#F3E5D8] cursor-pointer text-gray-600"
+                      >
+                        {option.label}{" "}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
